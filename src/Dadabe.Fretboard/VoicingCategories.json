@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1",
+  "comment": "Default voicing category templates for Dadabe v0.1 (per D20). Categories are evaluated in priority order; the first matching template wins. The final 'spread' category is a fallthrough catch-all so every emitted voicing carries a non-null category. User-extensible via filesystem overlay (per E9).",
+
+  "priority": ["triad", "shell", "drop-2", "drop-3", "spread"],
+
+  "functionClasses": {
+    "comment": "Named function-equivalence classes used inside templates. A pipe-delimited form (e.g. '3|b3') in a pattern is shorthand for one of these classes; classes here let users name new ones without re-typing the alternatives.",
+    "any-third":   ["3", "b3"],
+    "any-fifth":   ["5", "b5", "#5"],
+    "any-seventh": ["7", "b7", "bb7"],
+    "any-ninth":   ["9", "b9", "#9"],
+    "any-eleventh":["11", "#11"],
+    "any-thirteenth":["13", "b13"]
+  },
+
+  "categories": [
+    {
+      "name": "triad",
+      "description": "3-note chord-tone voicing of a triad — only root/third/fifth (and altered/suspended variants).",
+      "matches": [
+        {
+          "noteCount": 3,
+          "allFunctionsIn": ["1", "3", "b3", "5", "b5", "#5", "4", "2"]
+        }
+      ]
+    },
+
+    {
+      "name": "shell",
+      "description": "Rootless or near-rootless 2-3 note voicing emphasizing 3 and 7; no 5, no extensions.",
+      "matches": [
+        {
+          "noteCountRange": [2, 3],
+          "requireFunctions": ["3|b3", "7|b7|bb7"],
+          "forbidFunctions": ["5", "b5", "#5", "9", "b9", "#9", "11", "#11", "13", "b13"]
+        }
+      ]
+    },
+
+    {
+      "name": "drop-2",
+      "description": "Close-voiced 4-note 7th chord with the 2nd voice from top dropped an octave. One template per inversion (bass = 5, 7, 1, 3 of the close-voiced source).",
+      "matches": [
+        { "noteCount": 4, "functionSequenceLowToHigh": ["5|b5|#5", "1",       "3|b3",     "7|b7|bb7"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["7|b7|bb7", "3|b3",   "5|b5|#5",  "1"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["1",        "5|b5|#5","7|b7|bb7", "3|b3"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["3|b3",     "7|b7|bb7","1",       "5|b5|#5"] }
+      ]
+    },
+
+    {
+      "name": "drop-3",
+      "description": "Close-voiced 4-note 7th chord with the 3rd voice from top dropped an octave. One template per inversion (bass = 3, 5, 7, 1 of the close-voiced source).",
+      "matches": [
+        { "noteCount": 4, "functionSequenceLowToHigh": ["3|b3",    "1",        "5|b5|#5",  "7|b7|bb7"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["5|b5|#5", "3|b3",     "7|b7|bb7", "1"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["7|b7|bb7","5|b5|#5",  "1",        "3|b3"] },
+        { "noteCount": 4, "functionSequenceLowToHigh": ["1",       "7|b7|bb7", "3|b3",     "5|b5|#5"] }
+      ]
+    },
+
+    {
+      "name": "spread",
+      "description": "Fallthrough catch-all: any voicing not matching the more specific categories above. Typically applies to 4+ note voicings with wide intervals, and to 3-note voicings that aren't pure triads.",
+      "matches": [
+        { "matchAny": true }
+      ]
+    }
+  ],
+
+  "ruleSchema": {
+    "comment": "Rule types the classifier must support. Each match entry is an object combining one or more of these rules; ALL rules in an entry must hold for the entry to match.",
+    "noteCount": "integer — sounded (non-muted) string count must equal this exactly",
+    "noteCountRange": "[min, max] — sounded string count must fall in this inclusive range",
+    "allFunctionsIn": "[function*] — every sounded note's function must be a member of this set",
+    "requireFunctions": "[fn-class*] — at least one sounded note must satisfy each class (a class is '<function>' or 'a|b|c' or a named class name)",
+    "forbidFunctions": "[fn-class*] — no sounded note may satisfy any of these classes",
+    "functionSequenceLowToHigh": "[fn-class*] — sounded notes, in ascending pitch order, must satisfy each class at the corresponding index; sequence length must equal sounded-string count",
+    "adjacentIntervalMinSemitones": "integer — every adjacent interval (low to high) between sounded notes must be ≥ this value",
+    "matchAny": "boolean true — fallthrough; always matches"
+  }
+}

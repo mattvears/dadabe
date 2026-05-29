@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/chord.schema.json",
+  "title": "Dadabe chord payload",
+  "type": "object",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "command":       { "const": "chord" },
+    "input":         { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } },
+    "data": {
+      "type": "object",
+      "required": ["symbol", "root", "quality", "extensions", "alterations", "pitchClasses", "required"],
+      "additionalProperties": false,
+      "properties": {
+        "symbol":      { "type": "string" },
+        "root":        { "type": "string" },
+        "quality":     { "type": "string" },
+        "extensions":  { "type": "array", "items": { "type": "string" } },
+        "alterations": { "type": "array", "items": { "type": "string" } },
+        "pitchClasses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "function"],
+            "additionalProperties": false,
+            "properties": {
+              "name":     { "type": "string" },
+              "function": { "type": "string" }
+            }
+          }
+        },
+        "required":    { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <EmbeddedResource Include="Tunings.json" />
+    <EmbeddedResource Include="Chord\ChordGrammar.json" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "Cmaj",
+    "Dadabe",
+    "DADABE",
+    "Dsus",
+    "Eadd",
+    "fretboard",
+    "Fretboard",
+    "Pavement",
+    "softmax",
+    "Softmax",
+    "Ted",
+    "Tritone",
+    "unfretted",
+    "unparseable",
+    "voicing",
+    "voicings"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "bin/**",
+    "obj/**"
+  ]
+}

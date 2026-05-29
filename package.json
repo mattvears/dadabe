@@ -1,0 +1,14 @@
+{
+  "name": "dadabe",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "markdownlint-cli": "^0.33.0",
+    "cspell": "^6.32.0"
+  },
+  "scripts": {
+    "lint:md": "markdownlint \"**/*.md\" -c .markdownlint.json",
+    "spellcheck": "cspell \"**/*.md\"",
+    "lint:docs": "npm run lint:md && npm run spellcheck"
+  }
+}

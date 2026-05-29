@@ -1,0 +1,265 @@
+{
+  "schemaVersion": "1",
+  "comment": "Default chord grammar for Dadabe v0.1 (per D19). Forms are matched longest-token-first immediately after the root; modifiers are then matched longest-first and may appear in any order. Each form's 'required' list, augmented by any matched modifiers' 'required' entries, gives the minimum chord-tone set a voicing must contain (per D4). User-extensible via filesystem overlay (per E9).",
+
+  "forms": [
+    { "tokens": ["m(maj7)", "mMaj7", "mM7"], "displayName": "mMaj7",
+      "tones": [
+        { "function": "1",  "semitones": 0 },
+        { "function": "b3", "semitones": 3 },
+        { "function": "5",  "semitones": 7 },
+        { "function": "7",  "semitones": 11 }
+      ],
+      "required": ["b3", "7"] },
+
+    { "tokens": ["maj13", "M13"], "displayName": "maj13",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "7",  "semitones": 11 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 },
+        { "function": "13", "semitones": 21 }
+      ],
+      "required": ["3", "7", "13"] },
+
+    { "tokens": ["maj11", "M11"], "displayName": "maj11",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "7",  "semitones": 11 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 }
+      ],
+      "required": ["3", "7", "11"] },
+
+    { "tokens": ["maj9", "M9"], "displayName": "maj9",
+      "tones": [
+        { "function": "1", "semitones": 0  },
+        { "function": "3", "semitones": 4  },
+        { "function": "5", "semitones": 7  },
+        { "function": "7", "semitones": 11 },
+        { "function": "9", "semitones": 14 }
+      ],
+      "required": ["3", "7", "9"] },
+
+    { "tokens": ["maj7", "M7"], "displayName": "maj7",
+      "tones": [
+        { "function": "1", "semitones": 0  },
+        { "function": "3", "semitones": 4  },
+        { "function": "5", "semitones": 7  },
+        { "function": "7", "semitones": 11 }
+      ],
+      "required": ["3", "7"] },
+
+    { "tokens": ["m13", "min13"], "displayName": "m13",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "b3", "semitones": 3  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 },
+        { "function": "13", "semitones": 21 }
+      ],
+      "required": ["b3", "b7", "13"] },
+
+    { "tokens": ["m11", "min11"], "displayName": "m11",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "b3", "semitones": 3  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 }
+      ],
+      "required": ["b3", "b7", "11"] },
+
+    { "tokens": ["m9", "min9"], "displayName": "m9",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "b3", "semitones": 3  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 }
+      ],
+      "required": ["b3", "b7", "9"] },
+
+    { "tokens": ["m7b5", "ø7", "ø"], "displayName": "m7b5",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "b3", "semitones": 3  },
+        { "function": "b5", "semitones": 6  },
+        { "function": "b7", "semitones": 10 }
+      ],
+      "required": ["b3", "b5", "b7"] },
+
+    { "tokens": ["dim7", "°7", "o7"], "displayName": "dim7",
+      "tones": [
+        { "function": "1",   "semitones": 0 },
+        { "function": "b3",  "semitones": 3 },
+        { "function": "b5",  "semitones": 6 },
+        { "function": "bb7", "semitones": 9 }
+      ],
+      "required": ["b3", "b5", "bb7"] },
+
+    { "tokens": ["m7", "min7"], "displayName": "m7",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "b3", "semitones": 3  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 }
+      ],
+      "required": ["b3", "b7"] },
+
+    { "tokens": ["m6", "min6"], "displayName": "m6",
+      "tones": [
+        { "function": "1",  "semitones": 0 },
+        { "function": "b3", "semitones": 3 },
+        { "function": "5",  "semitones": 7 },
+        { "function": "6",  "semitones": 9 }
+      ],
+      "required": ["b3", "6"] },
+
+    { "tokens": ["13"], "displayName": "13",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 },
+        { "function": "13", "semitones": 21 }
+      ],
+      "required": ["3", "b7", "13"] },
+
+    { "tokens": ["11"], "displayName": "11",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 },
+        { "function": "11", "semitones": 17 }
+      ],
+      "required": ["3", "b7", "11"] },
+
+    { "tokens": ["9"], "displayName": "9",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 },
+        { "function": "9",  "semitones": 14 }
+      ],
+      "required": ["3", "b7", "9"] },
+
+    { "tokens": ["7"], "displayName": "7",
+      "tones": [
+        { "function": "1",  "semitones": 0  },
+        { "function": "3",  "semitones": 4  },
+        { "function": "5",  "semitones": 7  },
+        { "function": "b7", "semitones": 10 }
+      ],
+      "required": ["3", "b7"] },
+
+    { "tokens": ["6"], "displayName": "6",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "3", "semitones": 4 },
+        { "function": "5", "semitones": 7 },
+        { "function": "6", "semitones": 9 }
+      ],
+      "required": ["3", "6"] },
+
+    { "tokens": ["sus4", "sus"], "displayName": "sus4",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "4", "semitones": 5 },
+        { "function": "5", "semitones": 7 }
+      ],
+      "required": ["4", "5"] },
+
+    { "tokens": ["sus2"], "displayName": "sus2",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "2", "semitones": 2 },
+        { "function": "5", "semitones": 7 }
+      ],
+      "required": ["2", "5"] },
+
+    { "tokens": ["dim", "°", "o"], "displayName": "dim",
+      "tones": [
+        { "function": "1",  "semitones": 0 },
+        { "function": "b3", "semitones": 3 },
+        { "function": "b5", "semitones": 6 }
+      ],
+      "required": ["b3", "b5"] },
+
+    { "tokens": ["aug", "+"], "displayName": "aug",
+      "tones": [
+        { "function": "1",  "semitones": 0 },
+        { "function": "3",  "semitones": 4 },
+        { "function": "#5", "semitones": 8 }
+      ],
+      "required": ["3", "#5"] },
+
+    { "tokens": ["maj", "M"], "displayName": "maj",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "3", "semitones": 4 },
+        { "function": "5", "semitones": 7 }
+      ],
+      "required": ["3", "5"] },
+
+    { "tokens": ["m", "min", "-"], "displayName": "m",
+      "tones": [
+        { "function": "1",  "semitones": 0 },
+        { "function": "b3", "semitones": 3 },
+        { "function": "5",  "semitones": 7 }
+      ],
+      "required": ["b3", "5"] },
+
+    { "tokens": [""], "displayName": "",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "3", "semitones": 4 },
+        { "function": "5", "semitones": 7 }
+      ],
+      "required": ["3", "5"] }
+  ],
+
+  "modifiers": [
+    { "tokens": ["add9"],  "kind": "addition",
+      "addTones": [{ "function": "9",  "semitones": 14 }], "required": ["9"] },
+    { "tokens": ["add11"], "kind": "addition",
+      "addTones": [{ "function": "11", "semitones": 17 }], "required": ["11"] },
+    { "tokens": ["add13"], "kind": "addition",
+      "addTones": [{ "function": "13", "semitones": 21 }], "required": ["13"] },
+
+    { "tokens": ["b5"],  "kind": "alteration", "displaces": "5",
+      "addTones": [{ "function": "b5",  "semitones": 6  }], "required": ["b5"] },
+    { "tokens": ["#5"],  "kind": "alteration", "displaces": "5",
+      "addTones": [{ "function": "#5",  "semitones": 8  }], "required": ["#5"] },
+    { "tokens": ["b9"],  "kind": "alteration", "displaces": "9",
+      "addTones": [{ "function": "b9",  "semitones": 13 }], "required": ["b9"] },
+    { "tokens": ["#9"],  "kind": "alteration", "displaces": "9",
+      "addTones": [{ "function": "#9",  "semitones": 15 }], "required": ["#9"] },
+    { "tokens": ["#11"], "kind": "alteration", "displaces": "11",
+      "addTones": [{ "function": "#11", "semitones": 18 }], "required": ["#11"] },
+    { "tokens": ["b13"], "kind": "alteration", "displaces": "13",
+      "addTones": [{ "function": "b13", "semitones": 20 }], "required": ["b13"] }
+  ],
+
+  "parseRules": {
+    "rootRegex": "^([A-G])(bb|##|b|#)?",
+    "tokensCaseSensitive": true,
+    "longestTokenFirst": true,
+    "modifierOrder": "any",
+    "modifiersAllowedAfterEmptyForm": true,
+    "rejectUnparsedTail": true,
+    "rejectSlash": true
+  }
+}

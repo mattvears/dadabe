@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/voicings.schema.json",
+  "title": "Dadabe voicings payload",
+  "type": "object",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "command":       { "const": "voicings" },
+    "input":         { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } },
+    "data": {
+      "type": "object",
+      "required": ["chord", "tuning", "voicings", "nextChords"],
+      "additionalProperties": false,
+      "properties": {
+        "nextChords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["symbol", "probability"],
+            "additionalProperties": false,
+            "properties": {
+              "symbol":      { "type": "string" },
+              "probability": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "chord": {
+          "type": "object",
+          "required": ["symbol", "root", "quality", "pitchClasses"],
+          "additionalProperties": false,
+          "properties": {
+            "symbol":  { "type": "string" },
+            "root":    { "type": "string" },
+            "quality": { "type": "string" },
+            "pitchClasses": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "function"],
+                "additionalProperties": false,
+                "properties": {
+                  "name":     { "type": "string" },
+                  "function": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "tuning": {
+          "type": "object",
+          "required": ["name", "strings"],
+          "additionalProperties": false,
+          "properties": {
+            "name":    { "type": "string" },
+            "strings": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "voicings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/voicing" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "voicing": {
+      "type": "object",
+      "required": [
+        "id", "structure", "functions", "positions", "span", "lowestFret", "highestFret",
+        "barres", "openStrings", "mutedStrings", "comfort", "fingering"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id":        { "type": "string", "pattern": "^[a-z][a-z0-9-]*:\\d+:[0-9a-f]{32}$" },
+        "structure": { "type": "string", "minLength": 1 },
+        "functions": { "type": "array", "items": { "type": "string" } },
+        "positions": { "type": "array", "items": { "$ref": "#/$defs/position" } },
+        "span":         { "type": "integer", "minimum": 0 },
+        "lowestFret":   { "type": "integer", "minimum": 0 },
+        "highestFret":  { "type": "integer", "minimum": 0 },
+        "barres":       { "type": "array", "items": { "$ref": "#/$defs/barre" } },
+        "bassNote":     { "type": "string" },
+        "topNote":      { "type": "string" },
+        "openStrings":  { "type": "integer", "minimum": 0 },
+        "mutedStrings": { "type": "integer", "minimum": 0 },
+        "comfort":      { "type": "number", "minimum": 0, "maximum": 1 },
+        "fingering":    { "$ref": "#/$defs/fingering" }
+      }
+    },
+    "position": {
+      "type": "object",
+      "required": ["string"],
+      "additionalProperties": false,
+      "properties": {
+        "string":   { "type": "integer", "minimum": 0 },
+        "fret":     { "type": ["integer", "null"], "minimum": 0 },
+        "note":     { "type": "string" },
+        "function": { "type": "string" },
+        "muted":    { "type": "boolean" },
+        "voice":    { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "barre": {
+      "type": "object",
+      "required": ["finger", "fret", "lowString", "highString"],
+      "additionalProperties": false,
+      "properties": {
+        "finger":     { "type": "integer", "minimum": 1, "maximum": 5 },
+        "fret":       { "type": "integer", "minimum": 1 },
+        "lowString":  { "type": "integer", "minimum": 0 },
+        "highString": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "fingering": {
+      "type": "object",
+      "required": ["assignments", "barres", "mutes"],
+      "additionalProperties": false,
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["string", "fret"],
+            "additionalProperties": false,
+            "properties": {
+              "string": { "type": "integer", "minimum": 0 },
+              "fret":   { "type": "integer", "minimum": 0 },
+              "finger": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 }
+            }
+          }
+        },
+        "barres": { "type": "array", "items": { "$ref": "#/$defs/barre" } },
+        "mutes":  {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["string", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "string": { "type": "integer", "minimum": 0 },
+              "source": {
+                "type": "string",
+                "enum": ["adjacent-underside", "barre-extended", "thumb-wrap", "outer-hand", "unfretted"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

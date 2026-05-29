@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/envelope.schema.json",
+  "title": "Dadabe envelope",
+  "description": "Shared envelope around every Dadabe subcommand's payload (design.md §5).",
+  "type": "object",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "schemaVersion": { "type": "string", "pattern": "^\\d+$" },
+    "command":       { "type": "string", "enum": ["voicings", "tuning", "chord"] },
+    "input":         { "$ref": "#/$defs/input" },
+    "data":          { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "chord":     { "type": "string" },
+        "tuning":    { "type": "string" },
+        "handModel": { "$ref": "#/$defs/handModel" }
+      }
+    },
+    "handModel": {
+      "type": "object",
+      "required": ["name", "stretch", "thumb", "maxBarres"],
+      "additionalProperties": false,
+      "properties": {
+        "name":      { "type": "string" },
+        "stretch":   {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 },
+          "patternProperties": { "^\\d-\\d$": { "type": "integer", "minimum": 0 } }
+        },
+        "thumb": {
+          "type": "object",
+          "required": ["allowed", "maxFret", "string"],
+          "additionalProperties": false,
+          "properties": {
+            "allowed": { "type": "boolean" },
+            "maxFret": { "type": "integer", "minimum": 0 },
+            "string":  { "type": "integer", "minimum": 0 }
+          }
+        },
+        "maxBarres": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

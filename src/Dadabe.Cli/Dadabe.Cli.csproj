@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>dadabe</AssemblyName>
+    <RootNamespace>Dadabe.Cli</RootNamespace>
+    <!-- DTOs intentionally use the domain term "String" for fretboard strings. -->
+    <NoWarn>$(NoWarn);CA1720</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Dadabe.Cli.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dadabe.Core\Dadabe.Core.csproj" />
+    <ProjectReference Include="..\Dadabe.Fretboard\Dadabe.Fretboard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="3.0.0-preview.4.26230.115" />
+  </ItemGroup>
+
+</Project>

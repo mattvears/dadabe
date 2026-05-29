@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/tuning.schema.json",
+  "title": "Dadabe tuning payload",
+  "type": "object",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "command":       { "const": "tuning" },
+    "input":         { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } },
+    "data": {
+      "type": "object",
+      "required": ["name", "strings"],
+      "additionalProperties": false,
+      "properties": {
+        "name":    { "type": "string" },
+        "strings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

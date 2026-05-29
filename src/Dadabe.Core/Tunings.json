@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1",
+  "comment": "Default named-tuning catalog for Dadabe v0.1 (per D3). User-extensible via filesystem overlay (per E9). String pitches are scientific pitch notation, low to high.",
+  "tunings": [
+    { "name": "DADABE",   "strings": ["D2", "A2", "D3", "A3",  "B3", "E4"] },
+    { "name": "STANDARD", "strings": ["E2", "A2", "D3", "G3",  "B3", "E4"] },
+    { "name": "DROP_D",   "strings": ["D2", "A2", "D3", "G3",  "B3", "E4"] },
+    { "name": "DADGAD",   "strings": ["D2", "A2", "D3", "G3",  "A3", "D4"] },
+    { "name": "OPEN_G",   "strings": ["D2", "G2", "D3", "G3",  "B3", "D4"] },
+    { "name": "OPEN_D",   "strings": ["D2", "A2", "D3", "F#3", "A3", "D4"] }
+  ]
+}
