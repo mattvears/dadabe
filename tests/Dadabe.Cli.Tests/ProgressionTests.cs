@@ -9,7 +9,8 @@ namespace Dadabe.Cli.Tests
         [Fact]
         public void ProgressionDto_SerializesAndDeserializes()
         {
-            var p = new ProgressionDto(new[] { "Cmaj7", "Am7" }, 120);
+            var chords = new[] { "Cmaj7", "Am7" };
+            var p = new ProgressionDto(chords, 120);
             var json = JsonSerializer.Serialize(p);
             var round = JsonSerializer.Deserialize<ProgressionDto>(json);
             Assert.NotNull(round);
