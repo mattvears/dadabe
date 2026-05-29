@@ -26,7 +26,7 @@ Checklist
 - [x] Prepare release notes and changelog entry.
 - [x] Draft contracts & scaffolding notes: docs/v0.3/contracts.md (placeholders for progression, transformation, rendering, and parser extension points).
 - [x] Document prediction requirements (context, filters, response schema) in docs/v0.3/prediction-requirements.md (design-only for v0.3).
-- [ ] Tag release v0.3 when ready.
+- [x] Tag release v0.3 when ready.
 
 Files/places to inspect
 
