@@ -9,9 +9,16 @@ namespace Dadabe.Cli.Tests
         [Fact]
         public void ScaleCadenceMode_SerializeRoundTrip()
         {
-            var scale = new ScaleDto("Major", new[] { "C", "D", "E", "F", "G", "A", "B" }, new[] {0,2,4,5,7,9,11}, null, "Ionian");
-            var cadence = new CadenceDto("authentic", new[] { "V", "I" }, "V->I", "Standard authentic cadence");
-            var mode = new ModeDto("Dorian", "Major", 1, new[] {0,2,3,5,7,9,10}, new[] {"D","E","F","G","A","B","C"}, "Dorian mode");
+            var scaleNotes = new[] { "C", "D", "E", "F", "G", "A", "B" };
+            var scaleIntervals = new[] { 0, 2, 4, 5, 7, 9, 11 };
+            var scale = new ScaleDto("Major", scaleNotes, scaleIntervals, null, "Ionian");
+
+            var cadenceProgression = new[] { "V", "I" };
+            var cadence = new CadenceDto("authentic", cadenceProgression, "V->I", "Standard authentic cadence");
+
+            var modeIntervals = new[] { 0, 2, 3, 5, 7, 9, 10 };
+            var modeNotes = new[] { "D", "E", "F", "G", "A", "B", "C" };
+            var mode = new ModeDto("Dorian", "Major", 1, modeIntervals, modeNotes, "Dorian mode");
 
             var sjson = JsonSerializer.Serialize(scale);
             var cjson = JsonSerializer.Serialize(cadence);
