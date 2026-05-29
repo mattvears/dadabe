@@ -67,6 +67,7 @@ Short context: The full todo was archived to keep docs/todo.md concise. See the 
 - [ ] Add schema-validation tests (JsonSchema.Net) asserting request and response shapes and current output compatibility.
 - [ ] Add example request/response JSON under `docs/v0.3/examples/` for prediction, scale, mode, and cadence.
 - [ ] Add a CI job step to run schema validation against examples on PRs.
+- [ ] Document prediction requirements: docs/v0.3/prediction-requirements.md
 
 (These are v0.3 scaffolding tasks; keep future feature work in docs/future.md.)
 
