@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Progression",
+  "type": "object",
+  "description": "Placeholder schema for chord progressions. Add fields conservatively.",
+  "properties": {
+    "chords": { "type": "array", "items": { "type": "string" }, "description": "List of chord symbols in progression" },
+    "tempo": { "type": "integer", "minimum": 1 }
+  },
+  "required": [ "chords" ],
+  "additionalProperties": true
+}
