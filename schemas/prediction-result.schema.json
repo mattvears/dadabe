@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NextChordPredictionResult",
+  "type": "object",
+  "description": "Response shape for next-chord prediction. Score is normalised to 0..1 (higher = more likely).",
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chord":   { "type": "string", "description": "Predicted chord symbol." },
+          "score":   { "type": "number", "minimum": 0, "maximum": 1, "description": "Confidence score in [0,1]." },
+          "reasons": { "type": "array", "items": { "type": "string" }, "description": "Human-readable scoring rationale." }
+        },
+        "required": ["chord", "score"],
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "contextUsed":     { "$ref": "./progression.schema.json" },
+        "filtersApplied":  { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["results"],
+  "additionalProperties": false
+}

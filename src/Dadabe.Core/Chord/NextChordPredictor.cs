@@ -150,33 +150,33 @@ public static class NextChordPredictor
 
     private static ChordQualityFamily ClassifyQuality(string quality) => quality switch
     {
-        "maj"  or "6"                           => ChordQualityFamily.Major,
-        "maj7" or "maj9" or "maj11" or "maj13"  => ChordQualityFamily.Maj7,
-        "m"    or "m6"                          => ChordQualityFamily.Minor,
-        "m7"   or "m9"   or "m11"  or "m13"
-               or "mMaj7"                       => ChordQualityFamily.M7,
-        "7"    or "9"    or "11"   or "13"      => ChordQualityFamily.Dominant,
-        "dim"  or "dim7" or "m7b5"              => ChordQualityFamily.Diminished,
-        "aug"                                   => ChordQualityFamily.Augmented,
-        "sus2" or "sus4"                        => ChordQualityFamily.Sus,
-        _                                       => ChordQualityFamily.Major,
+        "maj" or "6" => ChordQualityFamily.Major,
+        "maj7" or "maj9" or "maj11" or "maj13" => ChordQualityFamily.Maj7,
+        "m" or "m6" => ChordQualityFamily.Minor,
+        "m7" or "m9" or "m11" or "m13"
+               or "mMaj7" => ChordQualityFamily.M7,
+        "7" or "9" or "11" or "13" => ChordQualityFamily.Dominant,
+        "dim" or "dim7" or "m7b5" => ChordQualityFamily.Diminished,
+        "aug" => ChordQualityFamily.Augmented,
+        "sus2" or "sus4" => ChordQualityFamily.Sus,
+        _ => ChordQualityFamily.Major,
     };
 
     private static string PcName(int pc) => pc switch
     {
-        0  => "C",
-        1  => "Db",
-        2  => "D",
-        3  => "Eb",
-        4  => "E",
-        5  => "F",
-        6  => "Gb",
-        7  => "G",
-        8  => "Ab",
-        9  => "A",
+        0 => "C",
+        1 => "Db",
+        2 => "D",
+        3 => "Eb",
+        4 => "E",
+        5 => "F",
+        6 => "Gb",
+        7 => "G",
+        8 => "Ab",
+        9 => "A",
         10 => "Bb",
         11 => "B",
-        _  => throw new ArgumentOutOfRangeException(nameof(pc)),
+        _ => throw new ArgumentOutOfRangeException(nameof(pc)),
     };
 }
 

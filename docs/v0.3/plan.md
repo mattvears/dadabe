@@ -18,14 +18,14 @@ Non-goals
 
 Checklist
 
-- [ ] Update README and top-level docs with any UX changes.
-- [ ] Polish CLI help and examples (src/Dadabe.Cli).
-- [ ] Run dotnet format and fix violations; update CI format check if necessary.
-- [ ] Expand unit tests for VoicingSearch and FingeringSolver; ensure golden tests are stable.
-- [ ] Verify schema compatibility and avoid JSON contract breaks; update schemas only if necessary and document schemaVersion changes.
-- [ ] Prepare release notes and changelog entry.
-- [ ] Draft contracts & scaffolding notes: docs/v0.3/contracts.md (placeholders for progression, transformation, rendering, and parser extension points).
-- [ ] Document prediction requirements (context, filters, response schema) in docs/v0.3/prediction-requirements.md (design-only for v0.3).
+- [x] Update README and top-level docs with any UX changes.
+- [x] Polish CLI help and examples (src/Dadabe.Cli).
+- [x] Run dotnet format and fix violations; update CI format check if necessary.
+- [x] Expand unit tests for VoicingSearch and FingeringSolver; ensure golden tests are stable.
+- [x] Verify schema compatibility and avoid JSON contract breaks; update schemas only if necessary and document schemaVersion changes.
+- [x] Prepare release notes and changelog entry.
+- [x] Draft contracts & scaffolding notes: docs/v0.3/contracts.md (placeholders for progression, transformation, rendering, and parser extension points).
+- [x] Document prediction requirements (context, filters, response schema) in docs/v0.3/prediction-requirements.md (design-only for v0.3).
 - [ ] Tag release v0.3 when ready.
 
 Files/places to inspect

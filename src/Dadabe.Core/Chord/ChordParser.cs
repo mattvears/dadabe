@@ -55,11 +55,17 @@ public sealed class ChordParser
             return false;
         }
 
+        // TODO (future): support slash chords — parse "C/E" as root=C, bass=E.
+        // Until then the grammar's rejectSlash flag keeps them rejected (D2).
         if (_grammar.ParseRules.RejectSlash && symbol.Contains('/', StringComparison.Ordinal))
         {
             error = "Slash chords are not supported in v0.1 (D2).";
             return false;
         }
+
+        // TODO (future): support polychords — parse "C|G" or "C over G" notations.
+        // Extension point: detect the polychord delimiter here and route to a
+        // dedicated PolychordParser before falling through to the standard path.
 
         var rootMatch = _rootRegex.Match(symbol);
         if (!rootMatch.Success || rootMatch.Index != 0)

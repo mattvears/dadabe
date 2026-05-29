@@ -77,6 +77,21 @@ public class ChordParserTests
         act.Should().Throw<FormatException>();
     }
 
+    [Theory(Skip = "Polychord support is not yet implemented (future extension point in ChordParser)")]
+    [InlineData("C|G", "C", "G")]
+    [InlineData("Dm|F#", "Dm", "F#")]
+    public void Polychords_parse_to_upper_and_lower_components(string input, string upper, string lower)
+    {
+        // When polychord parsing is implemented, the symbol "C|G" should yield
+        // an upper chord of C and a lower chord of G.  This test documents the
+        // desired shape; update and unskip when the feature lands.
+        var upper_ = Parser.Parse(upper);
+        var lower_ = Parser.Parse(lower);
+        upper_.Root.Letter.ToString().Should().Be(upper.TrimEnd('m')[0].ToString());
+        lower_.Root.Letter.ToString().Should().Be(lower.TrimEnd('m')[0].ToString());
+        _ = input;
+    }
+
     [Theory]
     [InlineData("Cxyz")]
     [InlineData("Cmaj7xyz")]

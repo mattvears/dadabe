@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VoicingCategoryOverlay",
+  "type": "object",
+  "description": "Schema for a VoicingCategories.json overlay file. Third-parties and per-project configs follow this shape. Fields are merged onto the embedded catalog: categories with the same name replace the built-in entry; new categories append before the matchAny fallthrough.",
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "priority": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered list of category names. Fully replaces the embedded priority list when provided."
+    },
+    "functionClasses": {
+      "type": "object",
+      "description": "Named function-class aliases. Each value is an array of chord-tone function strings (e.g. [\"3\",\"b3\"]).",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name":        { "type": "string" },
+          "description": { "type": "string" },
+          "matches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "noteCount":                  { "type": "integer" },
+                "noteCountRange":             { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+                "allFunctionsIn":             { "type": "array", "items": { "type": "string" } },
+                "requireFunctions":           { "type": "array", "items": { "type": "string" } },
+                "forbidFunctions":            { "type": "array", "items": { "type": "string" } },
+                "functionSequenceLowToHigh":  { "type": "array", "items": { "type": "string" } },
+                "adjacentIntervalMinSemitones": { "type": "integer" },
+                "matchAny":                   { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

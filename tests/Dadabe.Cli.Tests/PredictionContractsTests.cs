@@ -1,7 +1,7 @@
-using System.Text.Json;
-using Xunit;
-using Dadabe.Cli.Io;
 using System.Collections.Generic;
+using System.Text.Json;
+using Dadabe.Cli.Io;
+using Xunit;
 
 namespace Dadabe.Cli.Tests
 {

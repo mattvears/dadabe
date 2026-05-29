@@ -30,6 +30,13 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
 
+      - name: Validate v0.3 example JSON files (well-formed JSON)
+        run: |
+          echo "Checking docs/v0.3/examples/*.json ..."
+          for f in docs/v0.3/examples/*.json; do
+            jq empty "$f" && echo "OK: $f" || { echo "INVALID: $f"; exit 1; }
+          done
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
