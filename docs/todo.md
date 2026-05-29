@@ -1,10 +1,12 @@
-﻿# Dadabe v0.2 - TODO (concise)
+﻿
+# Dadabe v0.2 - TODO (concise)
 
 Archived full TODO: docs\v0.2\source\todo-full-2026-05-28.md
 
 Short context: The full todo was archived to keep docs/todo.md concise. See the archived file for the full history and rationale.
 
 ## Top decisions (excerpt)
+
 | # | Topic | Decision
 | --- | --- | ---
 | D1  | Voicing categories       | **Core 5**: triads, shell, drop-2, drop-3, spread                                                                                                                                                                                                                                                                                                           |
@@ -29,6 +31,7 @@ Short context: The full todo was archived to keep docs/todo.md concise. See the 
 | D20 | Voicing category config  | **Baked into v0.1.** Categories defined by `src/Dadabe.Fretboard/VoicingCategories.json` (embedded resource). Categories evaluated in `priority` order; first matching template wins; shipped `spread` is a `matchAny: true` fallthrough so every voicing has a non-null category. Rule types: `noteCount`, `noteCountRange`, `allFunctionsIn`, `requireFunctions`, `forbidFunctions`, `functionSequenceLowToHigh`, `adjacentIntervalMinSemitones`, `matchAny`. Default catalog implements the Core 5 (D1): triads, shell, drop-2, drop-3, spread. Drop-2 and drop-3 are spelled as four function-sequence templates each (one per inversion). User-extensible via filesystem overlay. Full spec in [design.md Â§10.3](design.md#103-voicingcategoriesjson-per-d20). |
 
 ## Current work (excerpt of checkboxes)
+
 - [x] `dotnet new sln -n Dadabe` at repo root.
 - [x] Create projects:
 - [x] Create test projects:
@@ -51,6 +54,24 @@ Short context: The full todo was archived to keep docs/todo.md concise. See the 
 - [x] `Memo/Namespaces.cs` â€” string constants for every memo namespace.
 
 ## Links
+
 - Full archived TODO: docs\v0.2\source\todo-full-2026-05-28.md
 
 (Edit this concise file to add the most important top-level todos; keep it under 200 lines.)
+
+## v0.3 next steps
+
+- [ ] Add a prediction response schema: `schemas/prediction-result.schema.json` (shape: `chord: string`, `score: float`, `reasons: string[]`).
+- [ ] Implement NextChordPredictor API surface in Dadabe.Core to accept `NextChordPredictionRequestDto` and return a typed `PredictionResultDto`.
+- [ ] Wire CLI flags: `--predict --input <file.json>` and `--validate-schema` to validate requests/responses against schemas.
+- [ ] Add schema-validation tests (JsonSchema.Net) asserting request and response shapes and current output compatibility.
+- [ ] Add example request/response JSON under `docs/v0.3/examples/` for prediction, scale, mode, and cadence.
+- [ ] Add a CI job step to run schema validation against examples on PRs.
+
+(These are v0.3 scaffolding tasks; keep future feature work in docs/future.md.)
+
+## v0.3 scaffolding created
+
+Scaffolding for a polish minor release has been added: docs/v0.3/plan.md
+
+Scope: polish and quality improvements (docs, tests, formatting, CLI UX, small bugfixes). No major new features. All future work remains planned in docs/future.md.
