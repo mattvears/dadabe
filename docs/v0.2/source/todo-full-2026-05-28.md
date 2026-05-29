@@ -1,0 +1,476 @@
+# Dadabe v0.2 — TODO
+
+Released: 2026-05-28 (tag: v0.2)
+
+Companion to [design.md](design.md). Tracks what's decided, what's still open,
+and the work to ship v0.1.
+
+## Decisions locked
+
+| #   | Topic                    | Decision                                                                                                                                                                                                                                                                                                                                                    |
+| --- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Voicing categories       | **Core 5**: triads, shell, drop-2, drop-3, spread                                                                                                                                                                                                                                                                                                           |
+| D2  | Chord grammar            | **Standard + altered**: maj/m/dim/aug/sus, 6/7/maj7/m7/m7b5/dim7, extensions 9/11/13, alterations b5 #5 b9 #9 #11 b13. No slash chords or polychords in v0.1.                                                                                                                                                                                               |
+| D3  | Named tunings            | **Common catalog from JSON**: DADABE, Standard, Drop D, DADGAD, Open G, Open D. Loaded from `tunings.json`; user-extensible without recompile.                                                                                                                                                                                                              |
+| D4  | Inclusion criterion      | **Permissive**: any playable voicing whose sounded pitch classes ⊆ chord spec is emitted. No quality-based filtering.                                                                                                                                                                                                                                       |
+| D5  | `--limit` cut order      | **Deterministic generation order**, lexicographic ascending over the per-string position tuple `(pos[0], …, pos[n-1])`; each `pos[i]` is the fret on string `i` (0 = open) with muted encoded as `int.MaxValue` so fretted positions always sort before muted on a per-string basis. The search iterates the cartesian product in this order; `--limit` truncates the prefix. No separate sort step. Full spec in [design.md §7 step 3](design.md#7-algorithm-sketch--voicing-generation). |
+| D6  | Playability model        | **Full hand model required.** A voicing is emitted only if a valid fingering exists — every fretted note assigned to a finger (1–4, plus thumb), respecting per-finger reach, inter-finger stretch, barre semantics, and physical mute legality. The assigned fingering is part of the JSON output, not just evidence used internally.                      |
+| D7  | Programmatic library API | **CLI only in v0.1.** `Dadabe.Core` and `Dadabe.Fretboard` stay internal to the solution; no NuGet publish, no public library contract. Revisit post-v0.1.                                                                                                                                                                                                  |
+| D8  | Open strings             | **`--allow-open` defaults to true.** Open strings are welcome in arbitrary chord contexts; no per-chord opt-in needed.                                                                                                                                                                                                                                      |
+| D9  | License                  | **MIT.**                                                                                                                                                                                                                                                                                                                                                    |
+| D10 | .NET version & tooling   | **`net9.0`.** Tooling per [design.md §9](design.md#9-tech-stack): `System.CommandLine`, `System.Text.Json` + source gen, `xUnit` + `FluentAssertions` + `FsCheck.Xunit`, `JsonSchema.Net`.                                                                                                                                                                  |
+| D11 | Hand-model constants     | Defaults for the v0.1 `HandModel`: max fret 15; max span 4 frets; min strings 3; max strings 6; inter-finger stretch 1↔2 ≤ 2, 2↔3 ≤ 2, 3↔4 ≤ 2, 1↔4 ≤ 4; thumb-over (T) on lowest string only at fret ≤ 5, **off by default** behind `--allow-thumb`; max 1 simultaneous barre per voicing.                                                                 |
+| D12 | Enharmonic spelling      | **Baked into v0.1.** A `Note` type carries letter (A–G) + accidental (−2..+2); `PitchClass` (0–11) is math-only and never user-facing. `F#maj7` spells as F♯/A♯/C♯/E♯, `Dbmaj7` as D♭/F/A♭/C. All JSON `note` strings and chord pitch-class names are spelled per chord context. Octave in SPN follows the letter (`Cb4` sounds like B3 but is labelled 4). |
+| D13 | JSON schema versioning   | **Baked into v0.1.** Envelope carries a top-level `"schemaVersion": "1"` separate from `"version"` (tool semver). Consumers pin the schema independently of the tool release. |
+| D14 | Hand-model in output     | **Baked into v0.1.** The envelope's `input` block records `"handModel"` — name plus fully resolved parameters (stretch matrix, thumb policy, max barres) — so a run is reproducible without re-supplying flags. |
+| D15 | Comfort score            | **Baked into v0.1.** Each `Voicing` carries `comfort: float ∈ [0, 1]` derived from span, mute count, position, and barre count. **Reported, not used for ordering** — D5 (deterministic generation order) still governs emission. Consumers may sort by comfort themselves. |
+| D16 | Transition types         | **Baked into v0.1 (types only).** `Transition` and `VoiceMove` records live in `Dadabe.Core` so v0.2 progression features are additive. v0.1 produces none and the CLI exposes no command that uses them. |
+| D17 | Content-hash IDs         | **Baked into v0.1.** Every memoizable domain type implements `IContentHashable` and exposes a `ContentHash` derived from canonical serialization of its identity fields. Format `<namespace>:<version>:<hex-digest>` (SHA-256 truncated to 128 bits, lowercase hex), e.g. `voicing:1:b5f3a8d2c1e4f6a78b9c0d1e2f3a4b5c`. The JSON `id` field carries this string; same inputs → same id across runs and machines. Affected types: `Tuning`, `ChordSpec`, `HandModel`, `Voicing`, `Fingering`, `Transition`. Resolves [E6](#future-expansion-risks). Full spec in [design.md §8.1](design.md#81-content-hashes-d17). |
+| D18 | Memoization layer        | **Baked into v0.1.** `Dadabe.Core.Memo` defines `IMemo<TIn, TOut>` keyed on content hashes (D17); ships `InMemoryMemo<,>` as the only implementation. `VoicingSearch`, `FingeringSolver`, `ChordExpander`, and `Classifier` accept an optional memo and consult it before computing. The CLI does **not** enable a cache in v0.1 — the layer is library surface for v0.2 to plug into. Persistent backends (filesystem, SQLite) reserved for v0.2. Namespace coverage for all deferred features pre-allocated as constants. Cache invariant: every golden test runs with and without a memo and must produce byte-identical output. Full spec in [design.md §8.2](design.md#82-the-memo-interface-d18). |
+| D19 | Chord grammar config     | **Baked into v0.1.** Chord grammar is defined by `src/Dadabe.Core/Chord/ChordGrammar.json` (embedded resource). Schema: `forms[]` (atomic chord patterns with `tokens`, `tones`, `required`) + `modifiers[]` (additions and alterations) + `parseRules` (root regex + longest-token-first matching). Parser tokenizes `<root><form><modifier>*` longest-match-first per form, then any-order modifiers. Default catalog covers D2's standard + altered vocabulary. The required-tones table falls out of the config (each form's `required` ∪ each applied modifier's `required`) — no separate table. User-extensible via filesystem overlay (per E9). Full spec in [design.md §10.2](design.md#102-chordgrammarjson-per-d19). |
+| D20 | Voicing category config  | **Baked into v0.1.** Categories defined by `src/Dadabe.Fretboard/VoicingCategories.json` (embedded resource). Categories evaluated in `priority` order; first matching template wins; shipped `spread` is a `matchAny: true` fallthrough so every voicing has a non-null category. Rule types: `noteCount`, `noteCountRange`, `allFunctionsIn`, `requireFunctions`, `forbidFunctions`, `functionSequenceLowToHigh`, `adjacentIntervalMinSemitones`, `matchAny`. Default catalog implements the Core 5 (D1): triads, shell, drop-2, drop-3, spread. Drop-2 and drop-3 are spelled as four function-sequence templates each (one per inversion). User-extensible via filesystem overlay. Full spec in [design.md §10.3](design.md#103-voicingcategoriesjson-per-d20). |
+| D21 | Mute-source enum         | **Baked into v0.1.** `Fingering.MuteAssignment.Source` is a closed enum: `AdjacentUnderside`, `BarreExtended`, `ThumbWrap`, `OuterHand`, `Unfretted`. Each has a documented legality rule (see [design.md §4 Fingering](design.md#4-domain-model)) tying it to the rest of the fingering. Resolves [E7](#future-expansion-risks). Schema enforces the closed set; additions are minor-version bumps. |
+| D22 | Environment              | **Baked into v0.1.** `Dadabe.Fretboard.Environment` is the runtime context for one CLI invocation: a `Catalogs` record (Tunings, ChordGrammar, VoicingCategories — each loaded from embedded defaults + same-named CWD overlay, overlay winning on name collision otherwise unioning), the resolved `HandModel`, and an `OutputTarget` (file path or stdout, plus `pretty` flag). Built once per run via `Environment.Build(workingDirectory, cliArgs)`; commands receive it rather than individual config args. Per-call inputs (chord symbols, `SearchParams`) stay explicit because they're the unit of per-call variance. Lives in `Dadabe.Fretboard` because `Catalogs` must reference `VoicingCategoryCatalog` and `HandModel` — `Dadabe.Core` cannot depend backwards on Fretboard. `IOutputSink`-style interface deferred: `OutputTarget` is plain data and the CLI's `JsonEnvelope` does the actual write. Resolves [E9](#future-expansion-risks). Full spec in [design.md §6.1](design.md#61-environment-d22). |
+| D23 | Voice-index field        | **Baked into v0.1 (null).** `FretPosition` carries a nullable `Voice: int?` field (null in v1). `PositionDto` emits `"voice"` only when non-null (JSON `Ignore WhenWritingNull`). v2 inner-line generation will assign stable voice indices (0 = bass, ascending) and write them through the existing field — no schema break. Resolves [E3](#data-model--hardest-to-retrofit). |
+| D24 | Structure / functions    | **Baked into v0.1 (functions empty).** `Voicing.Structure` (renamed from `Category`) holds the structural classifier result (drop-2, shell, …). `Voicing.Functions` is an `IReadOnlyList<string>` always empty in v1; v2 will populate it via a function classifier gated on `ModelVersion >= V2` in `VoicingSearch.TryEmit`. JSON output emits `"structure"` and `"functions": []`; the old `"category"` key is gone. `Environment.Version` (`ModelVersion` enum, default `V1`) propagates into `VoicingSearch.Search` so each version gate has a natural landing spot. Resolves [E8](#json-contract--consumer-visible-breakage). |
+
+All decisions are reflected in [design.md](design.md); the two docs are in
+sync.
+
+## Open questions
+
+None blocking. All v0.1 decisions are captured in the table above (D1–D16).
+
+## Work breakdown
+
+Boxes are checked when the task is merged and tested.
+
+### M0 — Scaffolding
+
+- [x] `dotnet new sln -n Dadabe` at repo root.
+- [x] Create projects:
+      `dotnet new classlib -n Dadabe.Core -o src/Dadabe.Core`,
+      `dotnet new classlib -n Dadabe.Fretboard -o src/Dadabe.Fretboard`,
+      `dotnet new console -n Dadabe.Cli -o src/Dadabe.Cli` (assembly name
+      `dadabe`).
+- [x] Create test projects:
+      `dotnet new xunit -n Dadabe.Core.Tests -o tests/Dadabe.Core.Tests`,
+      same for `Dadabe.Fretboard.Tests` and `Dadabe.Cli.Tests`.
+- [x] Wire project references: `Cli → Core, Fretboard`;
+      `Fretboard → Core`; each test project to its target. Add all to the
+      solution.
+- [x] Target framework `net9.0` (per D10). Enable `Nullable` and
+      `ImplicitUsings`.
+- [x] Add NuGet deps:
+      `Dadabe.Cli` → `System.CommandLine` (pre-release).
+      Tests → `FluentAssertions`, `FsCheck.Xunit`, `JsonSchema.Net`.
+- [x] `Directory.Build.props` with shared `<LangVersion>`, `<Nullable>`,
+      `<TreatWarningsAsErrors>` settings.
+- [x] `.editorconfig` for C# style; verify `dotnet format` passes.
+- [x] Add `LICENSE` (MIT, per D9).
+- [x] Extend `.gitignore` with .NET entries (`bin/`, `obj/`, `*.user`,
+      `TestResults/`).
+
+### M1 — Core music theory (`src/Dadabe.Core/`)
+
+- [x] `Memo/ContentHash.cs` *(D17)*
+  - [x] `ContentHash` readonly record struct
+        `{ Namespace: string, Version: int, Digest: string }`.
+        `ToString()` = `"{namespace}:{version}:{digest}"`; `Parse` is
+        round-trip safe.
+  - [x] SHA-256 helper that hashes a byte sequence and returns the first
+        128 bits as lowercase hex (32 chars).
+- [x] `Memo/IContentHashable.cs` — interface exposing
+      `ContentHash ContentHash { get; }`.
+- [x] `Memo/Canonical.cs` — deterministic byte serialization helpers
+      (big-endian fixed-width ints, length-prefixed UTF-8 strings,
+      length-prefixed lists). Provides primitives only — each domain type
+      controls its own layout.
+- [x] `Memo/IMemo.cs` *(D18)*
+  - [x] Generic `IMemo<TIn, TOut> where TIn : IContentHashable
+        where TOut : IContentHashable`.
+  - [x] Methods: `bool TryGet(TIn key, out TOut value)`;
+        `void Put(TIn key, TOut value)`.
+- [x] `Memo/InMemoryMemo.cs` — `ConcurrentDictionary<string, TOut>` keyed on
+      `key.ContentHash.ToString()`. Thread-safe. Only implementation in v0.1.
+- [x] `Memo/Namespaces.cs` — string constants for every memo namespace.
+      v0.1-wired: `chord-spec`, `voicing-search`, `fingering`,
+      `classification`. v0.2-reserved (declared, not used): `transition`,
+      `progression`, `transform`, `inner-line`, `melody-voicings`.
+- [x] Memo tests (`tests/Dadabe.Core.Tests/Memo/`):
+      hash stability across instantiations; cross-namespace digest
+      distinctness (a `voicing` and a `fingering` over the same bytes still
+      differ via the namespace prefix); `ContentHash.Parse(s.ToString()) == s`;
+      `InMemoryMemo` get/put + thread safety on the same key.
+- [x] `PitchClass.cs`
+  - [x] `PitchClass` (readonly struct over 0–11). **Math-only per D12** —
+        never serialized as user-facing text; no `ToName` helper.
+- [x] `Note.cs` *(D12)*
+  - [x] `Letter` enum (C, D, E, F, G, A, B).
+  - [x] `Note` readonly record struct `{ Letter, Accidental }` where
+        `Accidental ∈ −2..+2` (double-flat … double-sharp).
+  - [x] Derived `PitchClass` (e.g. `Note(B, +1).PitchClass == 0`).
+  - [x] Parse / format: `"C#"`, `"Bb"`, `"E#"`, `"Bbb"`. Round-trip safe —
+        `Parse(ToString(n)) == n`.
+  - [x] Letter arithmetic: walk the diatonic ladder for stacked-thirds
+        spelling (`Note.LetterPlus(2)` = a third up by letter).
+- [x] `Pitch.cs`
+  - [x] `Pitch` record `{ Note, Octave }` + MIDI conversion. Octave follows
+        the **letter** (`Cb4` = MIDI 59, same sound as B3, labelled 4).
+  - [x] SPN parse / format (`"C#4"`, `"Bb3"`, `"E#4"`).
+- [x] `Interval.cs`
+  - [x] Semitone arithmetic, quality labels (`P5`, `m3`, `b9`, `#11`, …).
+  - [x] `Pitch - Pitch -> Interval`; `Pitch + Interval -> Pitch` (operators).
+- [x] `Tuning.cs` + `Tunings.json`
+  - [x] `Tuning` type + `TuningCatalog` loader that reads embedded
+        `Tunings.json` and overlays a same-named file from the working
+        directory if present (per D22; overlay wins on name collision,
+        otherwise unions). Standalone `TuningCatalog.Load(workingDirectory)`
+        — called by `Catalogs.Load` in M2 but usable on its own.
+  - [x] `Tuning.ParseSpec("D2,A2,D3,A3,B3,E4")` for ad-hoc `--tuning`.
+  - [x] Ship `Tunings.json` with the six tunings in D3.
+  - [x] `Tuning.ContentHash` *(D17)* — namespace `tuning`. Canonical input:
+        each open-string `Pitch`'s MIDI number as u8, in string-index order
+        (low to high).
+- [x] `Chord/ChordGrammar.json` *(D19)* — already authored at
+      `src/Dadabe.Core/Chord/ChordGrammar.json`. M1 task is to wire it in
+      as an embedded resource (`<EmbeddedResource Include="..." />` in the
+      csproj) and provide a typed loader (`ChordGrammar` record types
+      matching the JSON shape) with the same embedded-default + CWD overlay
+      pattern as `TuningCatalog` (per D22).
+- [x] `Chord/ChordParser.cs`
+  - [x] Data-driven parser: consume the loaded `ChordGrammar`. Match root
+        via `parseRules.rootRegex`; then longest-token-first across
+        `forms[]` (sort tokens by length descending at load time); then
+        zero-or-more modifiers in any order (longest-first); fail on
+        unparsed tail per `parseRules.rejectUnparsedTail`.
+  - [x] Produce `ChordSymbol` with the root as a `Note` (preserving the
+        spelling the user typed — `F#maj7` ≠ `Gbmaj7`) and the matched
+        form's `displayName` as the quality.
+  - [x] Reject slash input with clear error per `parseRules.rejectSlash`
+        (deferred per D2).
+  - [x] Overlay handled by `ChordGrammar` loader per D22 — after merge of
+        embedded defaults with `./ChordGrammar.json` (if present), the parser
+        must re-sort tokens longest-first so the longest-match invariant
+        survives the merge.
+- [x] `Chord/ChordExpander.cs`
+  - [x] `ChordSymbol → ChordSpec`. Start from the matched form's `tones`
+        list; apply each modifier (alteration: remove `displaces` function,
+        add modifier's `addTones`; addition: just add). Take the union of
+        the form's `required` and every applied modifier's `required` for
+        the spec's required set. No separate hand-coded required-tones
+        table — it falls out of the config per D19.
+  - [x] Each chord tone is tagged with both its function (`1`, `3`, `5`,
+        `b7`, `9`, `#11`, …) and its spelled `Note`, computed by
+        **stacked-thirds letter walk** per D12: third = root letter + 2,
+        fifth = root letter + 4, seventh = root letter + 6 (etc.),
+        accidentals adjusted so semitone distances match interval quality.
+        `F#maj7 → F♯, A♯, C♯, E♯`; `Dbmaj7 → D♭, F, A♭, C`.
+  - [x] `ChordSpec.ContentHash` *(D17)* — namespace `chord-spec`. Canonical
+        input: root pitch class (u8), then sorted-by-function list of
+        (function-id u8, pitch class u8) pairs.
+  - [x] `ChordExpander.Expand` accepts an optional
+        `IMemo<ChordSymbol, ChordSpec>` (key wrapper makes `ChordSymbol`
+        content-hashable for this purpose).
+- [x] Tests (`tests/Dadabe.Core.Tests/`): pitch math, interval round-trips,
+      every quality+extension+alteration parses, **spelling correctness**
+      (F♯maj7/D♭maj7/B♯dim/etc. produce expected note letters), golden-file
+      expansion for a representative chord set.
+
+### M2 — Fretboard engine (`src/Dadabe.Fretboard/`)
+
+- [x] `Environment.cs` *(D22)*
+  - [x] `Environment` record `{ Catalogs Catalogs, HandModel HandModel,
+        OutputTarget Output }`. Plain data — no I/O, no content hash.
+  - [x] `Environment.Build(string workingDirectory, CliArgs args)` —
+        factory that calls `Catalogs.Load(workingDirectory)`, resolves the
+        `HandModel` from `--hand-profile` plus individual stretch / thumb /
+        barre override flags, and constructs the `OutputTarget` from
+        `--out` and `--pretty`. Called once by `Program.cs` per invocation
+        (M3).
+- [x] `Catalogs.cs` *(D22)*
+  - [x] `Catalogs` record `{ TuningCatalog Tunings, ChordGrammar
+        ChordGrammar, VoicingCategoryCatalog VoicingCategories }`.
+  - [x] `Catalogs.Load(string workingDirectory)` calls each catalog's
+        `Load(workingDirectory)` in parallel. Each loader independently
+        handles its own embedded-default + CWD overlay merge per D22; no
+        cross-catalog logic.
+- [x] `OutputTarget.cs` *(D22)*
+  - [x] Record `{ string? FilePath, bool Pretty }`. `FilePath == null`
+        means stdout. The CLI's `JsonEnvelope` (M3) is the only consumer;
+        no I/O abstraction is exposed in `Dadabe.Fretboard`.
+- [x] Content hashes *(D17)* — implemented alongside each type below:
+  - [x] `HandModel.ContentHash` — namespace `hand-model`. Canonical input:
+        max fret (u8), max span (u8), min/max strings (u8 each), stretch
+        matrix in fixed key order (1-2, 1-3, 1-4, 2-3, 2-4, 3-4; each u8),
+        thumb allowed (u8 bool), thumb max fret (u8), max barres (u8).
+  - [x] `Voicing.ContentHash` — namespace `voicing`. Canonical input:
+        tuning's hash bytes (16 bytes), then per-string
+        `(string:u8, fret:i16-BE)` in string-index order; `fret = -1`
+        denotes muted. **Excludes** `HandModel` — same shape → same id
+        regardless of which hand model permitted it.
+  - [x] `Fingering.ContentHash` — namespace `fingering`. Canonical input:
+        ordered positions (as in `Voicing`) + hand-model hash bytes.
+        **Includes** `HandModel` because fingerings are model-dependent.
+  - [x] `Transition.ContentHash` *(types only — D16)* — namespace
+        `transition`. Canonical input: from-voicing hash bytes + to-voicing
+        hash bytes.
+- [x] Memo wiring *(D18)*:
+  - [x] `VoicingSearchKey` record
+        `{ ChordSpec, Tuning, HandModel, SearchParams }` implementing
+        `IContentHashable` (namespace `voicing-search`).
+        `SearchParams` covers `--frets`, `--span`, `--min-strings`,
+        `--max-strings`, `--allow-open`, `--allow-barre`, `--allow-thumb`,
+        `--categories`. **Does not** include `--limit` (applied at read
+        time so different limits hit the same cache entry).
+  - [x] `FingeringKey` record `{ Position[], HandModel }` implementing
+        `IContentHashable` (namespace `fingering`).
+  - [x] `VoicingSearch.Search` and `FingeringSolver.Solve` accept an
+        optional `IMemo<,>` and consult it before computing. `null` memo
+        (default at v0.1 CLI call site) bypasses the cache.
+  - [x] `Classifier.Classify` accepts an optional
+        `IMemo<Voicing, CategoryAssignment>` (namespace `classification`).
+- [x] `FretLayout.cs` — enumerate `FretPosition`s per string up to `--frets`.
+- [x] `Reachability.cs` — positions per string holding a given `PitchClass`.
+- [x] `Playability.cs` — coarse, cheap prunes used _during_ search: span,
+      min/max strings, fret window. Designed to fail fast before the fingering
+      solver runs.
+- [x] `HandModel.cs` — the parameters that define "playable by a hand":
+      inter-finger stretch matrix, thumb rules, max barres. Ship one named
+      `Default` profile with the constants in **D11**: stretch
+      1↔2 ≤ 2, 2↔3 ≤ 2, 3↔4 ≤ 2, 1↔4 ≤ 4; thumb-over lowest string only,
+      fret ≤ 5; max 1 simultaneous barre. Profile is selectable; individual
+      params overridable via CLI flags.
+- [x] `Fingering.cs` — concrete contract types per [design.md §4](design.md#4-domain-model):
+  - [x] `enum Finger { Index=1, Middle=2, Ring=3, Pinky=4, Thumb=5 }`.
+  - [x] `enum MuteSource` *(D21)*: `AdjacentUnderside`, `BarreExtended`,
+        `ThumbWrap`, `OuterHand`, `Unfretted`. Closed set.
+  - [x] `FingerAssignment(int String, int Fret, Finger? Finger)` record.
+  - [x] `BarreGroup(Finger Finger, int Fret, int LowStringInclusive,
+        int HighStringInclusive)` record.
+  - [x] `MuteAssignment(int String, MuteSource Source)` record.
+  - [x] `Fingering(FingerAssignment[] Assignments, BarreGroup[] Barres,
+        MuteAssignment[] Mutes)` record.
+- [x] `FingeringSolver.cs` — solver per D6.
+  - [x] Input: a candidate voicing (`Position[]` — string + fret-or-muted).
+  - [x] Output: a valid `Fingering` (satisfying the eight-rule contract
+        spelled out in [design.md §4](design.md#4-domain-model)) or `null`
+        if no valid assignment exists.
+  - [x] Algorithm is a v0.1 implementation choice (CSP, backtracking,
+        rule-based — author chooses). Whatever is chosen must enforce all
+        eight rules: coverage, open-string, finger uniqueness, barre
+        consistency, barre count, inter-finger reach, thumb rule, mute-
+        source legality.
+  - [x] Deterministic tie-break: when multiple valid fingerings exist,
+        return the first per a documented preference order (author defines
+        and documents it; `Fingering.ContentHash` stability across runs
+        depends on this being deterministic).
+  - [x] Return the first valid fingering found per that preference order;
+        do not enumerate all.
+- [x] `VoicingSearch.cs` — combinatorial search across strings producing
+      `Voicing`s. Pipeline: enumerate candidates → cheap `Playability` prune →
+      `FingeringSolver` → enforce required chord tones (D4) → `Classifier`.
+      A candidate with no valid fingering is dropped.
+- [x] `VoicingCategories.json` *(D20)* — already authored at
+      `src/Dadabe.Fretboard/VoicingCategories.json`. M2 task is to wire it
+      in as an embedded resource and provide a `VoicingCategoryCatalog`
+      loader with typed records matching the JSON shape (categories,
+      function classes, match rules). Same embedded-default + CWD overlay
+      pattern as `TuningCatalog` and `ChordGrammar` (per D22).
+- [x] `Classifier.cs` — rule-driven, consumes the loaded
+      `VoicingCategories`. For each voicing, walk `priority` and return the
+      first category whose `matches` has any entry where every rule type
+      (`noteCount`, `noteCountRange`, `allFunctionsIn`, `requireFunctions`,
+      `forbidFunctions`, `functionSequenceLowToHigh`,
+      `adjacentIntervalMinSemitones`, `matchAny`) holds. Per D20, the
+      shipped `spread` category's `matchAny: true` guarantees a non-null
+      result. No hand-coded category-recognition logic — every category is
+      data.
+- [x] Overlay handled by `VoicingCategoryCatalog` loader per D22 — merged
+      `categories` lists must preserve `priority` ordering (overlay's
+      priority list, if present, fully replaces the embedded one; otherwise
+      appended categories sort to the end before the `matchAny` fallthrough).
+- [x] `Transition.cs` *(D16 — type stubs, no v0.1 producer)*
+  - [x] `VoiceMove` record `{ From: Pitch, To: Pitch, Semitones: int }`.
+  - [x] `Transition` record
+        `{ From: Voicing, To: Voicing, Moves: VoiceMove[], TotalSemitones: int }`.
+  - [x] Lives in `Dadabe.Fretboard` because `Voicing` does. Defined so v0.2
+        progressions are additive; no v0.1 CLI command produces one.
+- [x] Voicing metadata: bass note, top note, span, lowestFret, highestFret,
+      barres, openStrings, mutedStrings, **fingering** (per D6),
+      **comfort** (per D15).
+- [x] Comfort score (D15): compute `comfort ∈ [0, 1]` on each emitted
+      voicing. v0.1 formula:
+      `1 − 0.4·(span/maxSpan) − 0.1·mutedStrings − 0.15·barreCount −
+      0.05·(lowestFret/maxFret)`, clamped to `[0, 1]`. Document the formula
+      in design.md §7 so consumers can interpret. **Not used for ordering**
+      — emission order stays D5.
+- [x] Tests (`tests/Dadabe.Fretboard.Tests/`): invariants (sounded pitch
+      classes ⊆ chord spec; required tones present), category classification
+      on hand-picked fixtures, fingering solver against a fixture set of
+      known-playable and known-unplayable shapes (FsCheck properties + xUnit
+      `[Theory]` data).
+- [x] Cache-equivalence property *(D18)*: for every search/fingering
+      fixture, run twice — once with `null` memo, once with `InMemoryMemo` —
+      and assert byte-identical JSON output. Locks in the invariant that
+      the memo never changes results, only timing.
+
+### M3 — CLI + JSON (`src/Dadabe.Cli/`, `schemas/`)
+
+- [x] `Program.cs` — `System.CommandLine` setup, root command + subcommand
+      registration. Each subcommand handler builds an
+      `Environment.Build(Directory.GetCurrentDirectory(), parsedArgs)` once
+      (per D22) and hands it to the relevant `*Command` class along with the
+      per-call inputs (chord symbol, `SearchParams`).
+- [x] `Commands/VoicingsCommand.cs` — main command per
+      [design.md §3](design.md#3-cli-surface). Takes an `Environment` plus
+      the chord symbol and `SearchParams`. Per D5, the voicing search emits
+      in deterministic order (lowest string × lowest fret first); `--limit`
+      simply truncates the prefix — no sort step.
+- [x] `Commands/TuningCommand.cs`, `Commands/ChordCommand.cs` — debug
+      wrappers; same `Environment`-based signature as `VoicingsCommand`.
+- [x] `Io/JsonEnvelope.cs` — envelope assembly, pretty-print, stdout-vs-file.
+      Reads `Environment.Output` (D22) to decide where to write and whether
+      to indent. Uses `System.Text.Json` source generators for the DTOs.
+      Envelope includes `"schemaVersion": "1"` (D13) and `"input.handModel"`
+      block (D14).
+- [x] JSON `id` field for every `Voicing` is the content-hash form
+      `voicing:1:<32-char-hex>` (D17). No `v-NNNN` sequence numbers anywhere.
+- [x] CLI does not enable a memo in v0.1 — `Search`/`Solve`/`Classify` are
+      called with `null` cache. The wiring exists for v0.2 plug-in (D18).
+- [x] `schemas/voicings.schema.json`, `tuning.schema.json`,
+      `chord.schema.json` — hand-authored JSON Schema, validated against
+      emitted output in tests using `JsonSchema.Net`.
+- [x] Schema constrains `id` to regex `^[a-z][a-z0-9-]*:\d+:[0-9a-f]{32}$`
+      (D17).
+- [x] Schema enforces `mutes[].source` against the closed enum
+      `["AdjacentUnderside", "BarreExtended", "ThumbWrap", "OuterHand",
+      "Unfretted"]` (D21).
+- [x] Schema enforces `category` against the names in
+      `VoicingCategories.json`'s `priority` list (D20). When users overlay
+      categories, the schema is regenerated from the loaded catalog before
+      validation.
+- [x] Wire exit codes per [design.md §3](design.md#3-cli-surface) (0/1/2).
+- [x] Golden tests in `tests/Dadabe.Cli.Tests/Golden/` — invoke the CLI
+      in-process, diff JSON against committed fixtures.
+
+### M4 — Polish & release
+
+- [x] Per D7, ensure `Dadabe.Core` and `Dadabe.Fretboard` remain
+      non-published (no NuGet metadata, no public API guarantees in README).
+- [x] Add a small README usage section showing one `dadabe voicings Cmaj7
+    --tuning DADABE --pretty` example.
+- [x] CI: lint + test on push (GitHub Actions or chosen equivalent).
+- [ ] Tag `v0.1.0`.
+
+## Future-expansion risks
+
+First-principles review of [design.md](design.md) on 2026-05-26, looking
+specifically at how v0.1 choices interact with the deferred README features
+(transformations, progressions, inner-lines, chord-melody, rendering, more
+voicing categories). Each item names a design decision worth either fixing
+**now in v0.1** (cheap insurance) or **flagging for v0.2** (defer but don't
+forget).
+
+### Data model — hardest to retrofit
+
+- [x] ~~E1 — `PitchClass` loses enharmonic spelling.~~ **Resolved → D12.**
+      `Note` type added in M1; chord expander spells by stacked-thirds
+      letter walk.
+
+- [ ] **E2 — `ChordSymbol` has no key/tonal context.** It expands
+      independently of any key center. Will hurt: transformations (tritone
+      sub of V → ♭II depends on what V _is V of_), Roman-numeral analysis,
+      progression input parsing, modal interchange (borrow from where?).
+      **Flag for v0.2**: introduce a `Key` (root + mode) and a
+      `ChordInContext` that pairs `ChordSymbol` with `Key` + Roman-numeral
+      function. Keep `ChordSymbol` context-free for direct CLI input.
+
+- [x] ~~E3 — `Voicing` has no voice index per sounding string.~~
+      **Resolved → D23.** `FretPosition.Voice: int?` added (null in v1).
+      v2 inner-line generation writes through the same field — no schema
+      break needed.
+
+- [ ] **E4 — `HandModel` assumes 6-string topology.** "Thumb reaches lowest
+      string at fret ≤ 5" works for guitar but not for 7-/8-string electric,
+      bass, or short-scale instruments. Will hurt: any alternate-tuning user
+      who isn't on a 6-string. **Flag for v0.2**: parameterise thumb rules
+      by string-count rather than naming string 0 specifically; treat the
+      hand model as topology-aware.
+
+### JSON contract — consumer-visible breakage
+
+- [x] ~~E5 — `schemaVersion` is conflated with `version`.~~
+      **Resolved → D13.** Envelope gets a top-level `"schemaVersion": "1"`
+      alongside the tool semver.
+
+- [x] ~~E6 — Voicing `id` is per-run sequence (`v-0001`).~~
+      **Resolved → D17.** Voicing `id` is a content hash
+      `voicing:1:<32-char-hex>`, stable across runs and machines. The same
+      content-addressing applies to every other memoizable type
+      (`Tuning`, `ChordSpec`, `HandModel`, `Fingering`, `Transition`) so
+      cross-references between them are also stable.
+
+- [x] ~~E7 — `mutes[].source` taxonomy is not enumerated.~~
+      **Resolved → D21.** Closed enum: `AdjacentUnderside`, `BarreExtended`,
+      `ThumbWrap`, `OuterHand`, `Unfretted` — each with a legality rule
+      documented in design.md §4. Schema enforces the closed set.
+
+- [x] ~~E8 — `category` field conflates two orthogonal axes.~~
+      **Resolved → D24.** Split into `structure: string` (structural
+      classifier result, renamed from `category`) and `functions: []`
+      (always empty in v1; v2 function classifier populates it). Old
+      `"category"` key removed from schema.
+
+### Architecture & process
+
+- [x] ~~E9 — `Tunings.json` embedded vs runtime-extensible — contradiction.~~
+      **Resolved → D22.** Embedded defaults are overlaid with same-named
+      files from the working directory by `Catalogs.Load`, surfaced through
+      `Environment`. Overlay wins on name collision, otherwise unions.
+      Applies uniformly to all three catalogs (Tunings, ChordGrammar,
+      VoicingCategories) — no per-catalog overlay code.
+
+- [x] ~~E10 — Output doesn't record which `HandModel` was used.~~
+      **Resolved → D14.** `input.handModel` block in the envelope captures
+      name + resolved parameters.
+
+- [x] ~~E11 — Binary playability vs continuous comfort score.~~
+      **Resolved → D15.** `Voicing.comfort ∈ [0, 1]` computed in M2;
+      reported in JSON. **Does not override D5** — emission order stays
+      deterministic; consumers sort by comfort themselves if they want to.
+
+- [x] ~~E12 — No voice-leading / `Transition` type.~~
+      **Resolved → D16 (types only).** `Transition` and `VoiceMove` records
+      defined in `Dadabe.Core`. No v0.1 CLI command produces them; v0.2
+      progression features will be additive.
+
+### Address-now summary
+
+**Resolved in v0.1** (now part of decisions table): E1 → D12, E5 → D13,
+E6 → D17, E7 → D21, E9 → D22, E10 → D14, E11 → D15, E12 → D16 (types
+only), E3 → D23 (voice-index field, null in v1), E8 → D24 (structure/
+functions split, functions empty in v1); plus the memoization layer
+(D18) wired into M1, the chord grammar config (D19) feeding M1, the
+voicing category config (D20) feeding M2, the Environment + Catalogs
+aggregate (D22) feeding M2, and the explicit lexicographic emission
+order in the rewritten D5.
+
+**Deferred to v0.2**: **E2** (chord-in-key context), **E4** (string-count-
+aware hand model).
+
+## Cut from v0.1 — pick up in v0.2 design doc
+
+These come straight from the [README](../README.md). Keeping the list here so
+nothing gets forgotten when M4 ships.
+
+- Harmonic transformations: modal interchange, tritone sub, chromatic planing,
+  diminished sub, secondary dominants, negative harmony, parallel harmony.
+- Progression input + minimal-motion voice leading between chords.
+- Inner-line generation inside static harmony.
+- Chord-melody harmonization.
+- Voicing categories beyond Core 5: quartal, cluster, polychord,
+  upper-structure triad, altered dominant (as a category, not just as input).
+- Slash chords and polychord input parsing.
+- Rendering: chord diagrams, tab, notation, audio.
+- TUI / server / web frontends.
