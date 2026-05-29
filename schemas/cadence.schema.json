@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cadence",
+  "type": "object",
+  "description": "Defines a cadence type and example resolution progression.",
+  "properties": {
+    "type": { "type": "string", "enum": [ "authentic", "plagal", "deceptive", "half" ] },
+    "resolution": { "type": "string", "description": "Describes expected harmonic resolution (e.g., V->I)." },
+    "exampleProgression": { "type": "array", "items": { "type": "string" }, "description": "Example chords representing the cadence." },
+    "description": { "type": "string" }
+  },
+  "required": [ "type", "exampleProgression" ],
+  "additionalProperties": false
+}

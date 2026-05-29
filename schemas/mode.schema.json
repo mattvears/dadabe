@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mode",
+  "type": "object",
+  "description": "Defines a musical mode derived from a scale.",
+  "properties": {
+    "name": { "type": "string" },
+    "parentScale": { "type": "string", "description": "Name of the parent scale (if applicable)." },
+    "degreeIndex": { "type": "integer", "description": "Zero-based degree index into parent scale to form this mode." },
+    "intervals": { "type": "array", "items": { "type": "integer" } },
+    "noteNames": { "type": "array", "items": { "type": "string" } },
+    "description": { "type": "string" }
+  },
+  "required": [ "name", "intervals" ],
+  "additionalProperties": false
+}

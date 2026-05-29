@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scale",
+  "type": "object",
+  "description": "Defines a named scale: canonical note sequence and interval structure.",
+  "properties": {
+    "name": { "type": "string" },
+    "notes": { "type": "array", "items": { "type": "string" }, "description": "Ordered pitch names in scale (e.g., C, D, E, ...)." },
+    "intervals": { "type": "array", "items": { "type": "integer" }, "description": "Semitone steps from the root (e.g., 0,2,4,5,7,9,11)." },
+    "modeOf": { "type": "string", "description": "Optional: parent scale if this is a mode." },
+    "description": { "type": "string" }
+  },
+  "required": [ "name", "notes", "intervals" ],
+  "additionalProperties": false
+}
