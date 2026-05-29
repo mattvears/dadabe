@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "v0.3",
+  "progression": ["C", "G", "Am", "F"],
+  "context": {
+    "scale": "C major",
+    "mode": "ionian"
+  },
+  "filters": {
+    "mustBeMinor": false,
+    "allow": ["G", "Am"]
+  },
+  "topK": 5
+}

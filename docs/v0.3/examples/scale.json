@@ -1,0 +1,6 @@
+{
+  "name": "C major",
+  "notes": ["C", "D", "E", "F", "G", "A", "B"],
+  "type": "major",
+  "tonic": "C"
+}

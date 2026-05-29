@@ -1,0 +1,5 @@
+{
+  "name": "Simple I-V-vi-IV",
+  "chords": ["C", "G", "Am", "F"],
+  "description": "Common pop progression useful for testing predictor context handling"
+}

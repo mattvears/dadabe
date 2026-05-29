@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "v0.3",
+  "results": [
+    {
+      "chord": "G",
+      "score": 0.87,
+      "reasons": ["fits progression", "common cadence"]
+    },
+    {
+      "chord": "Em",
+      "score": 0.45,
+      "reasons": ["diatonic option"]
+    }
+  ]
+}
