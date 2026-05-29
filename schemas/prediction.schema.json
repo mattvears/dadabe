@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NextChordPredictionRequest",
+  "type": "object",
+  "description": "Request shape for next-chord prediction: optional context (progression) + optional filters.",
+  "properties": {
+    "context": { "$ref": "./progression.schema.json" },
+    "filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["byChord", "byScale", "byMode", "byQuality", "custom"] },
+          "params": { "type": "object", "additionalProperties": true }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }
+    },
+    "maxResults": { "type": "integer", "minimum": 1, "maximum": 100 }
+  },
+  "additionalProperties": false
+}
