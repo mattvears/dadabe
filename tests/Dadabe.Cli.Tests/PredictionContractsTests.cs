@@ -10,8 +10,10 @@ namespace Dadabe.Cli.Tests
         [Fact]
         public void PredictionRequest_SerializeRoundTrip()
         {
-            var context = new ProgressionDto(new[] { "Dm7", "G7" }, 100);
-            var filter = new PredictionFilterDto("byChord", new Dictionary<string, object> { { "chord", "Gm" } });
+            var contextChords = new[] { "Dm7", "G7" };
+            var context = new ProgressionDto(contextChords, 100);
+            var filterParams = new Dictionary<string, object> { { "chord", "Gm" } };
+            var filter = new PredictionFilterDto("byChord", filterParams);
             var req = new NextChordPredictionRequestDto(context, new[] { filter }, 10);
 
             var json = JsonSerializer.Serialize(req);
