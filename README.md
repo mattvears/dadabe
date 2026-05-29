@@ -33,48 +33,49 @@ This project asks:
 
 ## Features
 
-- Given a tuning: 
-    - Fretboard geometry solver - Map harmonic structures onto playable guitar shapes.
-        - Considers:
-            - Hand span
-            - String sets
-            - tunings
-            - Muted strings
-            - Open strings
-            - Finger independence
-            - Barres
-    - Given a chord, performs harmonic transformations:
-        - Transforms chords through:
-            - Model interchange
-            - Tritone substitution
-            - Chromatic planing
-            - Diminished substitution
-            - Secondary dominants
-            - Negative harmony
-            - Parallel harmony
-    - Given a chord, generate:
-        - Triads
-        - Shell voicings
-        - Drop-2, drop-3 voicings
-        - Quartal harmony
-        - Cluster voicings
-        - Spread voicings
-        - Polychords
-        - Altered dominants
-        - Upper-structure triads
-        - Chord-melody harmonization
-    - Generate chord charts
+- Given a tuning:
+  - Fretboard geometry solver - Map harmonic structures onto playable guitar shapes.
+    - Considers:
+      - Hand span
+      - String sets
+      - tunings
+      - Muted strings
+      - Open strings
+      - Finger independence
+      - Barres
+  - Given a chord, performs harmonic transformations:
+    - Transforms chords through:
+      - Model interchange
+      - Tritone substitution
+      - Chromatic planing
+      - Diminished substitution
+      - Secondary dominants
+      - Negative harmony
+      - Parallel harmony
+  - Given a chord, generate:
+    - Triads
+    - Shell voicings
+    - Drop-2, drop-3 voicings
+    - Quartal harmony
+    - Cluster voicings
+    - Spread voicings
+    - Polychords
+    - Altered dominants
+    - Upper-structure triads
+    - Chord-melody harmonization
+  - Generate chord charts
 
 - Given a progression: generate chord charts for the progression in alternate tunings
-    - Finds minimal motion transitions between chords
-    - Inner-line generator - generate moving voices inside static harmony.
+  - Finds minimal motion transitions between chords
+  - Inner-line generator - generate moving voices inside static harmony.
 
-## v0.1 — what ships now
+## v0.3 — current release
 
-v0.1 is a deliberately small slice: given a tuning and a chord symbol, emit
-every musically meaningful playable voicing as JSON. Everything else listed
-above is deferred. See [docs/design.md](docs/design.md) and
-[docs/todo.md](docs/todo.md) for the full scope.
+v0.1 shipped the core voicing engine. v0.2 added next-chord prediction
+(rules-based, softmax-scored). v0.3 is a polish release: expanded tests,
+schema scaffolding for future features, and CLI/output refinements.
+See [docs/v0.3/plan.md](docs/v0.3/plan.md) for the full scope and
+[CHANGELOG.md](CHANGELOG.md) for release notes.
 
 ### Build and run
 
@@ -86,9 +87,14 @@ dotnet run --project src/Dadabe.Cli -- voicings Cmaj7 --tuning DADABE --pretty
 Three subcommands ship:
 
 ```sh
-dadabe voicings <chord> [--tuning ...] [--frets N] [--span N] [--pretty] [--out path]
-dadabe tuning   <name|spec> [--pretty]
-dadabe chord    <symbol>    [--pretty]
+dadabe voicings <chord> [--tuning ...] [--frets N] [--span N]
+                        [--min-strings N] [--max-strings N]
+                        [--allow-open] [--allow-barre] [--allow-thumb]
+                        [--categories <csv>] [--limit N]
+                        [--top-n N] [--entropy F]
+                        [--pretty] [--out <path>]
+dadabe tuning   <name|spec> [--pretty] [--out <path>]
+dadabe chord    <symbol>    [--pretty] [--out <path>]
 ```
 
 Exit codes: `0` success, `1` bad input (unparseable chord/tuning), `2`
@@ -96,9 +102,31 @@ unexpected error. JSON `id` fields are content hashes — the same chord on
 the same tuning produces the same id across runs and machines (D17). The
 JSON shape is pinned by `schemas/*.schema.json`.
 
+### Schemas
+
+Every output envelope validates against `schemas/envelope.schema.json`.
+Subcommand payloads are pinned by:
+
+| Command    | Schema |
+|------------|--------|
+| `voicings` | `schemas/voicings.schema.json` |
+| `tuning`   | `schemas/tuning.schema.json`   |
+| `chord`    | `schemas/chord.schema.json`    |
+
+Scaffolding schemas for future features (not yet emitted by the CLI):
+
+| Schema | Purpose |
+|--------|---------|
+| `schemas/progression.schema.json`       | Chord progression |
+| `schemas/prediction.schema.json`        | Next-chord prediction request |
+| `schemas/prediction-result.schema.json` | Prediction response |
+| `schemas/scale.schema.json`             | Named scale |
+| `schemas/mode.schema.json`              | Musical mode |
+| `schemas/cadence.schema.json`           | Cadence type |
+| `schemas/transformation.schema.json`    | Harmonic transformation (placeholder) |
+| `schemas/voicing-category.schema.json`  | VoicingCategories overlay format |
+
 ### Library status
 
 `Dadabe.Core` and `Dadabe.Fretboard` are part of the solution but **not
-published to NuGet in v0.1** (D7). No public API guarantees yet; revisit
-post-v0.1.
-
+published to NuGet** (D7). No public API guarantees yet; revisit post-v0.3.

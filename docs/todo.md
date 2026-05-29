@@ -59,20 +59,28 @@ Short context: The full todo was archived to keep docs/todo.md concise. See the 
 
 (Edit this concise file to add the most important top-level todos; keep it under 200 lines.)
 
-## v0.3 next steps
+## v0.3 — completed (branch: feature/v0.3)
 
-- [ ] Add a prediction response schema: `schemas/prediction-result.schema.json` (shape: `chord: string`, `score: float`, `reasons: string[]`).
-- [ ] Implement NextChordPredictor API surface in Dadabe.Core to accept `NextChordPredictionRequestDto` and return a typed `PredictionResultDto`.
-- [ ] Wire CLI flags: `--predict --input <file.json>` and `--validate-schema` to validate requests/responses against schemas.
-- [ ] Add schema-validation tests (JsonSchema.Net) asserting request and response shapes and current output compatibility.
-- [ ] Add example request/response JSON under `docs/v0.3/examples/` for prediction, scale, mode, and cadence.
-- [ ] Add a CI job step to run schema validation against examples on PRs.
-- [ ] Document prediction requirements: docs/v0.3/prediction-requirements.md
+- [x] `schemas/prediction-result.schema.json` — prediction response shape.
+- [x] `schemas/voicing-category.schema.json` — overlay format for VoicingCategories.
+- [x] `ITransformation` placeholder interface in `Dadabe.Core`.
+- [x] `IOutputRenderer` placeholder interface in `Dadabe.Cli.Io`.
+- [x] Parser extension TODO comments + `[Skip]` polychord test.
+- [x] `TransitionTests` — content-hash determinism (D16/D17).
+- [x] `MemoBackendTests` — mock persistent-backend contract scaffold (D18).
+- [x] `VoicingCategoryCatalogTests` — overlay loading and determinism (D20).
+- [x] README updated to v0.3 with full CLI option listing and schemas table.
+- [x] `CHANGELOG.md` introduced.
+- [x] CI step validates `docs/v0.3/examples/*.json` on every PR.
+- [x] `docs/v0.3/plan.md`, `contracts.md`, `contracts-scales.md`,
+      `contracts-prediction.md`, `prediction-requirements.md`, examples.
 
-(These are v0.3 scaffolding tasks; keep future feature work in docs/future.md.)
+## Next — v0.4+ (deferred; see docs/future.md)
 
-## v0.3 scaffolding created
+- [ ] `--predict --input <file.json>` and `--validate-schema` CLI flags.
+- [ ] `NextChordPredictor` wired to accept `NextChordPredictionRequestDto`.
+- [ ] Progression engine and voice-leading transitions.
+- [ ] Rendering backends (diagram/tab sinks via `IOutputRenderer`).
+- [ ] Persistent memo backends (filesystem/SQLite).
 
-Scaffolding for a polish minor release has been added: docs/v0.3/plan.md
-
-Scope: polish and quality improvements (docs, tests, formatting, CLI UX, small bugfixes). No major new features. All future work remains planned in docs/future.md.
+(Keep future feature work in docs/future.md; this file stays under 200 lines.)
