@@ -1,0 +1,12 @@
+@inherits RazorSlices.RazorSlice<string?>
+
+<form hx-put="/api/reference/voicing-categories"
+      hx-target="#vc-result"
+      hx-swap="innerHTML">
+  <div class="field label border">
+    <textarea name="json" rows="20" class="small-text" style="font-family:monospace">@(Model ?? "{}")</textarea>
+    <label class="active">voicing-categories.json</label>
+  </div>
+  <div id="vc-result"></div>
+  <button type="submit">Save</button>
+</form>

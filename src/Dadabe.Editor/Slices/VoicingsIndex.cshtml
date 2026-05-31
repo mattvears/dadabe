@@ -1,0 +1,87 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoicingsIndexModel>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <h4>Voicings</h4>
+  <article class="border">
+    <div class="padding">
+      <form hx-post="/api/voicings/run"
+            hx-target="#result-panel"
+            hx-swap="innerHTML">
+        <div class="grid">
+          <div class="s12 m6 l4">
+            <div class="field label border">
+              <input type="text" name="chord" required placeholder="e.g. Dm7" />
+              <label>Chord</label>
+            </div>
+          </div>
+          <div class="s12 m6 l4">
+            <div class="field label border">
+              <select name="tuning">
+                @if (Model.EmbeddedTunings.Count > 0)
+                {
+                  <optgroup label="Built-in">
+                    @foreach (var t in Model.EmbeddedTunings)
+                    {
+                      <option value="@t" @(t == "DADABE" ? "selected" : "")>@t</option>
+                    }
+                  </optgroup>
+                }
+                @if (Model.SavedTunings.Count > 0)
+                {
+                  <optgroup label="Saved">
+                    @foreach (var t in Model.SavedTunings)
+                    {
+                      var spec = string.Join(",", t.Strings);
+                      <option value="@spec" data-name="@t.Name">@t.Name</option>
+                    }
+                  </optgroup>
+                }
+              </select>
+              <label>Tuning</label>
+            </div>
+          </div>
+          <div class="s12 m4 l1">
+            <div class="field label border">
+              <input type="number" name="limit" value="10" min="1" max="200" />
+              <label>Limit</label>
+            </div>
+          </div>
+          <div class="s12 m4 l2">
+            <div class="field label border">
+              <input type="number" name="topN" value="0" min="0" max="20" />
+              <label>Next chords (top N)</label>
+            </div>
+          </div>
+          <div class="s12 m4 l1">
+            <div class="field label border">
+              <input type="number" name="entropy" value="0.5" min="0.01" max="10" step="0.01" />
+              <label>Entropy</label>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="tuningName" id="tuning-name-field" />
+        <nav class="right-align top-margin">
+          <button type="submit"><i>play_arrow</i> Run</button>
+        </nav>
+      </form>
+      <script>
+        (function() {
+          var sel = document.querySelector('[name="tuning"]');
+          var nameField = document.getElementById('tuning-name-field');
+          function sync() {
+            var opt = sel.options[sel.selectedIndex];
+            nameField.value = opt.getAttribute('data-name') || opt.text;
+          }
+          sel.addEventListener('change', sync);
+          sync();
+        })();
+      </script>
+    </div>
+  </article>
+  <div id="result-panel"></div>
+</div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

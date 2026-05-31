@@ -69,11 +69,43 @@ public class ChordParserTests
     }
 
     [Theory]
-    [InlineData("C/G")]
-    [InlineData("Cmaj7/E")]
-    public void Slash_chords_rejected_in_v01(string input)
+    [InlineData("C/G",      Letter.C, 0, "",     Letter.G, 0)]
+    [InlineData("Cmaj7/E",  Letter.C, 0, "maj7", Letter.E, 0)]
+    [InlineData("Fmaj7/A",  Letter.F, 0, "maj7", Letter.A, 0)]
+    [InlineData("C/Bb",     Letter.C, 0, "",     Letter.B, -1)]
+    public void Slash_chords_parse_root_quality_and_bass(
+        string input, Letter root, int acc, string quality, Letter bassLetter, int bassAcc)
+    {
+        var chord = Parser.Parse(input);
+        chord.Root.Should().Be(new Note(root, acc));
+        chord.Quality.Should().Be(quality);
+        chord.Bass.Should().Be(new Note(bassLetter, bassAcc));
+    }
+
+    [Theory]
+    [InlineData("C/xyz")]
+    [InlineData("C/")]
+    public void Slash_chord_bad_bass_throws(string input)
     {
         var act = () => Parser.Parse(input);
+        act.Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void Slash_chord_double_slash_throws()
+    {
+        var act = () => Parser.Parse("C/E/G");
+        act.Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void Slash_chord_rejection_survives_overlay()
+    {
+        // A grammar with rejectSlash:true should still reject slash chords.
+        var rules = Grammar.ParseRules with { RejectSlash = true };
+        var strictGrammar = Grammar with { ParseRules = rules };
+        var strictParser = new ChordParser(strictGrammar);
+        var act = () => strictParser.Parse("C/G");
         act.Should().Throw<FormatException>();
     }
 

@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.CommandLine;
 using Dadabe.Cli.Commands;
+using Dadabe.Cli.Io;
 using Dadabe.Fretboard;
 using DadabeEnv = Dadabe.Fretboard.Environment;
 
@@ -11,6 +12,7 @@ internal static class Program
     private const int ExitOk = 0;
     private const int ExitBadInput = 1;
     private const int ExitUnexpected = 2;
+    private const int ExitSchemaViolation = 3;
 
     public static int Main(string[] args)
     {
@@ -25,6 +27,7 @@ internal static class Program
         // Shared options.
         var outOption = new Option<string?>("--out") { Description = "Write JSON to file (default: stdout)." };
         var prettyOption = new Option<bool>("--pretty") { Description = "Pretty-print JSON." };
+        var validateSchemaOption = new Option<bool>("--validate-schema") { Description = "Validate output JSON against schema; exit 3 on violation." };
 
         // --- voicings ---
         var chordArg = new Argument<string>("chord") { Description = "Chord symbol, e.g. \"Cmaj7\", \"G7b9\", \"F#m11\"." };
@@ -64,6 +67,7 @@ internal static class Program
             entropyOption,
             outOption,
             prettyOption,
+            validateSchemaOption,
         };
         voicings.SetAction(parse => SafeRun(() =>
         {
@@ -83,7 +87,8 @@ internal static class Program
                 searchParams: p,
                 limit: parse.GetValue(limitOption),
                 topN: parse.GetValue(topNOption),
-                entropy: parse.GetValue(entropyOption));
+                entropy: parse.GetValue(entropyOption),
+                validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
         // --- tuning ---
@@ -93,11 +98,13 @@ internal static class Program
             tuningPositionalArg,
             outOption,
             prettyOption,
+            validateSchemaOption,
         };
         tuning.SetAction(parse => SafeRun(() =>
         {
             var env = BuildEnvironment(parse, outOption, prettyOption, handProfileOption: null);
-            TuningCommand.Run(env, parse.GetRequiredValue(tuningPositionalArg));
+            TuningCommand.Run(env, parse.GetRequiredValue(tuningPositionalArg),
+                validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
         // --- chord ---
@@ -107,16 +114,40 @@ internal static class Program
             chordPositionalArg,
             outOption,
             prettyOption,
+            validateSchemaOption,
         };
         chord.SetAction(parse => SafeRun(() =>
         {
             var env = BuildEnvironment(parse, outOption, prettyOption, handProfileOption: null);
-            ChordCommand.Run(env, parse.GetRequiredValue(chordPositionalArg));
+            ChordCommand.Run(env, parse.GetRequiredValue(chordPositionalArg),
+                validateSchema: parse.GetValue(validateSchemaOption));
+        }));
+
+        // --- predict ---
+        var inputOption = new Option<string?>("--input") { Description = "Prediction request JSON file (required)." };
+        var predict = new Command("predict", "Predict the next chord from a JSON request file.")
+        {
+            inputOption,
+            entropyOption,
+            outOption,
+            prettyOption,
+            validateSchemaOption,
+        };
+        predict.SetAction(parse => SafeRun(() =>
+        {
+            var env = BuildEnvironment(parse, outOption, prettyOption, handProfileOption: null);
+            var inputPath = parse.GetValue(inputOption)
+                ?? throw new FormatException("--input is required for the predict subcommand.");
+            PredictCommand.Run(env,
+                inputFilePath: inputPath,
+                entropy: parse.GetValue(entropyOption),
+                validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
         root.Add(voicings);
         root.Add(tuning);
         root.Add(chord);
+        root.Add(predict);
         return root;
     }
 
@@ -126,6 +157,10 @@ internal static class Program
         {
             action();
             return ExitOk;
+        }
+        catch (SchemaViolationException)
+        {
+            return ExitSchemaViolation;
         }
         catch (FormatException ex)
         {

@@ -1,0 +1,45 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Services.ScaleModel?>
+
+@{
+  var isNew        = Model is null;
+  var slug         = Model?.Slug ?? string.Empty;
+  var method       = isNew ? "post" : "put";
+  var action       = isNew ? "/api/reference/scales" : $"/api/reference/scales/{slug}";
+  var notesStr     = Model is null ? "" : string.Join(", ", Model.Notes);
+  var intervalsStr = Model is null ? "" : string.Join(", ", Model.Intervals);
+}
+
+<dialog class="active" id="scale-dialog">
+  <h5>@(isNew ? "New Scale" : $"Edit: {Model!.Name}")</h5>
+  <form hx-@method="@action"
+        hx-target="#ref-content"
+        hx-swap="innerHTML"
+        hx-on::after-request="if(event.detail.successful) document.getElementById('scale-dialog').remove()">
+
+    <div class="field label border">
+      <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
+      <label>Name</label>
+    </div>
+    <div class="field label border">
+      <input type="text" name="notes" value="@notesStr" required placeholder="e.g. C, D, E, F, G, A, B" />
+      <label>Notes (comma-separated)</label>
+    </div>
+    <div class="field label border">
+      <input type="text" name="intervals" value="@intervalsStr" required placeholder="e.g. 0, 2, 4, 5, 7, 9, 11" />
+      <label>Intervals (comma-separated semitones)</label>
+    </div>
+    <div class="field label border">
+      <input type="text" name="modeOf" value="@(Model?.ModeOf ?? "")" />
+      <label>Mode of (optional)</label>
+    </div>
+    <div class="field label border">
+      <input type="text" name="description" value="@(Model?.Description ?? "")" />
+      <label>Description (optional)</label>
+    </div>
+
+    <nav class="right-align top-margin">
+      <button type="button" class="border" onclick="document.getElementById('scale-dialog').remove()">Cancel</button>
+      <button type="submit">Save</button>
+    </nav>
+  </form>
+</dialog>

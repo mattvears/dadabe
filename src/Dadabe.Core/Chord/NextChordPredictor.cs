@@ -38,7 +38,7 @@ public static class NextChordPredictor
     }
 
     private static double EntropyToTemperature(double entropy)
-        => Math.Clamp(1.0 / Math.Max(entropy, 0.01), 0.1, 10.0);
+        => Math.Clamp(entropy, 0.01, 10.0);
 
     private static double[] Softmax(double[] scores, double temperature)
     {

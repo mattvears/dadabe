@@ -55,11 +55,9 @@ public sealed class ChordParser
             return false;
         }
 
-        // TODO (future): support slash chords — parse "C/E" as root=C, bass=E.
-        // Until then the grammar's rejectSlash flag keeps them rejected (D2).
         if (_grammar.ParseRules.RejectSlash && symbol.Contains('/', StringComparison.Ordinal))
         {
-            error = "Slash chords are not supported in v0.1 (D2).";
+            error = "Slash chords are not supported (grammar rejectSlash=true).";
             return false;
         }
 
@@ -67,10 +65,33 @@ public sealed class ChordParser
         // Extension point: detect the polychord delimiter here and route to a
         // dedicated PolychordParser before falling through to the standard path.
 
-        var rootMatch = _rootRegex.Match(symbol);
+        // Slash chord: split on the first '/'; parse the left part normally,
+        // parse the right part as a bass note. Double-slash is rejected.
+        Note? bass = null;
+        var symbolToParse = symbol;
+        var slashIndex = symbol.IndexOf('/', StringComparison.Ordinal);
+        if (slashIndex >= 0)
+        {
+            if (slashIndex == 0 || slashIndex == symbol.Length - 1
+                || symbol.IndexOf('/', slashIndex + 1) >= 0)
+            {
+                error = $"'{symbol}' is not a valid slash chord (expected exactly one '/' between chord and bass note).";
+                return false;
+            }
+            var rightPart = symbol[(slashIndex + 1)..];
+            if (!Note.TryParse(rightPart, out var bassNote))
+            {
+                error = $"Bass note '{rightPart}' is not a valid note.";
+                return false;
+            }
+            bass = bassNote;
+            symbolToParse = symbol[..slashIndex];
+        }
+
+        var rootMatch = _rootRegex.Match(symbolToParse);
         if (!rootMatch.Success || rootMatch.Index != 0)
         {
-            error = $"Cannot parse root from '{symbol}'.";
+            error = $"Cannot parse root from '{symbolToParse}'.";
             return false;
         }
 
@@ -98,7 +119,7 @@ public sealed class ChordParser
         };
         var root = new Note(letter, accidental);
 
-        var cursor = symbol.AsSpan(rootMatch.Length);
+        var cursor = symbolToParse.AsSpan(rootMatch.Length);
 
         GrammarForm? matchedForm = null;
         foreach (var (token, form) in _formTokensLongestFirst)
@@ -118,7 +139,7 @@ public sealed class ChordParser
 
         if (matchedForm is null)
         {
-            error = $"No chord form matches '{symbol[rootMatch.Length..]}'.";
+            error = $"No chord form matches '{symbolToParse[rootMatch.Length..]}'.";
             return false;
         }
 
@@ -151,7 +172,7 @@ public sealed class ChordParser
 
         if (_grammar.ParseRules.RejectUnparsedTail && cursor.Length > 0)
         {
-            error = $"Unparsed tail '{cursor.ToString()}' after parsing root + form + modifiers in '{symbol}'.";
+            error = $"Unparsed tail '{cursor.ToString()}' after parsing root + form + modifiers in '{symbolToParse}'.";
             return false;
         }
 
@@ -160,7 +181,7 @@ public sealed class ChordParser
             matchedForm.DisplayName,
             extensions.ToImmutable(),
             alterations.ToImmutable(),
-            Bass: null);
+            Bass: bass);
         return true;
     }
 }

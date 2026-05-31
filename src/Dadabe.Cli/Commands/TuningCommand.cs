@@ -11,7 +11,7 @@ namespace Dadabe.Cli.Commands;
 /// </summary>
 public static class TuningCommand
 {
-    public static void Run(Environment env, string tuningNameOrSpec)
+    public static void Run(Environment env, string tuningNameOrSpec, bool validateSchema = false)
     {
         ArgumentNullException.ThrowIfNull(env);
         ArgumentNullException.ThrowIfNull(tuningNameOrSpec);
@@ -28,5 +28,10 @@ public static class TuningCommand
             Warnings: Array.Empty<string>());
 
         JsonEnvelope.Write(envelope, env.Output);
+
+        if (validateSchema)
+        {
+            JsonEnvelope.ValidateSchema(envelope, "tuning", env.WorkingDirectory, env.Output);
+        }
     }
 }

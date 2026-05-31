@@ -1,5 +1,8 @@
-namespace Dadabe.Cli.Io
-{
-    // Request DTO for next-chord prediction
-    public record NextChordPredictionRequestDto(ProgressionDto? Context = null, PredictionFilterDto[]? Filters = null, int? MaxResults = null);
-}
+namespace Dadabe.Cli.Io;
+
+public record NextChordPredictionRequestDto(
+    string Chord,
+    ProgressionDto? Context = null,
+    PredictionFilterDto[]? Filters = null,
+    int? MaxResults = null,
+    double? Entropy = null);

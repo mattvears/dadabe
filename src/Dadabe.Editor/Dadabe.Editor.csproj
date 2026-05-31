@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <AssemblyName>dadabe-editor</AssemblyName>
+    <RootNamespace>Dadabe.Editor</RootNamespace>
+    <!-- CA1859: IResult is idiomatic for minimal API helpers; concrete type isn't useful here. -->
+    <NoWarn>$(NoWarn);CA1859</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RazorSlices" Version="0.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dadabe.Core\Dadabe.Core.csproj" />
+    <ProjectReference Include="..\Dadabe.Fretboard\Dadabe.Fretboard.csproj" />
+  </ItemGroup>
+
+</Project>

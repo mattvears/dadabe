@@ -2,8 +2,9 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "NextChordPredictionRequest",
   "type": "object",
-  "description": "Request shape for next-chord prediction: optional context (progression) + optional filters.",
+  "description": "Request shape for next-chord prediction: required chord, optional context + filters.",
   "properties": {
+    "chord":      { "type": "string", "description": "Chord symbol to predict from, e.g. \"Dm7\"." },
     "context": { "$ref": "./progression.schema.json" },
     "filters": {
       "type": "array",
@@ -17,7 +18,11 @@
         "additionalProperties": false
       }
     },
-    "maxResults": { "type": "integer", "minimum": 1, "maximum": 100 }
+    "maxResults": { "type": "integer", "minimum": 1, "maximum": 50,
+                    "description": "Maximum candidates returned before filters. Result count may be lower after filters are applied." },
+    "entropy":    { "type": "number", "minimum": 0.01, "maximum": 10.0,
+                    "description": "Overrides the environment default entropy for this request." }
   },
+  "required": ["chord"],
   "additionalProperties": false
 }

@@ -13,7 +13,7 @@ namespace Dadabe.Cli.Commands;
 /// </summary>
 public static class ChordCommand
 {
-    public static void Run(Environment env, string chordSymbol)
+    public static void Run(Environment env, string chordSymbol, bool validateSchema = false)
     {
         ArgumentNullException.ThrowIfNull(env);
         ArgumentNullException.ThrowIfNull(chordSymbol);
@@ -34,5 +34,10 @@ public static class ChordCommand
             Warnings: Array.Empty<string>());
 
         JsonEnvelope.Write(envelope, env.Output);
+
+        if (validateSchema)
+        {
+            JsonEnvelope.ValidateSchema(envelope, "chord", env.WorkingDirectory, env.Output);
+        }
     }
 }

@@ -1,0 +1,8 @@
+/* minor layout adjustments */
+nav.left { min-width: 200px; }
+table { width: 100%; }
+td.no-wrap { white-space: nowrap; width: 1%; }
+.italic { font-style: italic; color: var(--on-surface-variant); }
+dialog { min-width: min(500px, 90vw); }
+#chord-list, #string-list, #filter-list { margin: .5rem 0; }
+.chord-item, .string-item, .filter-item { gap: .5rem; margin-bottom: .25rem; }

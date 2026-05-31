@@ -1,0 +1,35 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.ReferenceIndexModel>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <h4>Reference Data</h4>
+
+  <div class="tabs">
+    <a class="@(Model.Tab == "cadences" ? "active" : "")"
+       hx-get="/api/reference/tab/cadences" hx-target="#ref-content">Cadences</a>
+    <a class="@(Model.Tab == "modes" ? "active" : "")"
+       hx-get="/api/reference/tab/modes" hx-target="#ref-content">Modes</a>
+    <a class="@(Model.Tab == "scales" ? "active" : "")"
+       hx-get="/api/reference/tab/scales" hx-target="#ref-content">Scales</a>
+    <a class="@(Model.Tab == "voicing-categories" ? "active" : "")"
+       hx-get="/api/reference/tab/voicing-categories" hx-target="#ref-content">Voicing Categories</a>
+  </div>
+
+  <div id="ref-content" style="margin-top:1rem">
+    @{
+      if (Model.Tab == "modes")
+        await RenderPartialAsync<ReferenceModeList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ModeModel>>(Model.Modes);
+      else if (Model.Tab == "scales")
+        await RenderPartialAsync<ReferenceScaleList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ScaleModel>>(Model.Scales);
+      else if (Model.Tab == "voicing-categories")
+        await RenderPartialAsync<ReferenceVoicingCategories, string?>(Model.VoicingCategoriesJson);
+      else
+        await RenderPartialAsync<ReferenceCadenceList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.CadenceModel>>(Model.Cadences);
+    }
+  </div>
+</div>
+<div id="dialog-container"></div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

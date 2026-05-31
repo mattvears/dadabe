@@ -1,0 +1,8 @@
+{
+  "chord": "Dm7",
+  "context": { "chords": ["Cmaj7", "Am7", "Dm7"], "tempo": 120 },
+  "filters": [
+    { "type": "byQuality", "params": { "quality": "7" } }
+  ],
+  "maxResults": 5
+}

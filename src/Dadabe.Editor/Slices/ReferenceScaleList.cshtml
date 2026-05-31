@@ -1,0 +1,42 @@
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ScaleModel>>
+
+<div class="row bottom-margin">
+  <span class="max"></span>
+  <button hx-get="/api/reference/scales/new" hx-target="#dialog-container" hx-swap="innerHTML">
+    <i>add</i> New
+  </button>
+</div>
+
+@if (Model.Count == 0)
+{
+  <p class="italic">No scales yet.</p>
+}
+else
+{
+  <table class="border">
+    <thead><tr><th>Name</th><th>Notes</th><th>Intervals</th><th></th></tr></thead>
+    <tbody>
+      @foreach (var s in Model)
+      {
+        <tr id="scale-@s.Slug">
+          <td>@s.Name</td>
+          <td>@string.Join(", ", s.Notes)</td>
+          <td>@string.Join(", ", s.Intervals)</td>
+          <td class="no-wrap">
+            <button class="small border"
+                    hx-get="/api/reference/scales/@s.Slug/edit"
+                    hx-target="#dialog-container" hx-swap="innerHTML">
+              <i>edit</i>
+            </button>
+            <button class="small border error"
+                    hx-delete="/api/reference/scales/@s.Slug"
+                    hx-target="#scale-@s.Slug" hx-swap="outerHTML"
+                    hx-confirm="Delete '@s.Name'?">
+              <i>delete</i>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

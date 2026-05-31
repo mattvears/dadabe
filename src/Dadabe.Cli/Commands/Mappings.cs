@@ -33,11 +33,12 @@ internal static class Mappings
         tuning.Name,
         tuning.Strings.Select(p => p.ToString()).ToList());
 
-    public static ChordDto ToDto(ChordSpec spec, string symbol) => new(
-        Symbol: symbol,
+    public static ChordDto ToDto(ChordSpec spec, ChordSymbol symbol, string symbolText) => new(
+        Symbol: symbolText,
         Root: spec.Root.ToString(),
         Quality: spec.Quality,
-        PitchClasses: spec.Tones.Select(t => new ChordPcDto(t.Note.ToString(), t.Function)).ToList());
+        PitchClasses: spec.Tones.Select(t => new ChordPcDto(t.Note.ToString(), t.Function)).ToList(),
+        BassNote: symbol.Bass?.ToString());
 
     public static VoicingDto ToDto(Voicing v)
     {

@@ -1,0 +1,48 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.DashboardModel>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <h4>Dashboard</h4>
+  <div class="grid">
+    <div class="s12 m6 l3">
+      <article class="border">
+        <div class="padding">
+          <h5>@Model.ProgressionCount</h5>
+          <p>Progressions</p>
+          <a href="/progressions" class="button small">Open</a>
+        </div>
+      </article>
+    </div>
+    <div class="s12 m6 l3">
+      <article class="border">
+        <div class="padding">
+          <h5>@Model.PredictionCount</h5>
+          <p>Predictions</p>
+          <a href="/predictions" class="button small">Open</a>
+        </div>
+      </article>
+    </div>
+    <div class="s12 m6 l3">
+      <article class="border">
+        <div class="padding">
+          <h5>@Model.TuningCount</h5>
+          <p>Tunings</p>
+          <a href="/tunings" class="button small">Open</a>
+        </div>
+      </article>
+    </div>
+    <div class="s12 m6 l3">
+      <article class="border">
+        <div class="padding">
+          <h5>@Model.ReferenceCount</h5>
+          <p>Reference items</p>
+          <a href="/reference" class="button small">Open</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

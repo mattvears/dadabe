@@ -1,0 +1,19 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.TuningModel>>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <div class="row">
+    <h4 class="max">Tunings</h4>
+    <button hx-get="/api/tunings/new" hx-target="#dialog-container" hx-swap="innerHTML">
+      <i>add</i> New
+    </button>
+  </div>
+  <div id="tuning-list">
+    @{ await RenderPartialAsync<TuningsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.TuningModel>>(Model); }
+  </div>
+</div>
+<div id="dialog-container"></div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

@@ -1,31 +1,53 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/prediction-result.schema.json",
   "title": "NextChordPredictionResult",
   "type": "object",
   "description": "Response shape for next-chord prediction. Score is normalised to 0..1 (higher = more likely).",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
   "properties": {
-    "results": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "chord":   { "type": "string", "description": "Predicted chord symbol." },
-          "score":   { "type": "number", "minimum": 0, "maximum": 1, "description": "Confidence score in [0,1]." },
-          "reasons": { "type": "array", "items": { "type": "string" }, "description": "Human-readable scoring rationale." }
-        },
-        "required": ["chord", "score"],
-        "additionalProperties": false
-      }
-    },
-    "metadata": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "command":       { "const": "predict" },
+    "input":         { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } },
+    "data": {
       "type": "object",
+      "required": ["results"],
+      "additionalProperties": false,
       "properties": {
-        "contextUsed":     { "$ref": "./progression.schema.json" },
-        "filtersApplied":  { "type": "object", "additionalProperties": true }
-      },
-      "additionalProperties": false
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["chord", "score"],
+            "additionalProperties": false,
+            "properties": {
+              "chord":   { "type": "string", "description": "Predicted chord symbol." },
+              "score":   { "type": "number", "minimum": 0, "maximum": 1 },
+              "reasons": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contextUsed": {
+              "type": "object",
+              "required": ["chords"],
+              "properties": {
+                "chords": { "type": "array", "items": { "type": "string" } },
+                "tempo":  { "type": "integer", "minimum": 1 }
+              },
+              "additionalProperties": true
+            },
+            "filtersApplied": { "type": "object", "additionalProperties": true }
+          }
+        }
+      }
     }
-  },
-  "required": ["results"],
-  "additionalProperties": false
+  }
 }

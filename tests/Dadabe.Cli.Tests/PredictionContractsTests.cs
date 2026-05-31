@@ -14,7 +14,7 @@ namespace Dadabe.Cli.Tests
             var context = new ProgressionDto(contextChords, 100);
             var filterParams = new Dictionary<string, object> { { "chord", "Gm" } };
             var filter = new PredictionFilterDto("byChord", filterParams);
-            var req = new NextChordPredictionRequestDto(context, new[] { filter }, 10);
+            var req = new NextChordPredictionRequestDto("Gm", context, new[] { filter }, 10);
 
             var json = JsonSerializer.Serialize(req);
             var round = JsonSerializer.Deserialize<NextChordPredictionRequestDto>(json);

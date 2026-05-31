@@ -260,6 +260,6 @@
     "modifierOrder": "any",
     "modifiersAllowedAfterEmptyForm": true,
     "rejectUnparsedTail": true,
-    "rejectSlash": true
+    "rejectSlash": false
   }
 }

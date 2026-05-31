@@ -20,6 +20,9 @@ Thumbs.db
 *.snupkg
 .nuget/
 
+# Script output
+out/
+
 # Coverage
 coverage*.xml
 *.coverage

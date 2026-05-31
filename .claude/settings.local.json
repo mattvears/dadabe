@@ -1,17 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet build *)",
+      "Bash(dotnet *)",
       "Skill(remember)",
       "Skill(remember:*)",
-      "Bash(ls c:/dadabe_out 2>/dev/null && echo \"EXISTS\" || echo \"DOES NOT EXIST\")",
+      "Bash(ls c:/dadabe_out 2>/dev/null && echo \"EXISTS\" || echo \"DOES NOT EXIST\")v",
       "Read(//c/dadabe_out/**)",
       "Bash(rm -rf /c/dadabe_out)",
       "Bash(mkdir /c/dadabe_out)",
       "Bash(powershell.exe -NoProfile -File \"C:\\\\src\\\\dadabe\\\\scripts\\\\generate-voicings.ps1\" -DadabeCmd \"C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe\" -OutDir \"C:\\\\dadabe_out\" -TopN 5)",
-      "Bash(powershell.exe -NoProfile -File 'C:\\\\src\\\\dadabe\\\\scripts\\\\generate-voicings.ps1' -DadabeCmd 'C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe' -OutDir 'C:\\\\dadabe_out' -Source 'C:\\\\nonexistent' -TopN 5)",
+      "Bash(powershell.exe -NoProfile -File 'C:\\\\src\\\\dadabe\\\\scripts\\\\generate-oicings.ps1' -DadabeCmd 'C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe' -OutDir 'C:\\\\dadabe_out' -Source 'C:\\\\nonexistent' -TopN 5)",
       "Bash(powershell.exe -NoProfile -Command ' *)",
-      "Bash(powershell.exe -NoProfile -File 'C:\\\\src\\\\dadabe\\\\scripts\\\\generate-voicings.ps1' -DadabeCmd 'C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe' -OutDir 'C:\\\\dadabe_out' -Source 'C:\\\\tmp\\\\dadabe-empty' -TopN 5 -Entropy 0.5 -ChartLimit 5)"
+      "Bash(powershell.exe -NoProfile -File 'C:\\\\src\\\\dadabe\\\\scripts\\\\generate-voicings.ps1' -DadabeCmd 'C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe' -OutDir 'C:\\\\dadabe_out' -Source 'C:\\\\tmp\\\\dadabe-empty' -TopN 5 -Entropy 0.5 -ChartLimit 5)",
+      "Bash(powershell.exe *)",
+      "Bash(curl *)"
     ]
   }
 }

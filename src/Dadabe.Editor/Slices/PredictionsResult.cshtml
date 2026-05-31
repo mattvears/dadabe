@@ -1,0 +1,31 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.PredictionResultModel>
+
+<article class="border top-margin">
+  <div class="padding">
+    <div class="row">
+      <h6 class="max">Result: @Model.Chord</h6>
+      <button class="small border" onclick="document.getElementById('result-panel').innerHTML=''">
+        <i>close</i>
+      </button>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+      <p class="error-text">@Model.Error</p>
+    }
+    else
+    {
+      <table>
+        <thead><tr><th>Chord</th><th>Score</th></tr></thead>
+        <tbody>
+          @foreach (var r in Model.Results)
+          {
+            <tr>
+              <td><code>@r.Chord</code></td>
+              <td>@r.Score.ToString("F4")</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</article>

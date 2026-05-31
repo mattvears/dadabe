@@ -1,0 +1,19 @@
+{
+  "tool": "dadabe",
+  "version": "0.4.0",
+  "schemaVersion": "1",
+  "command": "predict",
+  "input": { "chord": "Dm7" },
+  "data": {
+    "results": [
+      { "chord": "G7",  "score": 0.4821 },
+      { "chord": "Bb7", "score": 0.2314 },
+      { "chord": "A7",  "score": 0.1703 }
+    ],
+    "metadata": {
+      "contextUsed": { "chords": ["Cmaj7", "Am7", "Dm7"], "tempo": 120 },
+      "filtersApplied": { "byQuality": { "quality": "7" } }
+    }
+  },
+  "warnings": []
+}

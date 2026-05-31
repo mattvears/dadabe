@@ -81,16 +81,32 @@ function Get-VoicingsArgs {
 
 function Invoke-Dadabe {
     param([string[]]$Arguments, [string]$Label)
-    Write-Host "  dadabe $($Arguments -join ' ')"
+    Write-Host "  $DadabeCmd $($Arguments -join ' ')"
     if ($WhatIf) { return }
+    # Split DadabeCmd on whitespace so compound forms like
+    # 'dotnet run --project .\src\Dadabe.Cli --' work correctly.
+    $parts = $DadabeCmd -split '\s+'
+    $exe   = $parts[0]
+    $pre   = if ($parts.Count -gt 1) { $parts[1..($parts.Count - 1)] } else { @() }
     try {
-        $proc = Start-Process -FilePath $DadabeCmd -ArgumentList $Arguments `
-            -NoNewWindow -Wait -PassThru -ErrorAction Stop
-        if ($proc.ExitCode -ne 0) {
-            Write-Warning "[$Label] Exited with code $($proc.ExitCode)"
+        & $exe @pre @Arguments
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "[$Label] Exited with code $LASTEXITCODE"
         }
     }
     catch { Write-Warning "[$Label] Failed: $_" }
+}
+
+# Simplify enharmonic note names that look odd in display: E#→F, B#→C, Cb→B, Fb→E.
+function ConvertTo-SimpleNoteName {
+    param([string]$Name)
+    switch ($Name) {
+        'E#'  { return 'F' }
+        'B#'  { return 'C' }
+        'Cb'  { return 'B' }
+        'Fb'  { return 'E' }
+        default { return $Name }
+    }
 }
 
 # Render a human-readable chart from a voicings JSON file.
@@ -112,7 +128,7 @@ function Render-ChordChart {
     $sb = [System.Text.StringBuilder]::new()
 
     # ── header ───────────────────────────────────────────────────────────
-    $tones = ($chord.pitchClasses | ForEach-Object { $_.name }) -join '  '
+    $tones = ($chord.pitchClasses | ForEach-Object { ConvertTo-SimpleNoteName $_.name }) -join '  '
     [void]$sb.AppendLine("$($chord.symbol)  [$($tuning.name)]")
     [void]$sb.AppendLine("Tones:  $tones")
     [void]$sb.AppendLine()
@@ -188,7 +204,7 @@ if (-not (Test-Path $OutDir)) {
 }
 
 $files = Get-TextFilesFromSource -Path $Source
-if ($files.Count -eq 0) {
+if (-not $files -or $files.Count -eq 0) {
     Write-Host "No input files found in '$Source'. Using predefined chord set (DADABE)."
     Write-Host ''
 
@@ -225,8 +241,10 @@ $found = [System.Collections.Generic.HashSet[string]]::new()
 
 foreach ($f in $files) {
     Write-Host "Reading: $($f.FullName)"
-    try { $text = Get-Content -Raw -ErrorAction Stop -Path $f.FullName }
+    try { $lines = Get-Content -ErrorAction Stop -Path $f.FullName }
     catch { Write-Warning "Failed to read $($f.FullName): $_"; continue }
+    # Strip comment lines so # headers in chord fixtures don't produce false tokens.
+    $text = ($lines | Where-Object { $_ -notmatch '^\s*#' }) -join ' '
     foreach ($m in $regex.Matches($text)) {
         $token = $m.Groups[1].Value.Trim()
         if (-not [string]::IsNullOrWhiteSpace($token)) { [void]$found.Add($token) }
@@ -240,19 +258,18 @@ Write-Host ''
 foreach ($chord in $found) {
     $safe = Sanitize-Name -Name $chord
     $dest = Join-Path -Path $OutDir -ChildPath $safe
+    $voicingsFile = Join-Path $dest 'voicings.json'
 
-    if (Test-Path $dest) {
+    if (Test-Path $voicingsFile) {
         if ($Force) {
             Write-Host "Removing: $dest"
             if (-not $WhatIf) { Remove-Item -Recurse -Force -LiteralPath $dest }
         }
-        else { Write-Host "Skipping (exists): $dest"; continue }
+        else { Write-Host "Skipping (complete): $dest"; continue }
     }
 
     Write-Host "[$chord]"
     if (-not $WhatIf) { New-Item -ItemType Directory -Force -Path $dest | Out-Null }
-
-    $voicingsFile = Join-Path $dest 'voicings.json'
     $chartFile    = Join-Path $dest 'chart.txt'
 
     Invoke-Dadabe -Arguments (Get-VoicingsArgs -Chord $chord -Tuning '' -OutPath $voicingsFile) -Label "voicings/$chord"

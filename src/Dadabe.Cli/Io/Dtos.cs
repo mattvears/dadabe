@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Dadabe.Cli.Io;
@@ -45,7 +46,9 @@ public sealed record ChordDto(
     [property: JsonPropertyName("symbol")] string Symbol,
     [property: JsonPropertyName("root")] string Root,
     [property: JsonPropertyName("quality")] string Quality,
-    [property: JsonPropertyName("pitchClasses")] IReadOnlyList<ChordPcDto> PitchClasses);
+    [property: JsonPropertyName("pitchClasses")] IReadOnlyList<ChordPcDto> PitchClasses,
+    [property: JsonPropertyName("bassNote"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    string? BassNote = null);
 
 public sealed record ChordPcDto(
     [property: JsonPropertyName("name")] string Name,
@@ -119,3 +122,22 @@ public sealed record ChordPayload(
     [property: JsonPropertyName("alterations")] IReadOnlyList<string> Alterations,
     [property: JsonPropertyName("pitchClasses")] IReadOnlyList<ChordPcDto> PitchClasses,
     [property: JsonPropertyName("required")] IReadOnlyList<string> Required);
+
+/// <summary>Payload for the <c>predict</c> subcommand.</summary>
+public sealed record PredictionResultDto(
+    [property: JsonPropertyName("results")]
+    IReadOnlyList<PredictionCandidateDto> Results,
+    [property: JsonPropertyName("metadata"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    PredictionMetadataDto? Metadata);
+
+public sealed record PredictionCandidateDto(
+    [property: JsonPropertyName("chord")]   string Chord,
+    [property: JsonPropertyName("score")]   double Score,
+    [property: JsonPropertyName("reasons"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<string>? Reasons);
+
+public sealed record PredictionMetadataDto(
+    [property: JsonPropertyName("contextUsed"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    ProgressionDto? ContextUsed,
+    [property: JsonPropertyName("filtersApplied"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    JsonObject? FiltersApplied);

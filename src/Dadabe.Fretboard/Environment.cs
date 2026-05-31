@@ -16,7 +16,8 @@ public sealed record Environment(
     Catalogs Catalogs,
     HandModel HandModel,
     OutputTarget Output,
-    ModelVersion Version = ModelVersion.V1)
+    ModelVersion Version = ModelVersion.V1,
+    string? WorkingDirectory = null)
 {
     /// <summary>
     /// Build with embedded-only catalogs (no overlays), default hand
@@ -38,5 +39,6 @@ public sealed record Environment(
         OutputTarget? output = null) => new(
             Catalogs.Load(workingDirectory),
             handModel ?? Dadabe.Fretboard.HandModel.Default,
-            output ?? OutputTarget.Stdout());
+            output ?? OutputTarget.Stdout(),
+            WorkingDirectory: workingDirectory);
 }

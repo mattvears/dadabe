@@ -1,0 +1,19 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ProgressionModel>>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <div class="row">
+    <h4 class="max">Progressions</h4>
+    <button hx-get="/api/progressions/new" hx-target="#dialog-container" hx-swap="innerHTML">
+      <i>add</i> New
+    </button>
+  </div>
+  <div id="progression-list">
+    @{ await RenderPartialAsync<ProgressionsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ProgressionModel>>(Model); }
+  </div>
+</div>
+<div id="dialog-container"></div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

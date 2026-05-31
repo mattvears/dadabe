@@ -1,0 +1,66 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoicingResultModel>
+
+<article class="border top-margin">
+  <div class="padding">
+    <div class="row">
+      <h6 class="max">@Model.Chord  [@Model.TuningName]</h6>
+      <button class="small border" onclick="document.getElementById('result-panel').innerHTML=''">
+        <i>close</i>
+      </button>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+      <p class="error-text">@Model.Error</p>
+    }
+    else
+    {
+      if (Model.NextChords.Count > 0)
+      {
+        <p><strong>Next chords</strong></p>
+        <table class="small-padding">
+          <thead><tr><th>Chord</th><th style="width:220px">Probability</th></tr></thead>
+          <tbody>
+            @foreach (var nc in Model.NextChords)
+            {
+              var pct = (int)Math.Round(nc.Probability * 100);
+              var barW = (int)Math.Round(nc.Probability * 150);
+              <tr>
+                <td><code>@nc.Symbol</code></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div style="background:var(--primary);height:8px;width:@(barW)px;border-radius:4px"></div>
+                    <span>@pct%</span>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="divider top-margin bottom-margin"></div>
+      }
+
+      <p class="small">@Model.TotalCount voicing(s)@(Model.TotalCount > Model.Voicings.Count ? $", showing {Model.Voicings.Count}" : "")</p>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Structure</th>
+            <th>Comfort</th>
+            <th>Positions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var v in Model.Voicings)
+          {
+            <tr>
+              <td>@v.Index</td>
+              <td>@v.Structure</td>
+              <td>@v.ComfortPct%</td>
+              <td><code>@v.Positions</code></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</article>

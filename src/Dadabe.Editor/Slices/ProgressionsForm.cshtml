@@ -1,0 +1,68 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Services.ProgressionModel?>
+
+@{
+    var isNew = Model is null;
+    var slug = Model?.Slug ?? string.Empty;
+    var method = isNew ? "post" : "put";
+    var action = isNew ? "/api/progressions" : $"/api/progressions/{slug}";
+}
+
+<dialog class="active" id="progression-dialog">
+    <h5>@(isNew ? "New Progression" : $"Edit: {Model!.Name}")</h5>
+    <form hx-@method="@action" hx-target="#progression-list" hx-swap="innerHTML"
+        hx-on::after-request="if(event.detail.successful) document.getElementById('progression-dialog').remove()">
+
+        <div class="field label border">
+            <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
+            <label>Name</label>
+        </div>
+
+        <div class="field label border">
+            <input type="number" name="tempo" value="@(Model?.Tempo?.ToString() ?? "")" min="1" max="400" />
+            <label>Tempo (optional)</label>
+        </div>
+
+        <label>Chords</label>
+        <div id="chord-list">
+            @{
+                var chords = Model?.Chords ?? [];
+                for (int i = 0; i < chords.Count; i++)
+                {
+                    <div class="row chord-item" id="chord-item-@i">
+                        <div class='max field border left-round'>
+                            <input type="text" name="chords" value="@chords[i]" placeholder="e.g. Dm7" />
+                        </div>
+                        <button type="button" class="right-round square tertiary small"
+                                onclick="this.closest('.chord-item').remove()">
+                            <i>close</i>
+                        </button>
+
+                    </div>
+                }
+            }
+        </div>
+        <button type="button" class="small border" onclick="addChord()">
+            <i>add</i> Add chord
+        </button>
+
+        <nav class="right-align top-margin">
+            <button type="button" class="border"
+                    onclick="document.getElementById('progression-dialog').remove()">Cancel</button>
+            <button type="submit">Save</button>
+        </nav>
+    </form>
+</dialog>
+
+<script>
+    function addChord() {
+        var list = document.getElementById('chord-list');
+        var idx = list.children.length;
+        var div = document.createElement('div');
+        div.className = 'row chord-item';
+        div.id = 'chord-item-' + idx;
+        div.innerHTML = '<div class="max field border left-round"><input type="text" name="chords" placeholder="e.g. Dm7" /></div>'
+            + '<button type="button" class="right-round square tertiary small" onclick="this.closest(\'.chord-item\').remove()"><i>close</i></button>';
+        list.appendChild(div);
+        div.querySelector('input').focus();
+    }
+</script>

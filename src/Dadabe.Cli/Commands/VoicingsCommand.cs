@@ -21,7 +21,8 @@ public static class VoicingsCommand
         SearchParams searchParams,
         int limit,
         int topN = 0,
-        double entropy = 0.5)
+        double entropy = 0.5,
+        bool validateSchema = false)
     {
         ArgumentNullException.ThrowIfNull(env);
         ArgumentNullException.ThrowIfNull(chordSymbol);
@@ -48,7 +49,7 @@ public static class VoicingsCommand
             .ToList();
 
         var payload = new VoicingsPayload(
-            Chord: ToDto(spec, chordSymbol),
+            Chord: ToDto(spec, symbol, chordSymbol),
             Tuning: ToDto(tuning),
             Voicings: voicings.Select(ToDto).ToList(),
             NextChords: nextChords);
@@ -63,6 +64,11 @@ public static class VoicingsCommand
             Warnings: Array.Empty<string>());
 
         JsonEnvelope.Write(envelope, env.Output);
+
+        if (validateSchema)
+        {
+            JsonEnvelope.ValidateSchema(envelope, "voicings", env.WorkingDirectory, env.Output);
+        }
     }
 
     internal static Dadabe.Core.Tuning ResolveTuning(Environment env, string tuningNameOrSpec)

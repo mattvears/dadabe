@@ -1,0 +1,20 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.PredictionsIndexModel>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="padding">
+  <div class="row">
+    <h4 class="max">Predictions</h4>
+    <button hx-get="/api/predictions/new" hx-target="#dialog-container" hx-swap="innerHTML">
+      <i>add</i> New
+    </button>
+  </div>
+  <div id="prediction-list">
+    @{ await RenderPartialAsync<PredictionsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.PredictionModel>>(Model.Predictions); }
+  </div>
+  <div id="result-panel"></div>
+</div>
+<div id="dialog-container"></div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

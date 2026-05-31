@@ -1,0 +1,39 @@
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ProgressionModel>>
+
+@if (Model.Count == 0)
+{
+  <p class="italic">No progressions yet. Click <strong>New</strong> to add one.</p>
+}
+else
+{
+  <table class="border">
+    <thead>
+      <tr><th>Name</th><th>Chords</th><th>Tempo</th><th></th></tr>
+    </thead>
+    <tbody>
+      @foreach (var p in Model)
+      {
+        <tr id="progression-@p.Slug">
+          <td>@p.Name</td>
+          <td>@string.Join(", ", p.Chords)</td>
+          <td>@(p.Tempo?.ToString() ?? "—")</td>
+          <td class="no-wrap">
+            <button class="small border"
+                    hx-get="/api/progressions/@p.Slug/edit"
+                    hx-target="#dialog-container"
+                    hx-swap="innerHTML">
+              <i>edit</i>
+            </button>
+            <button class="small border error"
+                    hx-delete="/api/progressions/@p.Slug"
+                    hx-target="#progression-@p.Slug"
+                    hx-swap="outerHTML"
+                    hx-confirm="Delete '@p.Name'?">
+              <i>delete</i>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

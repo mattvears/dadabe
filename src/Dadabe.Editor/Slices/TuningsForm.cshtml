@@ -1,0 +1,63 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Services.TuningModel?>
+
+@{
+  var isNew  = Model is null;
+  var slug   = Model?.Slug ?? string.Empty;
+  var method = isNew ? "post" : "put";
+  var action = isNew ? "/api/tunings" : $"/api/tunings/{slug}";
+}
+
+<dialog class="active" id="tuning-dialog">
+  <h5>@(isNew ? "New Tuning" : $"Edit: {Model!.Name}")</h5>
+  <form hx-@method="@action"
+        hx-target="#tuning-list"
+        hx-swap="innerHTML"
+        hx-on::after-request="if(event.detail.successful) document.getElementById('tuning-dialog').remove()">
+
+    <div class="field label border">
+      <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
+      <label>Name</label>
+    </div>
+
+    <label>Strings (low to high)</label>
+    <div id="string-list">
+      @{
+        var strings = Model?.Strings ?? [];
+        for (int i = 0; i < strings.Count; i++)
+        {
+          <div class="row string-item" id="string-item-@i">
+            <div class="field border max">
+              <input type="text" name="strings" value="@strings[i]" placeholder="e.g. E2" />
+            </div>
+            <button type="button" class="small border error"
+                    onclick="this.closest('.string-item').remove()">
+              <i>close</i>
+            </button>
+          </div>
+        }
+      }
+    </div>
+    <button type="button" class="small border" onclick="addString()">
+      <i>add</i> Add string
+    </button>
+
+    <nav class="right-align top-margin">
+      <button type="button" class="border" onclick="document.getElementById('tuning-dialog').remove()">Cancel</button>
+      <button type="submit">Save</button>
+    </nav>
+  </form>
+</dialog>
+
+<script>
+function addString() {
+  var list = document.getElementById('string-list');
+  var idx = list.children.length;
+  var div = document.createElement('div');
+  div.className = 'row string-item';
+  div.id = 'string-item-' + idx;
+  div.innerHTML = '<div class="field border max"><input type="text" name="strings" placeholder="e.g. E2" /></div>'
+    + '<button type="button" class="small border error" onclick="this.closest(\'.string-item\').remove()"><i>close</i></button>';
+  list.appendChild(div);
+  div.querySelector('input').focus();
+}
+</script>

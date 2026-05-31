@@ -39,9 +39,17 @@ public class ProgramTests
     }
 
     [Fact]
-    public void Slash_chord_returns_exit_one()
+    public void Slash_chord_succeeds_with_exit_zero()
     {
-        Run("chord", "C/G", "--out", "ignored.json").Should().Be(1);
+        var path = Path.Combine(Path.GetTempPath(), "dadabe-prog-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            Run("chord", "C/G", "--out", path).Should().Be(0);
+        }
+        finally
+        {
+            if (File.Exists(path)) { File.Delete(path); }
+        }
     }
 
     [Fact]

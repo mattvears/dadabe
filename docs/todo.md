@@ -51,6 +51,6 @@ Short context: The full todo was archived to keep docs/todo.md concise. See the 
 - [x] `Memo/Namespaces.cs` â€” string constants for every memo namespace.
 
 ## Links
-- Full archived TODO: docs\vv0.3\source\todo-full-2026-05-29.md
+- Full archived TODO: docs\v0.3\todo-full-2026-05-29.md
 
 (Edit this concise file to add the most important top-level todos; keep it under 200 lines.)
