@@ -53,6 +53,18 @@ public sealed record VoicingRow(
     int Index,
     string Structure,
     int ComfortPct,
-    string Positions);
+    string AsciiNotation,
+    ChordDiagram Diagram);
+
+public sealed record ChordDiagram(
+    IReadOnlyList<ChordDiagramString> Strings,
+    int StartFret,
+    int NumFrets);
+
+public sealed record ChordDiagramString(
+    string Name,
+    bool Muted,
+    bool Open,
+    int? FrettedAt);
 
 public sealed record NextChordEntry(string Symbol, double Probability);

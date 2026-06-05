@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Dadabe.Cli/Dadabe.Cli.csproj" />
     <Project Path="src/Dadabe.Core/Dadabe.Core.csproj" />
+    <Project Path="src/Dadabe.Editor/Dadabe.Editor.csproj" />
     <Project Path="src/Dadabe.Fretboard/Dadabe.Fretboard.csproj" />
   </Folder>
   <Folder Name="/tests/">

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Dadabe.Cli.Io;
 using Dadabe.Core.Chord;
 using Dadabe.Fretboard;
@@ -22,6 +23,7 @@ public static class VoicingsCommand
         int limit,
         int topN = 0,
         double entropy = 0.5,
+        double minComfort = 0.0,
         bool validateSchema = false)
     {
         ArgumentNullException.ThrowIfNull(env);
@@ -39,10 +41,10 @@ public static class VoicingsCommand
         var set = VoicingSearch.Search(spec, tuning, env.HandModel, searchParams, env.Catalogs.VoicingCategories, version: env.Version);
 
         var voicings = set.Voicings;
+        if (minComfort > 0.0)
+            voicings = voicings.Where(v => v.Comfort >= minComfort).ToImmutableArray();
         if (limit > 0 && voicings.Length > limit)
-        {
             voicings = voicings[..limit];
-        }
 
         var nextChords = NextChordPredictor.Predict(spec, topN, entropy)
             .Select(c => new NextChordDto(c.Symbol, c.Probability))

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Dadabe.Core.Chord;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
@@ -37,6 +38,8 @@ public static class VoicingRoutes
             var entropy     = double.TryParse(form["entropy"],
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var e) ? e : 0.5;
+            var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
+            var minComfort  = minComfortPct / 100.0;
 
             if (string.IsNullOrWhiteSpace(chord))
                 return Results.RazorSlice<VoicingsResult, VoicingResultModel>(
@@ -61,16 +64,23 @@ public static class VoicingRoutes
             var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default, SearchParams.Default, catalogs.VoicingCategories);
 
             var voicings = set.Voicings;
+            if (minComfort > 0.0)
+                voicings = voicings.Where(v => v.Comfort >= minComfort).ToImmutableArray();
             var total    = voicings.Length;
             if (limit > 0 && voicings.Length > limit)
                 voicings = voicings[..limit];
 
             var rows = voicings
-                .Select((v, i) => new VoicingRow(
-                    Index: i + 1,
-                    Structure: v.Structure,
-                    ComfortPct: (int)Math.Round(v.Comfort * 100),
-                    Positions: FormatPositions(v)))
+                .Select((v, i) =>
+                {
+                    var diagram = BuildDiagram(v);
+                    return new VoicingRow(
+                        Index: i + 1,
+                        Structure: v.Structure,
+                        ComfortPct: (int)Math.Round(v.Comfort * 100),
+                        AsciiNotation: BuildAsciiNotation(diagram.Strings),
+                        Diagram: diagram);
+                })
                 .ToList();
 
             var nextChords = NextChordPredictor.Predict(spec, topN, entropy)
@@ -96,18 +106,32 @@ public static class VoicingRoutes
         throw new FormatException($"Unknown tuning '{nameOrSpec}'.");
     }
 
-    private static string FormatPositions(Voicing voicing)
+    private static string BuildAsciiNotation(IReadOnlyList<ChordDiagramString> strings)
     {
-        return string.Join("  ", voicing.Positions
-            .OrderBy(p => p.String)
-            .Select(p =>
-            {
-                var stringName = voicing.Tuning.Strings[p.String].ToString();
-                if (p.Muted) return $"{stringName}:×";
-                var fret = p.Fret!.Value == 0 ? "0" : p.Fret!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                var fn   = p.Function is not null ? $"/{p.Function}" : "";
-                return $"{stringName}:{fret}{fn}";
-            }));
+        var parts = strings.Select(s => s.Muted ? "x" : s.Open ? "0" : s.FrettedAt!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return $"[{string.Join(" ", parts)}]";
+    }
+
+    private static ChordDiagram BuildDiagram(Voicing voicing)
+    {
+        var positions = voicing.Positions.OrderBy(p => p.String).ToList();
+
+        var frettedAboveOpen = positions
+            .Where(p => p.Fret is > 0)
+            .Select(p => p.Fret!.Value)
+            .ToList();
+
+        int startFret = frettedAboveOpen.Count > 0 ? frettedAboveOpen.Min() : 1;
+
+        var strings = positions.Select(p =>
+        {
+            var name = voicing.Tuning.Strings[p.String].ToString();
+            if (p.Muted) return new ChordDiagramString(name, true, false, null);
+            if (p.Open)  return new ChordDiagramString(name, false, true, null);
+            return new ChordDiagramString(name, false, false, p.Fret!.Value);
+        }).ToList();
+
+        return new ChordDiagram(strings, startFret, NumFrets: 4);
     }
 }
 

@@ -1,3 +1,7 @@
+/* htmx */
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline; }
+
 /* minor layout adjustments */
 nav.left { min-width: 200px; }
 table { width: 100%; }
@@ -6,3 +10,21 @@ td.no-wrap { white-space: nowrap; width: 1%; }
 dialog { min-width: min(500px, 90vw); }
 #chord-list, #string-list, #filter-list { margin: .5rem 0; }
 .chord-item, .string-item, .filter-item { gap: .5rem; margin-bottom: .25rem; }
+
+/* chord diagram (flex, legacy) */
+.cd { display: inline-flex; flex-direction: column; }
+.cd-row { display: flex; align-items: center; }
+.cd-sl { width: 22px; text-align: center; font-size: 10px; line-height: 1.8; }
+.cd-fl { width: 18px; text-align: right; font-size: 9px; color: var(--on-surface-variant); padding-right: 3px; }
+.cd-cell { width: 22px; height: 20px; border-left: 1px solid var(--on-surface-variant); border-bottom: 1px solid var(--on-surface-variant); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+.cd-last { border-right: 1px solid var(--on-surface-variant); }
+.cd-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--primary); }
+
+/* voicing result chord diagram (table) */
+.vcd { border-collapse: collapse; margin: 0; width: auto; }
+.vcd td { padding: 0; text-align: center; vertical-align: middle; }
+.vcd-top td { height: 14px; font-size: 11px; color: var(--on-surface-variant); }
+.vcd-cell { width: 20px; height: 18px; border: 1px solid var(--on-surface-variant); box-sizing: border-box; }
+.vcd-nut .vcd-cell { border-top-width: 3px; border-top-color: var(--on-surface); }
+.vcd-fl { width: 16px; font-size: 9px; color: var(--on-surface-variant); text-align: right !important; padding-right: 3px !important; }
+.vcd-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); margin: auto; }

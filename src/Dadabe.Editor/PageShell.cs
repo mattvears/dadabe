@@ -13,6 +13,7 @@ public static class PageShell
             <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@4.0.21/dist/cdn/beer.min.js"></script>
             <script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.4/dist/cdn/material-dynamic-colors.min.js"></script>
             <script src="https://unpkg.com/htmx.org@2/dist/htmx.min.js"></script>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
             <link rel="stylesheet" href="/app.css" />
         </head>
         <body>
@@ -28,7 +29,7 @@ public static class PageShell
             <a href="/predictions"><i>auto_awesome</i><div>Predictions</div></a>
             <a href="/tunings"><i>tune</i><div>Tunings</div></a>
             <a href="/reference"><i>library_books</i><div>Reference</div></a>
-            <a href="/voicings"><i>guitar</i><div>Voicings</div></a>
+            <a href="/voicings"><i>voice_chat</i><div>Voicings</div></a>
           </nav>
           <main class="responsive">
         """;

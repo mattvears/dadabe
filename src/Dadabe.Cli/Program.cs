@@ -48,6 +48,7 @@ internal static class Program
         var handProfileOption = new Option<string>("--hand-profile") { Description = "Named hand profile (default: Default).", DefaultValueFactory = _ => "Default" };
         var topNOption = new Option<int>("--top-n") { Description = "Number of next-chord candidates to predict (0 = disabled).", DefaultValueFactory = _ => 0 };
         var entropyOption = new Option<double>("--entropy") { Description = "Prediction diversity: lower = more confident, higher = more exploratory (default: 0.5).", DefaultValueFactory = _ => 0.5 };
+        var minComfortOption = new Option<double>("--min-comfort") { Description = "Minimum comfort score 0.0–1.0; voicings below this are excluded (default: 0.0).", DefaultValueFactory = _ => 0.0 };
 
         var voicings = new Command("voicings", "Emit all playable voicings of a chord on a tuning.")
         {
@@ -65,6 +66,7 @@ internal static class Program
             handProfileOption,
             topNOption,
             entropyOption,
+            minComfortOption,
             outOption,
             prettyOption,
             validateSchemaOption,
@@ -88,6 +90,7 @@ internal static class Program
                 limit: parse.GetValue(limitOption),
                 topN: parse.GetValue(topNOption),
                 entropy: parse.GetValue(entropyOption),
+                minComfort: parse.GetValue(minComfortOption),
                 validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
