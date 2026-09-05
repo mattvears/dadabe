@@ -1,0 +1,8 @@
+{
+  "slug": "hungarian-minor",
+  "name": "Hungarian Minor",
+  "notes": ["C", "D", "Eb", "F#", "G", "Ab", "B"],
+  "intervals": [0, 2, 3, 6, 7, 8, 11],
+  "modeOf": "Double Harmonic Major",
+  "description": "Harmonic minor with a raised 4th; contains two augmented-second (3-semitone) gaps, giving a distinctive 'Gypsy' or Eastern-European sound."
+}

@@ -2,29 +2,220 @@
 .htmx-indicator { display: none; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline; }
 
-/* minor layout adjustments */
-nav.left { min-width: 200px; }
-table { width: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--wa-font-sans, system-ui, sans-serif);
+    background: var(--wa-color-surface-default, #f9fafb);
+    color: var(--wa-color-text-normal, #111827);
+}
+
+#global-tuning-select[disabled] {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+/* ── page structure ── */
+.page-content { max-width: 960px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.page-header h4 { margin: 0; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.list-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 0.75rem; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+
+/* ── forms ── */
+.form-field { margin-bottom: 0.75rem; }
+.form-row { display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap; }
+.list-item { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.dialog-footer { display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.5rem; }
+
+/* ── tables ── */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+th { font-weight: 600; font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.03em; }
 td.no-wrap { white-space: nowrap; width: 1%; }
-.italic { font-style: italic; color: var(--on-surface-variant); }
-dialog { min-width: min(500px, 90vw); }
-#chord-list, #string-list, #filter-list { margin: .5rem 0; }
-.chord-item, .string-item, .filter-item { gap: .5rem; margin-bottom: .25rem; }
 
-/* chord diagram (flex, legacy) */
-.cd { display: inline-flex; flex-direction: column; }
-.cd-row { display: flex; align-items: center; }
-.cd-sl { width: 22px; text-align: center; font-size: 10px; line-height: 1.8; }
-.cd-fl { width: 18px; text-align: right; font-size: 9px; color: var(--on-surface-variant); padding-right: 3px; }
-.cd-cell { width: 22px; height: 20px; border-left: 1px solid var(--on-surface-variant); border-bottom: 1px solid var(--on-surface-variant); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
-.cd-last { border-right: 1px solid var(--on-surface-variant); }
-.cd-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--primary); }
+/* ── help panels ── */
+.help-panel { margin-bottom: 1.25rem; }
+.help-body { max-width: 680px; line-height: 1.6; }
+.help-body p { margin: 0 0 0.6rem; }
+.help-dl { margin: 0.75rem 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1rem; }
+.help-dl dt { font-weight: 600; white-space: nowrap; }
+.help-dl dd { margin: 0; color: #374151; }
 
-/* voicing result chord diagram (table) */
-.vcd { border-collapse: collapse; margin: 0; width: auto; }
-.vcd td { padding: 0; text-align: center; vertical-align: middle; }
-.vcd-top td { height: 14px; font-size: 11px; color: var(--on-surface-variant); }
-.vcd-cell { width: 20px; height: 18px; border: 1px solid var(--on-surface-variant); box-sizing: border-box; }
-.vcd-nut .vcd-cell { border-top-width: 3px; border-top-color: var(--on-surface); }
-.vcd-fl { width: 16px; font-size: 9px; color: var(--on-surface-variant); text-align: right !important; padding-right: 3px !important; }
-.vcd-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); margin: auto; }
+/* ── plain result card (avoids wa-card shadow DOM for htmx targeting) ── */
+.result-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+.result-card-close {
+    border: 1px solid var(--wa-color-neutral-300, #d1d5db);
+    background: var(--wa-color-surface-raised, #fff);
+    color: var(--wa-color-text-normal, inherit);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* ── clickable prediction rows ── */
+.pred-row:hover { background: #f0f9ff; }
+.pred-row--active { background: #eff6ff; }
+.pred-row--active td:first-child code { color: #1d4ed8; font-weight: 600; }
+
+/* ── clickable chord references (e.g. the chord a prediction is "for") ── */
+.chord-link { cursor: pointer; }
+.chord-link:hover { background: #dbeafe; }
+.chord-link--active { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
+
+/* ── inline voicing panel (inside prediction result card) ── */
+.voicing-panel-inline:not(:empty) {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+}
+.vf-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.vf-table { font-size: 0.85rem; }
+.vf-table th, .vf-table td { padding: 0.3rem 0.5rem; }
+
+/* ── probability bars (predictions + voicings "next chords") ── */
+.prob-cell { display: flex; align-items: center; gap: 8px; }
+.prob-bar {
+    /* Fallback matters: an undefined token collapses the bar to transparent. */
+    background: var(--wa-color-brand-fill-loud, #3b82f6);
+    height: 8px;
+    min-width: 2px;
+    border-radius: 4px;
+}
+.prob-pct { font-size: 0.85rem; color: #6b7280; }
+
+/* ── glossary abbreviations (voicing structure names) ── */
+abbr[title] { text-decoration: underline dotted; cursor: help; }
+
+/* ── context badge ── */
+.context-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 1px 8px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* ── form hints ── */
+.form-section-label { font-weight: 600; font-size: 0.875rem; margin: 0.75rem 0 0.25rem; }
+.form-hint { font-size: 0.8rem; color: #6b7280; margin: 0; }
+
+/* ── chord diagrams (v0.5.2 §11) ── */
+.vcd { display: inline-block; font-size: 0.75rem; line-height: 1; }
+.vcd-startfret {
+    min-height: 1em;
+    text-align: right;
+    margin-bottom: 2px;
+    color: var(--wa-color-neutral-500, #6b7280);
+}
+.vcd-markers {
+    display: grid;
+    grid-template-columns: repeat(var(--vcd-strings), 14px);
+    margin-bottom: 2px;
+    text-align: center;
+}
+.vcd-marker { font-size: 0.7rem; color: var(--wa-color-neutral-600, #4b5563); }
+.vcd-grid {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid var(--wa-color-neutral-700, #374151);
+}
+.vcd-row {
+    display: grid;
+    grid-template-columns: repeat(var(--vcd-strings), 14px);
+    height: 14px;
+    border-bottom: 1px solid var(--wa-color-neutral-300, #d1d5db);
+}
+.vcd-cell { position: relative; border-right: 1px solid var(--wa-color-neutral-300, #d1d5db); }
+.vcd-cell:last-child { border-right: none; }
+.vcd-dot::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--wa-color-brand-fill-loud, #3b82f6);
+}
+.vcd-toggle summary { cursor: pointer; color: var(--wa-color-brand-fill-loud, #3b82f6); font-size: 0.85rem; }
+.wa-dark .vcd-grid, .wa-dark .vcd-row { border-color: var(--wa-color-neutral-200, #374151); }
+.wa-dark .vcd-cell { border-color: var(--wa-color-neutral-200, #374151); }
+.wa-dark .vcd-startfret, .wa-dark .vcd-marker { color: var(--wa-color-neutral-400, #9ca3af); }
+
+/* ── song chart (v0.5.2 §12) ── */
+.song-chart-section { margin-bottom: 1.5rem; }
+.song-chart-section h5 { margin: 0 0 0.5rem; }
+.song-chart-slots { display: flex; flex-wrap: wrap; gap: 1rem; }
+.song-chart-slot {
+    border: 1px solid var(--wa-color-neutral-300, #d1d5db);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    min-width: 90px;
+}
+.song-chart-chord { font-weight: 600; font-size: 1.1rem; }
+.song-chart-bars { font-size: 0.75rem; color: var(--wa-color-neutral-500, #6b7280); margin-bottom: 0.4rem; }
+.wa-dark .song-chart-slot { border-color: var(--wa-color-neutral-200, #374151); }
+
+@media print {
+    header[slot="header"], .no-print, #dialog-container { display: none !important; }
+    main#main-content { padding: 0 !important; overflow: visible !important; }
+    .song-chart-slot { break-inside: avoid; }
+}
+
+/* ── transform panel chain builder ── */
+.chain-step-hint { margin: 0.2rem 0 0.5rem; }
+.chain-param-disabled { opacity: 0.5; }
+
+/* ── misc ── */
+.empty-state { font-style: italic; color: #9ca3af; }
+.theory-note { font-size: 0.85rem; color: #4b5563; margin-bottom: 0.75rem; }
+code { font-family: ui-monospace, monospace; background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+
+/* ── dark mode: wa-* components retheme themselves via design tokens; ── */
+/* ── these hand-rolled classes use fixed colors and need explicit overrides ── */
+.wa-dark th, .wa-dark td { border-bottom-color: var(--wa-color-neutral-200, #374151); }
+.wa-dark th { color: var(--wa-color-neutral-400, #9ca3af); }
+.wa-dark .help-dl dd { color: var(--wa-color-neutral-300, #d1d5db); }
+.wa-dark .result-card {
+    background: var(--wa-color-neutral-100, #1f2937);
+    border-color: var(--wa-color-neutral-200, #374151);
+}
+.wa-dark .pred-row:hover { background: var(--wa-color-neutral-100, #1e3a5f); }
+.wa-dark .pred-row--active { background: var(--wa-color-brand-900, #1e3a5f); }
+.wa-dark .pred-row--active td:first-child code { color: var(--wa-color-brand-300, #93c5fd); }
+.wa-dark .chord-link:hover { background: var(--wa-color-brand-900, #1e3a5f); }
+.wa-dark .chord-link--active { background: var(--wa-color-brand-900, #1e3a5f); color: var(--wa-color-brand-300, #93c5fd); }
+.wa-dark .voicing-panel-inline:not(:empty) { border-top-color: var(--wa-color-neutral-200, #374151); }
+.wa-dark .context-badge {
+    background: var(--wa-color-brand-950, #1e3a5f);
+    color: var(--wa-color-brand-300, #93c5fd);
+    border-color: var(--wa-color-brand-800, #1d4ed8);
+}
+.wa-dark .empty-state { color: var(--wa-color-neutral-500, #6b7280); }
+.wa-dark .theory-note { color: var(--wa-color-neutral-400, #9ca3af); }
+.wa-dark code {
+    background: var(--wa-color-neutral-200, #374151);
+    color: var(--wa-color-neutral-100, #e5e7eb);
+}
+.wa-dark .form-hint { color: var(--wa-color-neutral-400, #9ca3af); }
+.wa-dark .prob-pct { color: var(--wa-color-neutral-400, #9ca3af); }

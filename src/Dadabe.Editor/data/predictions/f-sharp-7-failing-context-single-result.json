@@ -1,0 +1,9 @@
+{
+  "slug": "f-sharp-7-failing-context-single-result",
+  "name": "F#7, High Entropy, Failing Context, Single Result",
+  "chord": "F#7",
+  "context": "chromatic-wanderer",
+  "filters": [],
+  "maxResults": 1,
+  "entropy": 9.5
+}

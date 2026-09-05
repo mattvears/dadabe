@@ -1,0 +1,8 @@
+{
+  "slug": "cb-major",
+  "name": "Cb Major",
+  "notes": ["Cb", "Db", "Eb", "Fb", "Gb", "Ab", "Bb"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "modeOf": "Major",
+  "description": "Major scale spelled with seven flats, using the theoretical pitches Fb and Cb rather than their enharmonic equivalents E and B - a deliberately rare spelling probing the edges of accidental-range handling."
+}

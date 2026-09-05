@@ -19,11 +19,22 @@ public class VoicingCategoryCatalogTests
     {
         var cat = VoicingCategoryCatalog.Load(workingDirectory: null);
         var names = cat.Categories.Select(c => c.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        names.Should().Contain("power");
         names.Should().Contain("triad");
         names.Should().Contain("shell");
         names.Should().Contain("drop-2");
         names.Should().Contain("drop-3");
         names.Should().Contain("spread");
+    }
+
+    [Fact]
+    public void Power_is_ordered_before_triad()
+    {
+        // 'triad' allows all-{1,5} function sets at noteCount 3, so it would
+        // absorb the octave-doubled power shape if it were evaluated first.
+        var cat = VoicingCategoryCatalog.Load(workingDirectory: null);
+        var names = cat.Categories.Select(c => c.Name).ToList();
+        names.IndexOf("power").Should().BeLessThan(names.IndexOf("triad"));
     }
 
     [Fact]

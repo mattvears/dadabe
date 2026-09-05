@@ -40,5 +40,24 @@ public readonly record struct Interval(int Semitones, string Quality)
         _ => semitones.ToString(System.Globalization.CultureInfo.InvariantCulture) + "st",
     };
 
+    /// <summary>
+    /// Letter-steps this interval moves: the digits of <see cref="Quality"/>,
+    /// minus 1. <c>P5</c> → 4, <c>m3</c> → 2, <c>A4</c> → 3. Drives
+    /// spelling-correct transposition (D45).
+    /// </summary>
+    public int DiatonicSteps
+    {
+        get
+        {
+            var digits = new string(Quality.Where(char.IsAsciiDigit).ToArray());
+            if (digits.Length == 0)
+            {
+                throw new FormatException(
+                    $"Interval quality '{Quality}' has no diatonic number to derive letter-steps from.");
+            }
+            return int.Parse(digits, System.Globalization.CultureInfo.InvariantCulture) - 1;
+        }
+    }
+
     public override string ToString() => Quality;
 }

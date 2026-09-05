@@ -1,0 +1,8 @@
+{
+  "slug": "phrygian",
+  "name": "Phrygian",
+  "notes": ["E", "F", "G", "A", "B", "C", "D"],
+  "intervals": [0, 1, 3, 5, 7, 8, 10],
+  "modeOf": "Phrygian",
+  "description": "Diatonic mode with a characteristic flat 2nd degree; this fixture's modeOf deliberately points back at its own name to probe the absence of self-reference checks in the modeOf graph."
+}

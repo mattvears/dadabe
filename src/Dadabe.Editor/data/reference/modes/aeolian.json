@@ -1,0 +1,9 @@
+{
+  "slug": "aeolian",
+  "name": "Aeolian",
+  "intervals": [0, 2, 3, 5, 7, 8, 10],
+  "parentScale": "Major",
+  "degreeIndex": 5,
+  "noteNames": ["A", "B", "C", "D", "E", "F", "G"],
+  "description": "Sixth mode of the major scale; the natural minor scale - the default minor tonality of Western music."
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "deceptive-aa11bb",
+  "type": "half",
+  "resolution": "V->vi (mislabelled slug)",
+  "exampleProgression": ["G", "Am"],
+  "description": "Deliberate slug/type mismatch: the slug carries the 'deceptive-' generation-convention prefix, but the type field says 'half' and the progression is actually a textbook deceptive resolution (V->vi). Schema-legal (slug isn't part of the public schema) but a useful data-integrity probe, since DataStore.LoadAll sorts by slug rather than type."
+}

@@ -1,0 +1,27 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.SongModel>>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="page-content">
+  <div class="page-header">
+    <h4>Songs</h4>
+    <div class="form-row">
+      <form hx-post="/api/songs/import" hx-encoding="multipart/form-data" hx-target="#song-list" hx-swap="innerHTML" style="display:inline">
+        <input type="file" name="file" accept="application/json" onchange="this.form.requestSubmit()" style="display:none" id="song-import-input" />
+        <wa-button size="small" variant="neutral" type="button" onclick="document.getElementById('song-import-input').click()">
+          <wa-icon slot="prefix" name="upload"></wa-icon> Import
+        </wa-button>
+      </form>
+      <wa-button hx-get="/api/songs/new" hx-target="#dialog-container" hx-swap="innerHTML">
+        <wa-icon slot="prefix" name="plus"></wa-icon> New
+      </wa-button>
+    </div>
+  </div>
+  <div id="song-list">
+    @{ await RenderPartialAsync<SongsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.SongModel>>(Model); }
+  </div>
+</div>
+<div id="dialog-container"></div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

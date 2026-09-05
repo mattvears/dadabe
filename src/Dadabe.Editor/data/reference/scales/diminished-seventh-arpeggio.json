@@ -1,0 +1,7 @@
+{
+  "slug": "diminished-seventh-arpeggio",
+  "name": "Diminished Seventh Arpeggio",
+  "notes": ["C", "Eb", "Gb", "A"],
+  "intervals": [0, 3, 6, 9],
+  "description": "Four-note symmetric 'scale' built from stacked minor thirds - the diminished-seventh arpeggio reframed as a scale, and a deliberate edge-of-cardinality fixture for code that assumes seven-note scales."
+}

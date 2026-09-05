@@ -1,0 +1,7 @@
+{
+  "slug": "picardy-1ab4f2",
+  "type": "picardy",
+  "resolution": "i->I",
+  "exampleProgression": ["Cm", "C"],
+  "description": "Picardy third: minor-key piece resolves to a major tonic chord - not in the schema's closed enum, should fail validation against cadence.schema.json."
+}

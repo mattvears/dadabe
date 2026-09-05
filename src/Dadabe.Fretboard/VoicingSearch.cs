@@ -83,6 +83,12 @@ public static class VoicingSearch
         var candidate = new int[tuning.Strings.Length];
         var voicings = ImmutableArray.CreateBuilder<Voicing>();
         var requiredFunctions = spec.Required.ToImmutableHashSet(StringComparer.Ordinal);
+        // Opt-in: most forms deliberately omit the root from `required` (D4) — a
+        // shell voicing's identity is carried by the 3rd/7th, and the root is
+        // routinely dropped in real playing. RequireRoot lets a caller who wants
+        // the root present anyway (e.g. teaching, or just wanting the note named
+        // "Fm7" to contain an actual F) opt into that stricter floor per search.
+        if (p.RequireRoot) { requiredFunctions = requiredFunctions.Add("1"); }
 
         Enumerate(
             perStringChoices,
@@ -220,6 +226,15 @@ public static class VoicingSearch
 
         var positions = positionsBuilder.ToImmutable();
 
+        // Slash-chord bass constraint: the lowest sounding pitch must be the
+        // requested bass. Compared by pitch class, so any octave of the bass
+        // note counts. Strings are not assumed to ascend in pitch, so this
+        // works on re-entrant tunings too.
+        if (spec.Bass is { } bass && !LowestSoundingPitchClassIs(positions, bass.PitchClass.Value))
+        {
+            return;
+        }
+
         var structure = Classifier.Classify(positions, categories);
         if (!p.Categories.IsDefaultOrEmpty && !p.Categories.Contains(structure, StringComparer.Ordinal))
         {
@@ -231,7 +246,10 @@ public static class VoicingSearch
         IReadOnlyList<string> functions = Array.Empty<string>();
 
         var span = ComputeSpan(positions);
-        var mutedStrings = positions.Count(pp => pp.Muted);
+        // Mutes running off either end of the neck are simply not struck, so
+        // they cost nothing; only interior mutes need deadening.
+        var interiorMutedStrings = positions.Count(pp => pp.Muted) - Voicing.CountEdgeMutes(positions);
+        var isolatedMutedStrings = Voicing.CountIsolatedMutes(positions);
         var lowestFret = positions
             .Where(pp => pp.Fret is > 0)
             .Select(pp => pp.Fret!.Value)
@@ -239,13 +257,35 @@ public static class VoicingSearch
             .Min();
         var comfort = Voicing.ComputeComfort(
             span,
-            mutedStrings,
-            fingering.Barres.Length,
+            interiorMutedStrings,
+            isolatedMutedStrings,
+            fingering.Barres,
             lowestFret,
             hand.MaxSpan,
             hand.MaxFret);
 
         output.Add(new Voicing(spec, tuning, hand, positions, fingering, structure, comfort, functions));
+    }
+
+    /// <summary>
+    /// True when the lowest-pitched sounded position in <paramref name="positions"/>
+    /// has pitch class <paramref name="pitchClass"/>. False for an all-muted
+    /// candidate, which has no bass to speak of.
+    /// </summary>
+    private static bool LowestSoundingPitchClassIs(ImmutableArray<FretPosition> positions, int pitchClass)
+    {
+        var lowestMidi = int.MaxValue;
+        var lowestPc = -1;
+        foreach (var p in positions)
+        {
+            if (p.Muted || p.SoundingPitch is not { } pitch) { continue; }
+            if (pitch.Midi < lowestMidi)
+            {
+                lowestMidi = pitch.Midi;
+                lowestPc = pitch.PitchClass.Value;
+            }
+        }
+        return lowestPc == pitchClass;
     }
 
     private static int ComputeSpan(ImmutableArray<FretPosition> positions)

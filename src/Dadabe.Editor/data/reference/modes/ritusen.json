@@ -1,0 +1,9 @@
+{
+  "slug": "ritusen",
+  "name": "Ritusen",
+  "intervals": [0, 2, 5, 7, 9],
+  "parentScale": "Major Pentatonic",
+  "degreeIndex": 3,
+  "noteNames": ["G", "A", "C", "D", "E"],
+  "description": "Fourth mode of the major pentatonic scale (also called the blues major pentatonic); a Japanese ritsu-scale collection with a major character and no half-steps, lending an open, folk-like sound."
+}

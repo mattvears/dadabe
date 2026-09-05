@@ -1,0 +1,9 @@
+{
+  "slug": "malformed-context-silent-skip",
+  "name": "Context with Unparseable Symbol (Silent Skip)",
+  "chord": "C",
+  "context": "malformed-symbol",
+  "filters": [],
+  "maxResults": 10,
+  "entropy": null
+}

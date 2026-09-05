@@ -1,0 +1,9 @@
+{
+  "slug": "static-vamp-recency",
+  "name": "Static Vamp Context, Recency Skew",
+  "chord": "Am",
+  "context": "static-am-vamp",
+  "filters": [],
+  "maxResults": 5,
+  "entropy": 0.5
+}

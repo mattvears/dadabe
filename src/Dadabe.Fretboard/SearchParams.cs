@@ -15,7 +15,8 @@ public sealed record SearchParams(
     bool AllowOpen,
     bool AllowBarre,
     bool AllowThumb,
-    ImmutableArray<string> Categories) : IContentHashable
+    ImmutableArray<string> Categories,
+    bool RequireRoot = false) : IContentHashable
 {
     /// <summary>Defaults matching CLI defaults in design.md §3.</summary>
     public static SearchParams Default => new(
@@ -26,7 +27,8 @@ public sealed record SearchParams(
         AllowOpen: true,
         AllowBarre: true,
         AllowThumb: false,
-        Categories: ImmutableArray<string>.Empty);
+        Categories: ImmutableArray<string>.Empty,
+        RequireRoot: false);
 
     public ContentHash ContentHash
     {
@@ -40,6 +42,7 @@ public sealed record SearchParams(
                 .U8(AllowOpen ? (byte)1 : (byte)0)
                 .U8(AllowBarre ? (byte)1 : (byte)0)
                 .U8(AllowThumb ? (byte)1 : (byte)0)
+                .U8(RequireRoot ? (byte)1 : (byte)0)
                 .U16BE((ushort)Categories.Length);
             foreach (var cat in Categories.OrderBy(s => s, StringComparer.Ordinal))
             {

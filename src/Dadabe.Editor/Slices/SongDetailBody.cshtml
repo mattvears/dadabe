@@ -1,0 +1,164 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.SongDetailModel>
+@using Dadabe.Editor.Slices
+@{
+    var song = Model.Song;
+}
+<div id="song-detail-body">
+    <div class="page-header">
+        <div>
+            <h4 style="margin-bottom:0.25rem">@song.Name</h4>
+            <p class="form-hint">
+                Tuning: @(song.Tuning ?? "—")
+                &nbsp;·&nbsp; @Model.KeyDisplay
+                @if (song.Tempo is { } tempo) { <text>&nbsp;·&nbsp; @tempo bpm</text> }
+            </p>
+        </div>
+        <div class="form-row">
+            <wa-button size="small" variant="neutral" hx-get="/api/songs/@song.Slug/edit" hx-target="#dialog-container" hx-swap="innerHTML">
+                <wa-icon slot="prefix" name="pencil"></wa-icon> Edit
+            </wa-button>
+            <wa-button size="small" variant="neutral" hx-get="/songs/@song.Slug/chart" hx-target="#main-content" hx-select="#page-body" hx-swap="innerHTML" hx-push-url="true">
+                <wa-icon slot="prefix" name="print"></wa-icon> Chart
+            </wa-button>
+            <wa-button size="small" variant="neutral" onclick="window.open('/api/songs/@song.Slug/export', '_blank')">
+                <wa-icon slot="prefix" name="download"></wa-icon> Export
+            </wa-button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <p style="color:var(--wa-color-danger-600)">@Model.Error</p>
+    }
+
+    <form hx-post="/api/songs/@song.Slug/sections" hx-target="#song-detail-body" hx-swap="outerHTML" class="form-row" style="margin:0.75rem 0">
+        <wa-input name="name" placeholder="New section name (e.g. Verse)" required style="flex:1"></wa-input>
+        <wa-button type="submit" variant="neutral" size="small">
+            <wa-icon slot="prefix" name="plus"></wa-icon> Add section
+        </wa-button>
+    </form>
+
+    @if (Model.Sections.Count == 0)
+    {
+        <p class="empty-state">No sections yet. Add one above, then paste a chart or pin voicings into it.</p>
+    }
+
+    @foreach (var sv in Model.Sections)
+    {
+        var sec = sv.Section;
+        var total = sv.Slots.Count;
+        <wa-card style="margin-bottom:1rem">
+            <div class="card-header">
+                <strong>@sec.Name</strong>
+                <span class="form-hint">
+                    @(total == 0 ? "empty" : sv.PinnedCount == total ? "complete" : $"{total - sv.PinnedCount} of {total} unpinned")
+                    @(sv.PositionRange is not null ? $" · {sv.PositionRange}" : "")
+                    @(sv.HardestChordLabel is not null ? $" · hardest: {sv.HardestChordLabel}" : "")
+                </span>
+                <wa-button size="small" variant="danger"
+                        hx-delete="/api/songs/@song.Slug/sections/@sec.Id"
+                        hx-target="#song-detail-body" hx-swap="outerHTML"
+                        hx-confirm="Delete section '@sec.Name'?">
+                    <wa-icon name="trash"></wa-icon>
+                </wa-button>
+            </div>
+
+            @if (total > 0)
+            {
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Chord</th><th>Bars</th><th>Voicing</th><th>Comfort</th><th>Diagram</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var slotView in sv.Slots)
+                        {
+                            var slot = slotView.Slot;
+                            <tr>
+                                <td>@(slotView.Index + 1)</td>
+                                <td><code>@slot.Symbol</code></td>
+                                <td>@slot.Bars</td>
+                                <td>
+                                    @if (slot.Voicing is null)
+                                    {
+                                        <span class="form-hint">unpinned</span>
+                                    }
+                                    else
+                                    {
+                                        <abbr title="@Dadabe.Editor.Services.VoicingStructureGlossary.Describe(slot.Voicing.Structure)">@slot.Voicing.Structure</abbr>
+                                        @if (slotView.Stale)
+                                        {
+                                            <span class="context-badge" title="Pinned under a different tuning, hand model, or comfort model — re-score it.">stale</span>
+                                        }
+                                    }
+                                </td>
+                                <td>@(slot.Voicing is null ? "—" : $"{slot.Voicing.ComfortPct}%")</td>
+                                <td>
+                                    @if (slotView.Diagram is not null)
+                                    {
+                                        <details class="vcd-toggle">
+                                            <summary>Show</summary>
+                                            @{ await RenderPartialAsync<ChordDiagramPartial, ChordDiagram>(slotView.Diagram); }
+                                        </details>
+                                    }
+                                </td>
+                                <td class="no-wrap">
+                                    <wa-button size="small" variant="neutral"
+                                            hx-delete="/api/songs/@song.Slug/sections/@sec.Id/slots/@slotView.Index"
+                                            hx-target="#song-detail-body" hx-swap="outerHTML">
+                                        <wa-icon name="xmark"></wa-icon>
+                                    </wa-button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            <div class="form-row" style="margin-top:0.5rem">
+                <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/slots" hx-target="#song-detail-body" hx-swap="outerHTML" class="form-row">
+                    <wa-input name="symbol" placeholder="Add chord, e.g. Dm7" size="small" style="width:140px"></wa-input>
+                    <wa-input name="bars" type="number" value="1" min="1" size="small" style="width:70px"></wa-input>
+                    <wa-button type="submit" size="small" variant="neutral">Add</wa-button>
+                </form>
+
+                <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/fill" hx-target="#song-detail-body" hx-swap="outerHTML">
+                    <input type="hidden" name="minComfort" value="70" />
+                    <wa-button type="submit" size="small" variant="brand">
+                        <wa-icon slot="prefix" name="wand-magic-sparkles"></wa-icon> Fill unpinned
+                    </wa-button>
+                </form>
+
+                <wa-button size="small" variant="neutral" appearance="outlined"
+                        onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? '' : 'none'">
+                    Paste chart
+                </wa-button>
+                <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/paste" hx-target="#song-detail-body" hx-swap="outerHTML"
+                      style="display:none; flex:1 0 100%; margin-top:0.5rem" class="form-row">
+                    <wa-textarea name="chart" placeholder="Am7 D7 Gmaj7 Cmaj7" style="flex:1"></wa-textarea>
+                    <wa-button type="submit" size="small" variant="neutral">Append</wa-button>
+                </form>
+
+                @if (Model.SavedProgressions.Count > 0)
+                {
+                    <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/instantiate" hx-target="#song-detail-body" hx-swap="outerHTML" class="form-row">
+                        <wa-select name="progression" size="small" style="width:160px">
+                            @foreach (var p in Model.SavedProgressions)
+                            {
+                                <wa-option value="@p.Slug">@p.Name</wa-option>
+                            }
+                        </wa-select>
+                        <wa-button type="submit" size="small" variant="neutral">Instantiate</wa-button>
+                    </form>
+                }
+
+                @if (total > 0)
+                {
+                    <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/promote" hx-target="#song-detail-body" hx-swap="outerHTML" class="form-row">
+                        <wa-input name="name" placeholder="Save as progression…" size="small" style="width:160px" required></wa-input>
+                        <wa-button type="submit" size="small" variant="neutral">Promote</wa-button>
+                    </form>
+                }
+            </div>
+        </wa-card>
+    }
+</div>

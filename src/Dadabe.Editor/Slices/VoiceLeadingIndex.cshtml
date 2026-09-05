@@ -1,0 +1,58 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoiceLeadIndexModel>
+@using Dadabe.Editor.Slices
+@{
+    WriteLiteral(Dadabe.Editor.PageShell.Header);
+}
+
+<div class="page-content">
+    <h4>Voice Lead</h4>
+    <wa-card>
+        <form hx-post="/api/voiceleading/run" hx-target="#result-panel" hx-swap="afterbegin"
+              hx-indicator="#vl-indicator" hx-sync="this:abort">
+
+            <input type="hidden" name="tuning" id="form-tuning" />
+            <input type="hidden" name="tuningName" id="form-tuning-name" />
+            <div class="form-field">
+                <wa-textarea label="Chords" name="chords" rows="3"
+                             placeholder="Cmaj7 Am7 Dm7 G7  (space or newline separated)" required></wa-textarea>
+            </div>
+            <div class="form-row">
+                <wa-input label="Solutions" name="solutions" type="number" value="1" min="1" max="5" style="width:110px"></wa-input>
+                <wa-input label="Min comfort %" name="minComfort" type="number" value="70" min="0" max="100" style="width:130px"></wa-input>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;margin-top:0.75rem">
+                <wa-spinner id="vl-indicator" class="htmx-indicator"></wa-spinner>
+                <wa-button type="submit" variant="brand">
+                    <wa-icon slot="prefix" name="play"></wa-icon> Find paths
+                </wa-button>
+            </div>
+        </form>
+    </wa-card>
+
+    <wa-details style="margin-top:1rem">
+        <span slot="summary">About voice leading</span>
+        <div style="max-width:640px">
+            <p><strong>Minimal-motion voice leading</strong> finds the sequence of chord voicings across a
+            progression that minimises total finger travel across the neck.</p>
+            <p>On guitar, smooth voice leading reduces hand fatigue and creates cleaner transitions between
+            chords — the same principle used in classical four-part writing.</p>
+            <p>The <strong>distance metric</strong> is the sum of absolute fret changes per string between
+            consecutive voicings. Muted strings use −1 as a sentinel so a muted↔fretted move counts as a
+            full-span move.</p>
+            <p>When <strong>Solutions &gt; 1</strong>, an A* search with exact backward-DP cost-to-go
+            heuristic enumerates the k cheapest distinct paths through the progression graph.</p>
+        </div>
+    </wa-details>
+
+    <div id="result-panel"></div>
+</div>
+
+<script>
+    window.bindTuningSelect();
+</script>
+
+@{
+    WriteLiteral(Dadabe.Editor.PageShell.Footer);
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "minor-key-context-sevenths",
+  "name": "Minor-Key Context Filtered to Sevenths",
+  "chord": "E7",
+  "context": "minor-ii-v-i",
+  "filters": [
+    { "type": "byQuality", "params": { "quality": "7" } }
+  ],
+  "maxResults": 10,
+  "entropy": 0.3
+}

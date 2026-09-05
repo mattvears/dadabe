@@ -1,0 +1,7 @@
+{
+  "slug": "off-enum-trailing-space-plagal",
+  "type": "plagal ",
+  "resolution": "IV->I",
+  "exampleProgression": ["F", "C"],
+  "description": "Type value carries trailing whitespace ('plagal ' vs 'plagal'). It passes the editor's IsNullOrWhiteSpace rejection check (the string isn't blank) and would be persisted as-is, but fails the schema's exact-match enum - another drift probe between UI-level and schema-level validation."
+}

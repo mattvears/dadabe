@@ -15,6 +15,7 @@ builder.Services.AddSingleton<ProgressionService>();
 builder.Services.AddSingleton<TuningService>();
 builder.Services.AddSingleton<PredictionService>();
 builder.Services.AddSingleton<ReferenceService>();
+builder.Services.AddSingleton<SongService>();
 
 var app = builder.Build();
 
@@ -27,5 +28,8 @@ app.MapTuningRoutes();
 app.MapPredictionRoutes();
 app.MapReferenceRoutes();
 app.MapVoicingRoutes();
+app.MapVoiceLeadRoutes();
+app.MapSongRoutes();
+app.MapTransformRoutes();
 
 app.Run();

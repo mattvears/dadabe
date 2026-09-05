@@ -3,10 +3,10 @@
 <form hx-put="/api/reference/voicing-categories"
       hx-target="#vc-result"
       hx-swap="innerHTML">
-  <div class="field label border">
-    <textarea name="json" rows="20" class="small-text" style="font-family:monospace">@(Model ?? "{}")</textarea>
-    <label class="active">voicing-categories.json</label>
+  <p><strong>voicing-categories.json</strong></p>
+  <textarea name="json" rows="20" style="width:100%;font-family:monospace;font-size:0.85rem">@(Model ?? "{}")</textarea>
+  <div id="vc-result" style="margin-top:0.5rem"></div>
+  <div style="margin-top:0.5rem">
+    <wa-button type="submit" variant="brand">Save</wa-button>
   </div>
-  <div id="vc-result"></div>
-  <button type="submit">Save</button>
 </form>

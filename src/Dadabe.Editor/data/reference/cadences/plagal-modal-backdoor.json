@@ -1,0 +1,7 @@
+{
+  "slug": "plagal-modal-backdoor",
+  "type": "plagal",
+  "resolution": "bVII->I",
+  "exampleProgression": ["Bb", "C"],
+  "description": "Dorian 'backdoor' progression (bVII-I): modal cadential motion that resembles a plagal close in shape but arises from the flat-7th scale degree rather than the subdominant - tagged 'plagal' here to probe whether the type enum can stretch to cover modal phenomena, or whether it should get its own classification."
+}

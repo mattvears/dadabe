@@ -1,0 +1,7 @@
+{
+  "slug": "off-enum-casing-authentic",
+  "type": "Authentic",
+  "resolution": "V->I",
+  "exampleProgression": ["G", "C"],
+  "description": "Type value differs from the schema enum only in casing ('Authentic' vs 'authentic'). ParseCadenceForm's blank-only check would accept and persist this, but cadence.schema.json's case-sensitive enum should reject it - a drift probe between UI-level and schema-level validation."
+}

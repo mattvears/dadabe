@@ -1,0 +1,9 @@
+{
+  "slug": "man-gong",
+  "name": "Man Gong",
+  "intervals": [0, 3, 5, 8, 10],
+  "parentScale": "Major Pentatonic",
+  "degreeIndex": 2,
+  "noteNames": ["E", "G", "A", "C", "D"],
+  "description": "Third mode of the major pentatonic scale (also called the blues minor pentatonic); a minor-flavoured five-note collection with a flattened 6th, found in Chinese and blues-derived traditions."
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "relative-ambiguous-context",
+  "name": "Em with Relative-Ambiguous Context",
+  "chord": "Em",
+  "context": "relative-ambiguous",
+  "filters": [],
+  "maxResults": 10,
+  "entropy": null
+}

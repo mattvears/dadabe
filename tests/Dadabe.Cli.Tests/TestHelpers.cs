@@ -45,8 +45,9 @@ internal static class TestHelpers
         }
     }
 
-    public static string RunVoicings(string chord, string tuning = "STANDARD", int limit = 5, bool pretty = true) =>
-        RunToString(env => VoicingsCommand.Run(env, chord, tuning, SearchParams.Default, limit), pretty);
+    public static string RunVoicings(string chord, string tuning = "STANDARD", int limit = 5, bool pretty = true,
+        SearchParams? searchParams = null) =>
+        RunToString(env => VoicingsCommand.Run(env, chord, tuning, searchParams ?? SearchParams.Default, limit), pretty);
 
     public static string RunTuning(string tuning, bool pretty = true) =>
         RunToString(env => TuningCommand.Run(env, tuning), pretty);

@@ -1,0 +1,7 @@
+{
+  "slug": "whole-tone",
+  "name": "Whole Tone",
+  "intervals": [0, 2, 4, 6, 8, 10],
+  "noteNames": ["C", "D", "E", "F#", "G#", "A#"],
+  "description": "Symmetric hexatonic scale built entirely from whole steps. Every rotation produces the identical interval pattern, so it has no distinct modes and no meaningful 'parent' or degree relationship - both fields are intentionally omitted here."
+}

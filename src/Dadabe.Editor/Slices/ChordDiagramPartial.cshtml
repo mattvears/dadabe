@@ -1,0 +1,26 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.ChordDiagram>
+@{
+    var n = Model.Strings.Count;
+}
+<div class="vcd" style="--vcd-strings:@n">
+    <div class="vcd-startfret">@(Model.StartFret > 1 ? $"{Model.StartFret}fr" : "")</div>
+    <div class="vcd-markers">
+        @foreach (var s in Model.Strings)
+        {
+            <span class="vcd-marker">@(s.Muted ? "×" : s.Open ? "○" : "")</span>
+        }
+    </div>
+    <div class="vcd-grid">
+        @for (var fret = 0; fret < Model.NumFrets; fret++)
+        {
+            var absoluteFret = Model.StartFret + fret;
+            <div class="vcd-row">
+                @foreach (var s in Model.Strings)
+                {
+                    var isDot = !s.Muted && !s.Open && s.FrettedAt == absoluteFret;
+                    <div class="vcd-cell@(isDot ? " vcd-dot" : "")"></div>
+                }
+            </div>
+        }
+    </div>
+</div>

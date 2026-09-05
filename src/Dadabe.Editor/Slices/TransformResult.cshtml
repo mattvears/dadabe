@@ -1,0 +1,66 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.TransformResultViewModel>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <p style="color:var(--wa-color-danger-600)">@Model.Error</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>#</th><th>Original</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Diff)
+            {
+                <tr>
+                    <td>@(row.Index + 1)</td>
+                    <td><code>@row.Original</code></td>
+                    <td><code class="@(row.Changed ? "chord-link--active" : "")">@row.Result</code></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="form-hint" style="margin-top:0.5rem">
+        Key: @Model.KeyBefore → @Model.KeyAfter
+        @if (Model.Playability is { } p)
+        {
+            @(p.Unplayable.Count > 0
+                ? $" · unplayable: {string.Join(", ", p.Unplayable)}"
+                : $" · worst comfort {p.WorstComfortPct}% · distance {p.TotalDistance} frets · frets {p.MinFret}–{p.MaxFret}")
+        }
+    </p>
+
+    @if (Model.Notes.Count > 0)
+    {
+        <ul class="form-hint">
+            @foreach (var note in Model.Notes)
+            {
+                <li>@(note.Index is { } i ? $"[{i + 1}] " : "")@note.Message</li>
+            }
+        </ul>
+    }
+
+    <div class="form-row" style="margin-top:0.75rem">
+        <form hx-post="/api/progressions/@Model.SourceSlug/transform/save" hx-target="#transform-output" hx-swap="innerHTML" class="form-row">
+            @foreach (var step in Model.Chain)
+            {
+                <input type="hidden" name="type" value="@step.Type" />
+                <input type="hidden" name="paramsRaw" value="@step.ParamsRaw" />
+            }
+            <wa-input name="name" placeholder="Save as new progression…" size="small" required></wa-input>
+            <wa-button type="submit" size="small" variant="brand">Save as new</wa-button>
+        </form>
+
+        <form hx-post="/api/progressions/@Model.SourceSlug/transform/replace" hx-target="#transform-output" hx-swap="innerHTML"
+              hx-confirm="Replace this progression's chords with the transform result?">
+            @foreach (var step in Model.Chain)
+            {
+                <input type="hidden" name="type" value="@step.Type" />
+                <input type="hidden" name="paramsRaw" value="@step.ParamsRaw" />
+            }
+            <wa-button type="submit" size="small" variant="danger" appearance="outlined">Replace</wa-button>
+        </form>
+    </div>
+}

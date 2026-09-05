@@ -1,0 +1,38 @@
+{
+  "tool": "dadabe",
+  "version": "0.5.0",
+  "schemaVersion": "1",
+  "command": "voice-lead",
+  "input": { "chord": "Cmaj7 Am7 Dm7 G7", "tuning": "DADABE" },
+  "data": {
+    "chords": ["Cmaj7", "Am7", "Dm7", "G7"],
+    "tuning": "DADABE",
+    "solutions": [
+      {
+        "totalDistance": 6,
+        "steps": [
+          {
+            "chord": "Cmaj7",
+            "voicing": { "id": "voicing:1:...", "structure": "drop-2", "comfort": 0.82 }
+          },
+          {
+            "chord": "Am7",
+            "voicing": { "id": "voicing:1:...", "structure": "shell", "comfort": 0.79 },
+            "transition": { "totalDistance": 2, "moves": [{ "string": 1, "from": 3, "to": 5, "distance": 2 }] }
+          },
+          {
+            "chord": "Dm7",
+            "voicing": { "id": "voicing:1:...", "structure": "drop-2", "comfort": 0.75 },
+            "transition": { "totalDistance": 2, "moves": [{ "string": 2, "from": 5, "to": 3, "distance": 2 }] }
+          },
+          {
+            "chord": "G7",
+            "voicing": { "id": "voicing:1:...", "structure": "shell", "comfort": 0.71 },
+            "transition": { "totalDistance": 2, "moves": [{ "string": 0, "from": 2, "to": 3, "distance": 1 }, { "string": 3, "from": 3, "to": 4, "distance": 1 }] }
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": []
+}

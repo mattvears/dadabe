@@ -48,7 +48,20 @@ public static class PredictCommand
         // 3. Predict — topN before filters, entropy overridable per-request.
         var topN = request.MaxResults ?? 10;
         var effectiveEntropy = request.Entropy ?? entropy;
-        var candidates = NextChordPredictor.Predict(spec, topN, effectiveEntropy);
+
+        // Parse context chords for key-weighted scoring (D33).
+        List<ChordSpec>? contextSpecs = null;
+        if (request.Context?.Chords is { Length: > 0 } contextChords)
+        {
+            contextSpecs = [];
+            foreach (var cs in contextChords)
+            {
+                if (parser.TryParse(cs, out var cSym, out _))
+                    contextSpecs.Add(expander.Expand(cSym));
+            }
+        }
+
+        var candidates = NextChordPredictor.Predict(spec, topN, effectiveEntropy, contextSpecs);
 
         // 4. Apply filters in declaration order.
         var warnings = new List<string>();

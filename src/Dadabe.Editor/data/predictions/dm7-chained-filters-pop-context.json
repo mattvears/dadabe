@@ -1,0 +1,12 @@
+{
+  "slug": "dm7-chained-filters-pop-context",
+  "name": "Dm7, Chained Filters (Pop Context)",
+  "chord": "Dm7",
+  "context": "pop-vi-iv-i-v",
+  "filters": [
+    { "type": "byQuality", "params": { "quality": "7" } },
+    { "type": "byChord",   "params": { "chord": "G7" } }
+  ],
+  "maxResults": 10,
+  "entropy": 0.5
+}

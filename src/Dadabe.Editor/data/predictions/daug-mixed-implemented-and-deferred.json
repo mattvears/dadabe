@@ -1,0 +1,11 @@
+{
+  "slug": "daug-mixed-implemented-and-deferred",
+  "name": "Daug, Mixed Implemented + Deferred Filters",
+  "chord": "Daug",
+  "filters": [
+    { "type": "byChord", "params": { "chord": "G" } },
+    { "type": "byScale", "params": { "scale": "whole-tone" } }
+  ],
+  "maxResults": 10,
+  "entropy": null
+}

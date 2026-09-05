@@ -1,0 +1,9 @@
+{
+  "slug": "locrian-diminished",
+  "name": "Locrian Diminished",
+  "intervals": [0, 1, 3, 5, 6, 8, 9],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 6,
+  "noteNames": ["B", "C", "D", "E", "F", "G", "Ab"],
+  "description": "Seventh mode of the harmonic major scale (also called Locrian bb7); the darkest mode of its parent, replacing Locrian's minor 7th with a diminished 7th."
+}

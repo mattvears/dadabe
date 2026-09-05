@@ -1,9 +1,0 @@
-{
-  "slug": "c7-prediction-test5",
-  "name": "C7 Prediction Test5",
-  "chord": "C7",
-  "context": "basic",
-  "filters": [],
-  "maxResults": 5,
-  "entropy": 0.3
-}

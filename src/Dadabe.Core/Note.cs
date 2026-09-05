@@ -70,6 +70,144 @@ public readonly record struct Note
     }
 
     /// <summary>
+    /// Transposes by letter-walk then accidental correction, so the result is
+    /// spelled rather than guessed (D45). Throws nothing: if the diatonically
+    /// correct spelling would fall outside ±2 accidentals, the result is
+    /// respelled enharmonically and <paramref name="spellingNote"/> carries a
+    /// human-readable explanation; otherwise it is <c>null</c>.
+    /// </summary>
+    public Note Transpose(Interval interval, out string? spellingNote)
+    {
+        var targetPc = Mod12(NaturalPitchClass(Letter) + Accidental + interval.Semitones);
+        var steps = interval.DiatonicSteps;
+        if (interval.Semitones < 0) { steps = -steps; }
+        var letter = LetterPlus(Letter, steps);
+        var accidental = NormalizeAccidental(targetPc - NaturalPitchClass(letter));
+
+        if (accidental is >= MinAccidental and <= MaxAccidental)
+        {
+            spellingNote = null;
+            return new Note(letter, accidental);
+        }
+
+        var attempted = FormatUnchecked(letter, accidental);
+        var (respelledLetter, respelledAccidental) = SpellPitchClass(targetPc, letter);
+        var result = new Note(respelledLetter, respelledAccidental);
+        spellingNote =
+            $"{attempted} respelled as {result} — this key is past what standard notation handles comfortably.";
+        return result;
+    }
+
+    /// <summary>Transposes by named interval. See the <c>out spellingNote</c> overload for overflow handling.</summary>
+    public Note Transpose(Interval interval) => Transpose(interval, out _);
+
+    private static int Mod12(int v)
+    {
+        var m = v % 12;
+        return m < 0 ? m + 12 : m;
+    }
+
+    /// <summary>Normalizes an accidental delta to its representative in (-6, 6].</summary>
+    private static int NormalizeAccidental(int accidental)
+    {
+        while (accidental > 6) { accidental -= 12; }
+        while (accidental <= -6) { accidental += 12; }
+        return accidental;
+    }
+
+    /// <summary>
+    /// Spells a raw pitch class (0..11) as a <see cref="Note"/>, preferring
+    /// the simplest accidental (ties broken by circular distance to
+    /// <paramref name="preferredLetter"/>). Used by transforms that compute a
+    /// target pitch class directly rather than via a named interval (e.g.
+    /// inversion about an axis, D47) — unlike the diatonic-overflow respell
+    /// path, there is no "correct" letter to stay near here, and preferring
+    /// the plainest spelling is what makes double application return to the
+    /// original spelling (mirror-about-C on F and back, not F## and back).
+    /// </summary>
+    public static Note Spell(int pitchClass, Letter preferredLetter)
+    {
+        var targetPc = Mod12(pitchClass);
+        var bestLetter = preferredLetter;
+        var bestAccidental = 0;
+        var bestAbsAccidental = int.MaxValue;
+        var bestDistance = int.MaxValue;
+
+        foreach (Letter letter in Enum.GetValues<Letter>())
+        {
+            var accidental = NormalizeAccidental(targetPc - NaturalPitchClass(letter));
+            if (accidental is < MinAccidental or > MaxAccidental) { continue; }
+
+            var absAccidental = Math.Abs(accidental);
+            var diff = Math.Abs((int)letter - (int)preferredLetter);
+            var distance = Math.Min(diff, 7 - diff);
+            if (absAccidental < bestAbsAccidental || (absAccidental == bestAbsAccidental && distance < bestDistance))
+            {
+                bestLetter = letter;
+                bestAccidental = accidental;
+                bestAbsAccidental = absAccidental;
+                bestDistance = distance;
+            }
+        }
+
+        return new Note(bestLetter, bestAccidental);
+    }
+
+    /// <summary>
+    /// Finds the letter closest to <paramref name="preferredLetter"/> (by
+    /// circular letter distance) whose accidental for <paramref name="targetPc"/>
+    /// falls within ±2. Natural pitch classes are at most 2 semitones apart, so
+    /// a valid candidate always exists.
+    /// </summary>
+    private static (Letter Letter, int Accidental) SpellPitchClass(int targetPc, Letter preferredLetter)
+    {
+        var bestLetter = preferredLetter;
+        var bestAccidental = 0;
+        var bestDistance = int.MaxValue;
+        var bestAbsAccidental = int.MaxValue;
+
+        foreach (Letter letter in Enum.GetValues<Letter>())
+        {
+            var accidental = NormalizeAccidental(targetPc - NaturalPitchClass(letter));
+            if (accidental is < MinAccidental or > MaxAccidental) { continue; }
+
+            var diff = Math.Abs((int)letter - (int)preferredLetter);
+            var distance = Math.Min(diff, 7 - diff);
+            var absAccidental = Math.Abs(accidental);
+            if (distance < bestDistance || (distance == bestDistance && absAccidental < bestAbsAccidental))
+            {
+                bestLetter = letter;
+                bestAccidental = accidental;
+                bestDistance = distance;
+                bestAbsAccidental = absAccidental;
+            }
+        }
+
+        return (bestLetter, bestAccidental);
+    }
+
+    private static string FormatUnchecked(Letter letter, int accidental)
+    {
+        var sb = new StringBuilder();
+        sb.Append(LetterChar(letter));
+        if (accidental > 0) { sb.Append('#', accidental); }
+        else if (accidental < 0) { sb.Append('b', -accidental); }
+        return sb.ToString();
+    }
+
+    private static char LetterChar(Letter letter) => letter switch
+    {
+        Letter.C => 'C',
+        Letter.D => 'D',
+        Letter.E => 'E',
+        Letter.F => 'F',
+        Letter.G => 'G',
+        Letter.A => 'A',
+        Letter.B => 'B',
+        _ => throw new InvalidOperationException(),
+    };
+
+    /// <summary>
     /// Parse a note name like <c>C</c>, <c>C#</c>, <c>Bb</c>, <c>Bbb</c>,
     /// <c>E#</c>. Accepts both ASCII <c>#</c>/<c>b</c> and Unicode <c>♯</c>/<c>♭</c>
     /// accidentals. Round-trips with <see cref="ToString"/> when the input
@@ -115,22 +253,5 @@ public readonly record struct Note
         return true;
     }
 
-    public override string ToString()
-    {
-        var sb = new StringBuilder(3);
-        sb.Append(Letter switch
-        {
-            Letter.C => 'C',
-            Letter.D => 'D',
-            Letter.E => 'E',
-            Letter.F => 'F',
-            Letter.G => 'G',
-            Letter.A => 'A',
-            Letter.B => 'B',
-            _ => throw new InvalidOperationException(),
-        });
-        if (Accidental > 0) { sb.Append('#', Accidental); }
-        else if (Accidental < 0) { sb.Append('b', -Accidental); }
-        return sb.ToString();
-    }
+    public override string ToString() => FormatUnchecked(Letter, Accidental);
 }

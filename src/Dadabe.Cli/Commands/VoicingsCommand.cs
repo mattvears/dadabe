@@ -40,6 +40,14 @@ public static class VoicingsCommand
 
         var set = VoicingSearch.Search(spec, tuning, env.HandModel, searchParams, env.Catalogs.VoicingCategories, version: env.Version);
 
+        var warnings = new List<string>();
+        if (spec.Bass is { } bass && set.Voicings.IsEmpty)
+        {
+            warnings.Add(
+                $"No playable voicing on {tuning.Name} places {bass} in the bass; " +
+                $"try '{symbol.Root}{symbol.Quality}' without the slash bass, or widen the search.");
+        }
+
         var voicings = set.Voicings;
         if (minComfort > 0.0)
             voicings = voicings.Where(v => v.Comfort >= minComfort).ToImmutableArray();
@@ -63,7 +71,7 @@ public static class VoicingsCommand
             Command: "voicings",
             Input: JsonEnvelope.BuildInput(env.HandModel, chord: chordSymbol, tuning: tuningName),
             Data: payload,
-            Warnings: Array.Empty<string>());
+            Warnings: warnings);
 
         JsonEnvelope.Write(envelope, env.Output);
 

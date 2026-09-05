@@ -1,0 +1,9 @@
+{
+  "slug": "mixolydian-b2",
+  "name": "Mixolydian b2",
+  "intervals": [0, 1, 4, 5, 7, 9, 10],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 4,
+  "noteNames": ["G", "Ab", "B", "C", "D", "E", "F"],
+  "description": "Fifth mode of the harmonic major scale (also called Mixolydian b9); a dominant 7th sound with a flattened 2nd, useful over V7b9 chords resolving to a major tonic."
+}

@@ -2,11 +2,11 @@
 
 @if (Model.Count == 0)
 {
-  <p class="italic">No prediction requests yet.</p>
+  <p class="empty-state">No prediction requests yet.</p>
 }
 else
 {
-  <table class="border">
+  <table>
     <thead>
       <tr><th>Name</th><th>Chord</th><th>Filters</th><th></th></tr>
     </thead>
@@ -18,25 +18,25 @@ else
           <td><code>@p.Chord</code></td>
           <td>@p.Filters.Count</td>
           <td class="no-wrap">
-            <button class="small border"
+            <wa-button size="small" variant="brand"
                     hx-post="/api/predictions/@p.Slug/run"
                     hx-target="#result-panel"
                     hx-swap="innerHTML">
-              <i>play_arrow</i>
-            </button>
-            <button class="small border"
+              <wa-icon name="play"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="neutral"
                     hx-get="/api/predictions/@p.Slug/edit"
                     hx-target="#dialog-container"
                     hx-swap="innerHTML">
-              <i>edit</i>
-            </button>
-            <button class="small border error"
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="danger"
                     hx-delete="/api/predictions/@p.Slug"
                     hx-target="#prediction-@p.Slug"
                     hx-swap="outerHTML"
                     hx-confirm="Delete '@p.Name'?">
-              <i>delete</i>
-            </button>
+              <wa-icon name="trash"></wa-icon>
+            </wa-button>
           </td>
         </tr>
       }

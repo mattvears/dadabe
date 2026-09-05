@@ -1,0 +1,7 @@
+{
+  "slug": "authentic-pathological-length",
+  "type": "authentic",
+  "resolution": "extended turnaround resolving authentically",
+  "exampleProgression": ["I", "vi", "IV", "V7", "iii", "vi", "ii", "V7", "I", "IV", "V7", "I"],
+  "description": "A pathologically long (12-chord) example progression, used to probe list rendering (string.Join in ReferenceCadenceList.cshtml) and storage round-tripping at scale."
+}

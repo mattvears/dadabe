@@ -1,0 +1,7 @@
+{
+  "slug": "deceptive-mixed-notation",
+  "type": "deceptive",
+  "resolution": "V7->vi",
+  "exampleProgression": ["V7", "Am9", "G/B", "viio6"],
+  "description": "Deliberately mixes Roman-numeral function symbols, absolute chord symbols, and a slash chord within one progression, to probe whether anything assumes a single notation convention - both styles are schema-legal and both appear 'in the wild' in this codebase."
+}

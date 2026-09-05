@@ -2,7 +2,7 @@
   "schemaVersion": "1",
   "comment": "Default voicing category templates for Dadabe v0.1 (per D20). Categories are evaluated in priority order; the first matching template wins. The final 'spread' category is a fallthrough catch-all so every emitted voicing carries a non-null category. User-extensible via filesystem overlay (per E9).",
 
-  "priority": ["triad", "shell", "drop-2", "drop-3", "spread"],
+  "priority": ["power", "triad", "shell", "drop-2", "drop-3", "spread"],
 
   "functionClasses": {
     "comment": "Named function-equivalence classes used inside templates. A pipe-delimited form (e.g. '3|b3') in a pattern is shorthand for one of these classes; classes here let users name new ones without re-typing the alternatives.",
@@ -15,6 +15,18 @@
   },
 
   "categories": [
+    {
+      "name": "power",
+      "description": "Root-and-fifth voicing with no third — the '5' (power) chord. Octave doublings of either tone are allowed, so the common 3-string root/fifth/root shape lands here rather than in 'triad'. Must be evaluated before 'triad', whose allFunctionsIn set would otherwise absorb it.",
+      "matches": [
+        {
+          "noteCountRange": [2, 6],
+          "requireFunctions": ["any-fifth"],
+          "allFunctionsIn": ["1", "5", "b5", "#5"]
+        }
+      ]
+    },
+
     {
       "name": "triad",
       "description": "3-note chord-tone voicing of a triad — only root/third/fifth (and altered/suspended variants).",

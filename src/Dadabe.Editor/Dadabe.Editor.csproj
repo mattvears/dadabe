@@ -4,8 +4,13 @@
     <AssemblyName>dadabe-editor</AssemblyName>
     <RootNamespace>Dadabe.Editor</RootNamespace>
     <!-- CA1859: IResult is idiomatic for minimal API helpers; concrete type isn't useful here. -->
-    <NoWarn>$(NoWarn);CA1859</NoWarn>
+    <!-- CA1720: DTOs intentionally use the domain term "String" for fretboard strings. -->
+    <NoWarn>$(NoWarn);CA1859;CA1720</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Dadabe.Editor.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="RazorSlices" Version="0.10.1" />

@@ -1,0 +1,6 @@
+{
+  "slug": "pachelbel-canon",
+  "name": "Pachelbel Canon",
+  "chords": ["C", "G", "Am", "Em", "F", "C", "F", "G"],
+  "tempo": 96
+}

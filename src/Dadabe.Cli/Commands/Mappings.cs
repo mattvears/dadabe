@@ -92,7 +92,8 @@ internal static class Mappings
         Extensions: symbol.Extensions.ToList(),
         Alterations: symbol.Alterations.ToList(),
         PitchClasses: spec.Tones.Select(t => new ChordPcDto(t.Note.ToString(), t.Function)).ToList(),
-        Required: spec.Required.ToList());
+        Required: spec.Required.ToList(),
+        BassNote: symbol.Bass?.ToString());
 
     public static TuningPayload ToTuningPayload(Tuning tuning) => new(
         Name: tuning.Name,

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Text;
 using Dadabe.Core.Memo;
 
 namespace Dadabe.Core.Chord;
@@ -34,5 +35,33 @@ public sealed record ChordSymbol(
             }
             return Memo.ContentHash.FromCanonical(Namespaces.ChordSymbol, 1, c.AsSpan());
         }
+    }
+
+    // Grammar-declared order (ChordGrammar.json "modifiers"), not input order — normalising
+    // is the point: C7#9b13 and C7b13#9 both emit as C7#9b13 (D44).
+    private static readonly ImmutableArray<string> ExtensionOrder = ["add9", "add11", "add13"];
+    private static readonly ImmutableArray<string> AlterationOrder = ["b5", "#5", "b9", "#9", "#11", "b13"];
+
+    /// <summary>
+    /// Renders this symbol back to a string the parser accepts:
+    /// Root + Quality + Extensions + Alterations + ("/" + Bass), each group in
+    /// canonical grammar order. The round-trip identity is over parsed
+    /// values (<c>parse(format(parse(s))) == parse(s)</c>), not over the
+    /// original text — <c>C-</c> emits as <c>Cm</c>.
+    /// </summary>
+    public string ToSymbol()
+    {
+        var sb = new StringBuilder();
+        sb.Append(Root).Append(Quality);
+        foreach (var ext in ExtensionOrder)
+        {
+            if (Extensions.Contains(ext)) { sb.Append(ext); }
+        }
+        foreach (var alt in AlterationOrder)
+        {
+            if (Alterations.Contains(alt)) { sb.Append(alt); }
+        }
+        if (Bass is { } bass) { sb.Append('/').Append(bass); }
+        return sb.ToString();
     }
 }

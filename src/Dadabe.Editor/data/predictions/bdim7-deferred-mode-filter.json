@@ -1,0 +1,10 @@
+{
+  "slug": "bdim7-deferred-mode-filter",
+  "name": "Bdim7 + Unimplemented Mode Filter",
+  "chord": "Bdim7",
+  "filters": [
+    { "type": "byMode", "params": { "mode": "locrian" } }
+  ],
+  "maxResults": 10,
+  "entropy": null
+}

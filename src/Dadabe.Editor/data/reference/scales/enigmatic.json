@@ -1,0 +1,7 @@
+{
+  "slug": "enigmatic",
+  "name": "Enigmatic",
+  "notes": ["C", "Db", "E", "F#", "G#", "A#", "B"],
+  "intervals": [0, 1, 4, 6, 8, 10, 11],
+  "description": "Deliberately irregular seven-note scale (attributed to Verdi), mixing a half-step opening, two wide major-third leaps, and a half-step approach to the octave - an asymmetric outlier among the 'exotic' fixtures."
+}

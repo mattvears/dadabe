@@ -1,0 +1,9 @@
+{
+  "slug": "lydian-dominant",
+  "name": "Lydian Dominant",
+  "intervals": [0, 2, 4, 6, 7, 9, 10],
+  "parentScale": "Melodic Minor",
+  "degreeIndex": 3,
+  "noteNames": ["D", "E", "F#", "G#", "A", "B", "C"],
+  "description": "Fourth mode of the melodic minor scale (also called the acoustic or overtone scale); Lydian with a flattened 7th - the classic colour over dominant 7#11 chords."
+}

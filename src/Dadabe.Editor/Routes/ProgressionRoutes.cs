@@ -42,8 +42,9 @@ public static class ProgressionRoutes
             var name   = form["name"].ToString();
             var chords = form["chords"].Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c!).ToList();
             var tempo  = int.TryParse(form["tempo"], out var t) ? t : (int?)null;
+            var existing = svc.Get(slug);
 
-            var (ok, error) = svc.Update(slug, name, chords, tempo);
+            var (ok, error) = svc.Update(slug, name, chords, tempo, existing?.DerivedFrom);
             if (!ok) return Results.BadRequest(error);
 
             return Results.RazorSlice<ProgressionsList,

@@ -1,0 +1,8 @@
+{
+  "slug": "natural-minor",
+  "name": "Natural Minor",
+  "notes": ["A", "B", "C", "D", "E", "F", "G"],
+  "intervals": [0, 2, 3, 5, 7, 8, 10],
+  "modeOf": "Major",
+  "description": "Aeolian mode of the major scale; the 'relative minor' - melancholic, and the basis of the classical minor system."
+}

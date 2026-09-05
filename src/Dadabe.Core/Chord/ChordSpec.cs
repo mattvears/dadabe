@@ -16,12 +16,29 @@ public sealed record ChordTone(string Function, int Semitones, Note Note, PitchC
 /// tone set. Identity carries the spelled <see cref="Note"/> for every
 /// tone (D17 / §8.1), so <c>F#maj7</c> and <c>Gbmaj7</c> hash distinctly.
 /// </summary>
+/// <param name="Bass">
+/// Slash-chord bass note, or null for a root-position symbol. When set, a
+/// voicing only satisfies this spec if its lowest sounding pitch has this
+/// pitch class. A bass that is not already a chord tone is also appended to
+/// <see cref="Tones"/> with the <see cref="BassFunction"/> label, so the
+/// fretboard search can reach it at all.
+/// </param>
 public sealed record ChordSpec(
     Note Root,
     string Quality,
     ImmutableArray<ChordTone> Tones,
-    ImmutableArray<string> Required) : IContentHashable
+    ImmutableArray<string> Required,
+    Note? Bass = null) : IContentHashable
 {
+    /// <summary>
+    /// Function label for a slash bass that is foreign to the chord (the D of
+    /// <c>C/D</c>). Deliberately not a scale-degree string: it must not be
+    /// mistaken for a chord tone by the voicing classifier or the required-tone
+    /// check. An inverted chord tone (the G of <c>C/G</c>) keeps its own
+    /// function and never carries this label.
+    /// </summary>
+    public const string BassFunction = "bass";
+
     public IEnumerable<PitchClass> PitchClasses => Tones.Select(t => t.PitchClass);
 
     public ContentHash ContentHash
@@ -43,6 +60,14 @@ public sealed record ChordSpec(
             }
             c.U16BE((ushort)Required.Length);
             foreach (var r in Required) { c.Utf8(r); }
+            // Appended only when present, so every root-position spec keeps the
+            // exact canonical bytes it had before slash chords existed and the
+            // published voicing ids do not churn. Required is length-prefixed, so
+            // the two extra bytes stay unambiguous.
+            if (Bass is { } bass)
+            {
+                c.U8((byte)bass.Letter).I8((sbyte)bass.Accidental);
+            }
             return Memo.ContentHash.FromCanonical(Namespaces.ChordSpec, 1, c.AsSpan());
         }
     }

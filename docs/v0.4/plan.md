@@ -32,55 +32,57 @@ No progression engine, no rendering, no persistent memo backends. Those remain i
 
 ### Prediction pipeline
 
-- [ ] Add required `chord` field (string) to `NextChordPredictionRequestDto`; update
+- [x] Add required `chord` field (string) to `NextChordPredictionRequestDto`; update
       `schemas/prediction.schema.json`.
-- [ ] `PredictionResultDto` / `PredictionCandidateDto` / `PredictionMetadataDto` in
+- [x] `PredictionResultDto` / `PredictionCandidateDto` / `PredictionMetadataDto` in
       `src/Dadabe.Cli/Io/Dtos.cs` — match `schemas/prediction-result.schema.json`.
-- [ ] `PredictCommand.cs` — new static class in `src/Dadabe.Cli/Commands/`.
-- [ ] Wire `predict` subcommand in `Program.cs` (`--input`, `--out`, `--pretty`,
+- [x] `PredictCommand.cs` — new static class in `src/Dadabe.Cli/Commands/`.
+- [x] Wire `predict` subcommand in `Program.cs` (`--input`, `--out`, `--pretty`,
       `--validate-schema`).
-- [ ] Filter application in predictor: `byChord` (hard) and `byQuality` (hard); deferred
+- [x] Filter application in predictor: `byChord` (hard) and `byQuality` (hard); deferred
       types emit a warning string into `Envelope.Warnings`.
 
 ### Schema validation
 
-- [ ] `--validate-schema` option available on all subcommands.
-- [ ] Embed schema files as resources in `Dadabe.Cli.csproj`; load via
+- [x] `--validate-schema` option available on all subcommands.
+- [x] Embed schema files as resources in `Dadabe.Cli.csproj`; load via
       `Assembly.GetManifestResourceStream`.
-- [ ] Exit code 3 on schema violation (new constant `ExitSchemaViolation`).
+- [x] Exit code 3 on schema violation (new constant `ExitSchemaViolation`).
 
 ### Slash chord parsing
 
-- [ ] Set `rejectSlash: false` as the default in `ChordGrammar.json`; keep the flag so
+- [x] Set `rejectSlash: false` as the default in `ChordGrammar.json`; keep the flag so
       overlays can restore rejection.
-- [ ] Update `ChordParser.cs`: detect `/`, split, parse bass note (`Letter` + optional
+- [x] Update `ChordParser.cs`: detect `/`, split, parse bass note (`Letter` + optional
       accidental); reject if bass token is unparseable.
-- [ ] Add `Note? BassNote` to `ChordSymbol`; include it in `ContentHash` when non-null.
-- [ ] Add `bassNote` (nullable, `JsonIgnore` when null) to `ChordDto` in `Dtos.cs`.
-- [ ] Remove `Skip` from slash chord tests in `ChordParserTests`; add bass-note assertion;
-      keep existing rejection tests removed (or rephrased for overlay case).
+- [x] Add `Note? Bass` to `ChordSymbol`; include it in `ContentHash` when non-null.
+- [x] Add `bassNote` (nullable, `JsonIgnore` when null) to `ChordDto` in `Dtos.cs`.
+- [x] Slash chord tests in `ChordParserTests`: round-trip, bad bass token, double-slash,
+      overlay-rejection.
 
 ### Tests
 
-- [ ] `PredictCommandTests` — round-trip: request file → predict → result envelope shape.
-- [ ] Filter-wiring tests: `byChord` hard filter; `byQuality` hard filter; deferred type
+- [x] `PredictCommandTests` — round-trip: request file → predict → result envelope shape.
+- [x] Filter-wiring tests: `byChord` hard filter; `byQuality` hard filter; deferred type
       adds warning.
-- [ ] Schema validation tests: valid envelope passes; deliberately-invalid envelope exits 3.
-- [ ] Slash chord tests: `C/E` → root C, bass E; `Fmaj7/A` → root F, bass A; bad bass
+- [x] Schema validation tests: valid envelope passes; deliberately-invalid envelope throws
+      `SchemaViolationException` (exit 3 path).
+- [x] Slash chord tests: `C/E` → root C, bass E; `Fmaj7/A` → root F, bass A; bad bass
       token throws.
 
 ### Docs
 
-- [ ] `docs/v0.4/examples/prediction-request.json` and `prediction-response.json`.
-- [ ] `README.md` — add `predict` subcommand entry and slash chord notation note.
-- [ ] `CHANGELOG.md` — v0.4 entry.
-- [ ] `docs/todo.md` — move v0.4 items to completed; add v0.5 deferred section.
-- [ ] Tag release v0.4 when ready.
+- [x] `docs/v0.4/examples/prediction-request.json` and `prediction-response.json`.
+- [x] `README.md` — updated to v0.4 current release; `predict` subcommand and slash chord
+      notation documented.
+- [x] `CHANGELOG.md` — v0.4 entry added.
+- [x] `docs/todo.md` — move v0.4 items to completed; add v0.5 deferred section.
+- [x] Tag release v0.4 (released as v0.4.1).
 
 ## Files to create / modify
 
 | File | Action |
-|---|---|
+| --- | --- |
 | `src/Dadabe.Cli/Commands/PredictCommand.cs` | Create |
 | `src/Dadabe.Cli/Io/Dtos.cs` | Add prediction result DTOs; `BassNote` on `ChordDto` |
 | `src/Dadabe.Cli/Io/NextChordPredictionRequestDto.cs` | Add `Chord` field |

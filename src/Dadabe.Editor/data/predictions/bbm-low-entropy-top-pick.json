@@ -1,0 +1,8 @@
+{
+  "slug": "bbm-low-entropy-top-pick",
+  "name": "Bbm, Low Entropy, Top Pick Only",
+  "chord": "Bbm",
+  "filters": [],
+  "maxResults": 1,
+  "entropy": 0.01
+}

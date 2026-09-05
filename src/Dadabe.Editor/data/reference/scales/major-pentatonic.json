@@ -1,0 +1,7 @@
+{
+  "slug": "major-pentatonic",
+  "name": "Major Pentatonic",
+  "notes": ["C", "D", "E", "G", "A"],
+  "intervals": [0, 2, 4, 7, 9],
+  "description": "Five-note scale omitting the 4th and 7th degrees of the major scale; open and consonant, ubiquitous across folk, rock, and country music."
+}

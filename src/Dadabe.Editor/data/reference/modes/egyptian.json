@@ -1,0 +1,9 @@
+{
+  "slug": "egyptian",
+  "name": "Egyptian",
+  "intervals": [0, 2, 5, 7, 10],
+  "parentScale": "Major Pentatonic",
+  "degreeIndex": 1,
+  "noteNames": ["D", "E", "G", "A", "C"],
+  "description": "Second mode of the major pentatonic scale (also called the suspended pentatonic); built from stacked 2nds and 4ths, with no 3rd degree giving it an open, ambiguous, suspended quality."
+}

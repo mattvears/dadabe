@@ -1,12 +1,28 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/transformation.schema.json",
   "title": "Transformation",
   "type": "object",
-  "description": "Placeholder schema for transformations (harmonic operations).",
+  "description": "One step in a transform chain (D50, v0.5.2 §3). type is constrained to the registered transform ids; params is transform-specific and left open.",
   "properties": {
-    "type": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "transpose",
+        "retrograde",
+        "rotate",
+        "invert",
+        "interval-negate",
+        "interval-reverse",
+        "interval-multiply",
+        "quality-map",
+        "reduce",
+        "tritone-sub",
+        "plr"
+      ]
+    },
     "params": { "type": "object", "additionalProperties": true }
   },
-  "required": [ "type" ],
-  "additionalProperties": true
+  "required": ["type"],
+  "additionalProperties": false
 }

@@ -9,8 +9,52 @@ namespace Dadabe.Editor.Routes;
 
 public static class VoicingRoutes
 {
+    private static readonly string[] AllCategories = ["power", "triad", "shell", "drop-2", "drop-3", "spread"];
     public static void MapVoicingRoutes(this WebApplication app)
     {
+        // Inline voicing fragment — used by the predictions result card.
+        app.MapGet("/api/voicings/fragment", (
+            [FromQuery] string chord,
+            [FromQuery] string tuning,
+            [FromServices] Catalogs catalogs,
+            [FromServices] ChordParser parser,
+            [FromServices] ChordExpander expander) =>
+        {
+            if (string.IsNullOrWhiteSpace(chord))
+                return Results.RazorSlice<VoicingFragment, VoicingFragmentModel>(
+                    new VoicingFragmentModel("?", tuning, [], "Chord is required."));
+
+            if (!parser.TryParse(chord, out var symbol, out var parseError))
+                return Results.RazorSlice<VoicingFragment, VoicingFragmentModel>(
+                    new VoicingFragmentModel(chord, tuning, [], $"Invalid chord: {parseError}"));
+
+            Dadabe.Core.Tuning resolvedTuning;
+            try { resolvedTuning = ResolveTuning(catalogs, tuning, tuning); }
+            catch (FormatException ex)
+            {
+                return Results.RazorSlice<VoicingFragment, VoicingFragmentModel>(
+                    new VoicingFragmentModel(chord, tuning, [], ex.Message));
+            }
+
+            var spec = expander.Expand(symbol);
+            var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default,
+                SearchParams.Default, catalogs.VoicingCategories);
+
+            var rows = set.Voicings
+                .Take(12)
+                .Select(v =>
+                {
+                    var ascii = "[" + string.Join(" ", v.Positions.OrderBy(p => p.String).Select(p =>
+                        p.Muted ? "x" : p.Open ? "0" : p.Fret!.Value.ToString(
+                            System.Globalization.CultureInfo.InvariantCulture))) + "]";
+                    return new VoicingFragmentRow(ascii, v.Structure, (int)Math.Round(v.Comfort * 100));
+                })
+                .ToList();
+
+            return Results.RazorSlice<VoicingFragment, VoicingFragmentModel>(
+                new VoicingFragmentModel(chord, resolvedTuning.Name, rows, null));
+        });
+
         app.MapGet("/voicings", ([FromServices] Catalogs catalogs, [FromServices] TuningService tunings) =>
         {
             var embeddedNames = catalogs.Tunings.All
@@ -32,14 +76,35 @@ public static class VoicingRoutes
             var form        = await req.ReadFormAsync();
             var chord       = form["chord"].ToString().Trim();
             var tuning      = form["tuning"].ToString().Trim();
-            var tuningLabel = form["tuningName"].ToString().Trim().NullIfEmpty() ?? tuning;
-            var limit       = int.TryParse(form["limit"],   out var l) ? l : 10;
-            var topN        = int.TryParse(form["topN"],    out var n) ? n : 0;
+            var tuningLabel = ResolveLabel(form["tuningName"].ToString(), tuning, catalogs);
+            var limit       = int.TryParse(form["limit"],      out var l)  ? l  : 200;
+            var topN        = int.TryParse(form["topN"],       out var n)  ? n  : 0;
             var entropy     = double.TryParse(form["entropy"],
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var e) ? e : 0.5;
             var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
             var minComfort  = minComfortPct / 100.0;
+
+            // Advanced options — fall back to SearchParams.Default values when absent.
+            var frets      = int.TryParse(form["frets"],      out var fr) ? fr : 15;
+            var span       = int.TryParse(form["span"],       out var sp) ? sp : 4;
+            var minStr     = int.TryParse(form["minStrings"], out var mn) ? mn : 3;
+            var maxStr     = int.TryParse(form["maxStrings"], out var mx) ? mx : 6;
+            var allowOpen  = form["allowOpen"].Contains("true");
+            var allowBarre = form["allowBarre"].Contains("true");
+            var allowThumb = form["allowThumb"].Contains("true");
+            var requireRoot = form["requireRoot"].Contains("true");
+
+            var checkedCats = AllCategories
+                .Where(cat => form["cat_" + cat.Replace("-", "")].Contains(cat))
+                .ToImmutableArray();
+            // If all are checked (or none explicitly unchecked), pass empty = no filter.
+            var categories = checkedCats.Length == AllCategories.Length
+                ? ImmutableArray<string>.Empty
+                : checkedCats;
+
+            var searchParams = new SearchParams(frets, span, minStr, maxStr,
+                allowOpen, allowBarre, allowThumb, categories, requireRoot);
 
             if (string.IsNullOrWhiteSpace(chord))
                 return Results.RazorSlice<VoicingsResult, VoicingResultModel>(
@@ -61,7 +126,7 @@ public static class VoicingRoutes
             }
 
             var spec = expander.Expand(symbol);
-            var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default, SearchParams.Default, catalogs.VoicingCategories);
+            var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default, searchParams, catalogs.VoicingCategories);
 
             var voicings = set.Voicings;
             if (minComfort > 0.0)
@@ -73,12 +138,19 @@ public static class VoicingRoutes
             var rows = voicings
                 .Select((v, i) =>
                 {
+                    var ordered = v.Positions.OrderBy(p => p.String).ToList();
+                    var notes = string.Join(" ", ordered.Select(p =>
+                        p.Muted ? "x" : p.DisplayNote!.Value.ToString()));
+                    var intervals = string.Join(" ", ordered.Select(p =>
+                        p.Muted ? "x" : FunctionToRoman(p.Function!)));
                     var diagram = BuildDiagram(v);
                     return new VoicingRow(
                         Index: i + 1,
                         Structure: v.Structure,
                         ComfortPct: (int)Math.Round(v.Comfort * 100),
                         AsciiNotation: BuildAsciiNotation(diagram.Strings),
+                        Notes: notes,
+                        Intervals: intervals,
                         Diagram: diagram);
                 })
                 .ToList();
@@ -87,10 +159,31 @@ public static class VoicingRoutes
                 .Select(c => new NextChordEntry(c.Symbol, c.Probability))
                 .ToList();
 
+            var notice = spec.Bass is { } bass && set.Voicings.IsEmpty
+                ? $"No playable voicing on {resolvedTuning.Name} places {bass} in the bass. "
+                  + "Try widening the search, or drop the slash bass."
+                : null;
+
             return Results.RazorSlice<VoicingsResult, VoicingResultModel>(
-                new VoicingResultModel(chord, tuningLabel, total, rows, nextChords, null));
+                new VoicingResultModel(chord, tuningLabel, total, rows, nextChords, null, notice, tuning));
         });
     }
+
+    /// <summary>
+    /// Returns a human-readable label for a tuning value.
+    /// Falls back to the catalog name (or the raw value) when the JS-supplied label
+    /// is blank or the literal string "undefined" (wa-select not yet upgraded on submit).
+    /// </summary>
+    public static string ResolveLabel(string? formLabel, string tuningValue, Catalogs catalogs)
+    {
+        var label = formLabel?.Trim();
+        if (!string.IsNullOrEmpty(label) && label != "undefined")
+            return label;
+        return catalogs.Tunings.TryGet(tuningValue, out var named) ? named!.Name : tuningValue;
+    }
+
+    public static Dadabe.Core.Tuning ResolveTuningPublic(Catalogs catalogs, string nameOrSpec, string displayName)
+        => ResolveTuning(catalogs, nameOrSpec, displayName);
 
     private static Dadabe.Core.Tuning ResolveTuning(Catalogs catalogs, string nameOrSpec, string displayName)
     {
@@ -106,33 +199,37 @@ public static class VoicingRoutes
         throw new FormatException($"Unknown tuning '{nameOrSpec}'.");
     }
 
+    private static string FunctionToRoman(string function)
+    {
+        // A foreign slash bass has no scale-degree reading. Handled up front:
+        // the accidental-stripping loop below would otherwise treat the leading
+        // 'b' as a flat and emit "b" + "ass".
+        if (function == Dadabe.Core.Chord.ChordSpec.BassFunction) { return "bass"; }
+
+        var i = 0;
+        while (i < function.Length && (function[i] == 'b' || function[i] == '#')) i++;
+        var prefix = function[..i];
+        var roman = function[i..] switch
+        {
+            "1"       => "I",
+            "2" or "9"  => "II",
+            "3"       => "III",
+            "4" or "11" => "IV",
+            "5"       => "V",
+            "6" or "13" => "VI",
+            "7"       => "VII",
+            var other => other,
+        };
+        return prefix + roman;
+    }
+
     private static string BuildAsciiNotation(IReadOnlyList<ChordDiagramString> strings)
     {
         var parts = strings.Select(s => s.Muted ? "x" : s.Open ? "0" : s.FrettedAt!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
         return $"[{string.Join(" ", parts)}]";
     }
 
-    private static ChordDiagram BuildDiagram(Voicing voicing)
-    {
-        var positions = voicing.Positions.OrderBy(p => p.String).ToList();
-
-        var frettedAboveOpen = positions
-            .Where(p => p.Fret is > 0)
-            .Select(p => p.Fret!.Value)
-            .ToList();
-
-        int startFret = frettedAboveOpen.Count > 0 ? frettedAboveOpen.Min() : 1;
-
-        var strings = positions.Select(p =>
-        {
-            var name = voicing.Tuning.Strings[p.String].ToString();
-            if (p.Muted) return new ChordDiagramString(name, true, false, null);
-            if (p.Open)  return new ChordDiagramString(name, false, true, null);
-            return new ChordDiagramString(name, false, false, p.Fret!.Value);
-        }).ToList();
-
-        return new ChordDiagram(strings, startFret, NumFrets: 4);
-    }
+    private static ChordDiagram BuildDiagram(Voicing voicing) => ChordDiagramBuilder.FromVoicing(voicing);
 }
 
 file static class StringExtensions

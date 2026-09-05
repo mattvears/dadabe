@@ -1,0 +1,9 @@
+{
+  "slug": "lydian",
+  "name": "Lydian",
+  "intervals": [0, 2, 4, 6, 7, 9, 11],
+  "parentScale": "Major",
+  "degreeIndex": 3,
+  "noteNames": ["F", "G", "A", "B", "C", "D", "E"],
+  "description": "Fourth mode of the major scale; major scale with a raised 4th degree - floating, dreamlike brightness, a film-score and fusion staple."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "gb-major",
+  "name": "Gb Major",
+  "notes": ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "modeOf": "Major",
+  "description": "Major scale on Gb, spelled with six flats including the theoretical Cb; the enharmonic twin of 'F# Major' - identical pitches and interval pattern, distinct catalog spelling."
+}

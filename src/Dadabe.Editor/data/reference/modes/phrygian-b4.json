@@ -1,0 +1,9 @@
+{
+  "slug": "phrygian-b4",
+  "name": "Phrygian b4",
+  "intervals": [0, 1, 3, 4, 7, 8, 10],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 2,
+  "noteNames": ["E", "F", "G", "Ab", "B", "C", "D"],
+  "description": "Third mode of the harmonic major scale; Phrygian with a flattened 4th, producing a tightly-clustered run of half- and whole-steps near the root - dark and exotic."
+}

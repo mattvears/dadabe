@@ -7,67 +7,66 @@
   var action = isNew ? "/api/reference/cadences" : $"/api/reference/cadences/{slug}";
 }
 
-<dialog class="active" id="cadence-dialog">
-  <h5>@(isNew ? "New Cadence" : "Edit Cadence")</h5>
+<wa-dialog id="cadence-dialog" open label="@(isNew ? "New Cadence" : "Edit Cadence")">
   <form hx-@method="@action"
         hx-target="#ref-content"
         hx-swap="innerHTML"
-        hx-on::after-request="if(event.detail.successful) document.getElementById('cadence-dialog').remove()">
+        hx-on::after-request="if(event.detail.successful) document.getElementById('cadence-dialog').hide()">
 
-    <div class="field label border">
-      <select name="type">
+    <div class="form-field">
+      <wa-select label="Type" name="type">
         @foreach (var t in new[] { "authentic", "plagal", "deceptive", "half" })
         {
-          <option value="@t" @(Model?.Type == t ? "selected" : "")>@t</option>
+          <wa-option value="@t" @(Model?.Type == t ? "selected" : "")>@t</wa-option>
         }
-      </select>
-      <label>Type</label>
+      </wa-select>
     </div>
-    <div class="field label border">
-      <input type="text" name="resolution" value="@(Model?.Resolution ?? "")" placeholder="e.g. V->I" />
-      <label>Resolution (optional)</label>
+    <div class="form-field">
+      <wa-input label="Resolution (optional)" name="resolution"
+                value="@(Model?.Resolution ?? "")" placeholder="e.g. V→I"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="description" value="@(Model?.Description ?? "")" />
-      <label>Description (optional)</label>
+    <div class="form-field">
+      <wa-input label="Description (optional)" name="description"
+                value="@(Model?.Description ?? "")"></wa-input>
     </div>
 
-    <label>Example Progression</label>
+    <p>Example Progression</p>
     <div id="chord-list">
       @{
         var chords = Model?.ExampleProgression ?? [];
         for (int i = 0; i < chords.Count; i++)
         {
-          <div class="row chord-item" id="chord-item-@i">
-            <div class="field border max">
-              <input type="text" name="chords" value="@chords[i]" placeholder="e.g. G7" />
-            </div>
-            <button type="button" class="small border error" onclick="this.closest('.chord-item').remove()">
-              <i>close</i>
-            </button>
+          <div class="list-item chord-item" id="chord-item-@i">
+            <wa-input name="chords" value="@chords[i]" placeholder="e.g. G7" style="flex:1"></wa-input>
+            <wa-button type="button" variant="neutral" size="small"
+                       onclick="this.closest('.chord-item').remove()">
+              <wa-icon name="xmark"></wa-icon>
+            </wa-button>
           </div>
         }
       }
     </div>
-    <button type="button" class="small border" onclick="addChord()"><i>add</i> Add chord</button>
+    <wa-button type="button" variant="neutral" size="small" onclick="addChord()">
+      <wa-icon slot="prefix" name="plus"></wa-icon> Add chord
+    </wa-button>
 
-    <nav class="right-align top-margin">
-      <button type="button" class="border" onclick="document.getElementById('cadence-dialog').remove()">Cancel</button>
-      <button type="submit">Save</button>
-    </nav>
+    <div slot="footer" class="dialog-footer">
+      <wa-button variant="neutral" onclick="document.getElementById('cadence-dialog').hide()">Cancel</wa-button>
+      <wa-button type="submit" variant="brand">Save</wa-button>
+    </div>
   </form>
-</dialog>
+</wa-dialog>
 
 <script>
 function addChord() {
   var list = document.getElementById('chord-list');
   var idx = list.children.length;
   var div = document.createElement('div');
-  div.className = 'row chord-item';
+  div.className = 'list-item chord-item';
   div.id = 'chord-item-' + idx;
-  div.innerHTML = '<div class="field border max"><input type="text" name="chords" placeholder="e.g. G7" /></div>'
-    + '<button type="button" class="small border error" onclick="this.closest(\'.chord-item\').remove()"><i>close</i></button>';
+  div.innerHTML = '<wa-input name="chords" placeholder="e.g. G7" style="flex:1"></wa-input>'
+    + '<wa-button type="button" variant="neutral" size="small" onclick="this.closest(\'.chord-item\').remove()"><wa-icon name="xmark"></wa-icon></wa-button>';
   list.appendChild(div);
-  div.querySelector('input').focus();
+  div.querySelector('wa-input').focus();
 }
 </script>

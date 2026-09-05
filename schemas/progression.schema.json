@@ -5,7 +5,28 @@
   "description": "Placeholder schema for chord progressions. Add fields conservatively.",
   "properties": {
     "chords": { "type": "array", "items": { "type": "string" }, "description": "List of chord symbols in progression" },
-    "tempo": { "type": "integer", "minimum": 1 }
+    "tempo": { "type": "integer", "minimum": 1 },
+    "derivedFrom": {
+      "type": "object",
+      "description": "Provenance when this progression was produced by a transform chain (v0.5.2 §7).",
+      "required": ["sourceSlug", "chain"],
+      "additionalProperties": false,
+      "properties": {
+        "sourceSlug": { "type": "string" },
+        "chain": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "type": "string" },
+              "params": { "type": "object", "additionalProperties": true }
+            }
+          }
+        }
+      }
+    }
   },
   "required": [ "chords" ],
   "additionalProperties": true

@@ -1,6 +1,7 @@
 ﻿using Dadabe.Core.Chord;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
+using Dadabe.Fretboard;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dadabe.Editor.Routes;
@@ -59,6 +60,8 @@ public static class PredictionRoutes
         app.MapPost("/api/predictions/{slug}/run", (
             string slug,
             PredictionService svc,
+            [FromServices] ProgressionService progressions,
+            [FromServices] Catalogs catalogs,
             [FromServices] ChordParser parser,
             [FromServices] ChordExpander expander) =>
         {
@@ -71,37 +74,63 @@ public static class PredictionRoutes
                 return Results.RazorSlice<PredictionsResult, PredictionResultModel>(
                     PredictionResultModel.FromError(model.Chord, $"Invalid chord: {parseError}"));
 
-            var spec      = expander.Expand(symbol);
-            var topN      = model.MaxResults ?? 10;
-            var entropy   = model.Entropy ?? 0.5;
-            var candidates = NextChordPredictor.Predict(spec, topN, entropy);
-            var filtered  = ApplyFilters(candidates, model.Filters);
+            var spec = expander.Expand(symbol);
+            var topN = model.MaxResults ?? 10;
+            var entropy = model.Entropy ?? 0.5;
+
+            // Load context chords from the linked progression (D33).
+            List<Dadabe.Core.Chord.ChordSpec>? contextSpecs = null;
+            string? contextName = null;
+            IReadOnlyList<string>? contextChords = null;
+            if (model.ContextSlug is not null)
+            {
+                var prog = progressions.Get(model.ContextSlug);
+                if (prog is not null)
+                {
+                    contextName = prog.Name;
+                    contextChords = prog.Chords;
+                    contextSpecs = [];
+                    foreach (var cs in prog.Chords)
+                    {
+                        if (parser.TryParse(cs, out var cSym, out _))
+                            contextSpecs.Add(expander.Expand(cSym));
+                    }
+                }
+            }
+
+            var candidates = NextChordPredictor.Predict(spec, topN, entropy, contextSpecs);
+            var filtered = ApplyFilters(candidates, model.Filters);
 
             var results = filtered
                 .Select(c => new PredictionCandidate(c.Symbol, c.Probability))
                 .ToList();
 
+            var tuningNames = catalogs.Tunings.All
+                .OrderBy(t => t.Name, StringComparer.Ordinal)
+                .Select(t => t.Name)
+                .ToList();
+
             return Results.RazorSlice<PredictionsResult, PredictionResultModel>(
-                new PredictionResultModel(model.Chord, results, null));
+                new PredictionResultModel(model.Chord, results, null, contextName, tuningNames, contextChords));
         });
     }
 
     private static async Task<(PredictionModel? model, string error)> ParseForm(HttpRequest req)
     {
         var form = await req.ReadFormAsync();
-        var name  = form["name"].ToString();
+        var name = form["name"].ToString();
         var chord = form["chord"].ToString();
-        if (string.IsNullOrWhiteSpace(name))  return (null, "Name is required.");
+        if (string.IsNullOrWhiteSpace(name)) return (null, "Name is required.");
         if (string.IsNullOrWhiteSpace(chord)) return (null, "Chord is required.");
 
-        var slug        = DataStore.ToSlug(name);
+        var slug = DataStore.ToSlug(name);
         var contextSlug = form["contextSlug"].ToString().NullIfEmpty();
-        var maxResults  = int.TryParse(form["maxResults"], out var mr) ? mr : (int?)null;
-        var entropy     = double.TryParse(form["entropy"],
+        var maxResults = int.TryParse(form["maxResults"], out var mr) ? mr : (int?)null;
+        var entropy = double.TryParse(form["entropy"],
             System.Globalization.NumberStyles.Any,
             System.Globalization.CultureInfo.InvariantCulture, out var e) ? e : (double?)null;
 
-        var filterTypes  = form["filterType"].ToList();
+        var filterTypes = form["filterType"].ToList();
         var filterParams = form["filterParam"].ToList();
         var filters = filterTypes
             .Zip(filterParams)

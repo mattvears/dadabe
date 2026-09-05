@@ -121,7 +121,48 @@ public sealed record ChordPayload(
     [property: JsonPropertyName("extensions")] IReadOnlyList<string> Extensions,
     [property: JsonPropertyName("alterations")] IReadOnlyList<string> Alterations,
     [property: JsonPropertyName("pitchClasses")] IReadOnlyList<ChordPcDto> PitchClasses,
-    [property: JsonPropertyName("required")] IReadOnlyList<string> Required);
+    [property: JsonPropertyName("required")] IReadOnlyList<string> Required,
+    [property: JsonPropertyName("bassNote"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    string? BassNote = null);
+
+/// <summary>Payload for the <c>voice-lead</c> subcommand.</summary>
+public sealed record VoiceLeadingResultDto(
+    [property: JsonPropertyName("chords")]
+    IReadOnlyList<string> Chords,
+    [property: JsonPropertyName("tuning")]
+    string Tuning,
+    [property: JsonPropertyName("solutions")]
+    IReadOnlyList<VoiceLeadingSolutionDto> Solutions);
+
+public sealed record VoiceLeadingSolutionDto(
+    [property: JsonPropertyName("totalDistance")]
+    int TotalDistance,
+    [property: JsonPropertyName("steps")]
+    IReadOnlyList<VoiceLeadingStepDto> Steps);
+
+public sealed record VoiceLeadingStepDto(
+    [property: JsonPropertyName("chord")]
+    string Chord,
+    [property: JsonPropertyName("voicing")]
+    VoicingDto Voicing,
+    [property: JsonPropertyName("transition"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    VoiceLeadingTransitionDto? Transition);
+
+public sealed record VoiceLeadingTransitionDto(
+    [property: JsonPropertyName("totalDistance")]
+    int TotalDistance,
+    [property: JsonPropertyName("moves")]
+    IReadOnlyList<VoiceMoveDto> Moves);
+
+public sealed record VoiceMoveDto(
+    [property: JsonPropertyName("string")]
+    int String,
+    [property: JsonPropertyName("from")]
+    int? From,
+    [property: JsonPropertyName("to")]
+    int? To,
+    [property: JsonPropertyName("distance")]
+    int Distance);
 
 /// <summary>Payload for the <c>predict</c> subcommand.</summary>
 public sealed record PredictionResultDto(
@@ -141,3 +182,36 @@ public sealed record PredictionMetadataDto(
     ProgressionDto? ContextUsed,
     [property: JsonPropertyName("filtersApplied"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     JsonObject? FiltersApplied);
+
+/// <summary>Payload for the <c>transform</c> subcommand.</summary>
+public sealed record TransformResultDto(
+    [property: JsonPropertyName("source")]      IReadOnlyList<string> Source,
+    [property: JsonPropertyName("results")]     IReadOnlyList<TransformVariantDto> Results);
+
+public sealed record TransformVariantDto(
+    [property: JsonPropertyName("chain")]       IReadOnlyList<TransformStepDto> Chain,
+    [property: JsonPropertyName("chords")]      IReadOnlyList<string> Chords,
+    [property: JsonPropertyName("playability"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+                                                PlayabilityDto? Playability,
+    [property: JsonPropertyName("keyBefore"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+                                                string? KeyBefore,
+    [property: JsonPropertyName("keyAfter"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+                                                string? KeyAfter,
+    [property: JsonPropertyName("notes")]       IReadOnlyList<TransformNoteDto> Notes);
+
+public sealed record TransformStepDto(
+    [property: JsonPropertyName("type")]        string Type,
+    [property: JsonPropertyName("params")]      IReadOnlyDictionary<string, string> Params);
+
+public sealed record PlayabilityDto(
+    [property: JsonPropertyName("worstComfort")]  int WorstComfort,
+    [property: JsonPropertyName("totalDistance")] int TotalDistance,
+    [property: JsonPropertyName("minFret")]       int MinFret,
+    [property: JsonPropertyName("maxFret")]       int MaxFret,
+    [property: JsonPropertyName("unplayable")]    IReadOnlyList<string> Unplayable);
+
+public sealed record TransformNoteDto(
+    [property: JsonPropertyName("index"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+                                                int? Index,
+    [property: JsonPropertyName("kind")]        string Kind,
+    [property: JsonPropertyName("message")]     string Message);

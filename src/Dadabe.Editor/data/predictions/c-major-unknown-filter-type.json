@@ -1,0 +1,10 @@
+{
+  "slug": "c-major-unknown-filter-type",
+  "name": "C Major, Unknown Filter Type Probe",
+  "chord": "C",
+  "filters": [
+    { "type": "byMood", "params": { "mood": "wistful" } }
+  ],
+  "maxResults": 10,
+  "entropy": null
+}

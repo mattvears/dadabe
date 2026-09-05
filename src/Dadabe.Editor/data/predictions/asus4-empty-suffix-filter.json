@@ -1,0 +1,10 @@
+{
+  "slug": "asus4-empty-suffix-filter",
+  "name": "Asus4 Filtered to Plain Triads (Empty Suffix)",
+  "chord": "Asus4",
+  "filters": [
+    { "type": "byQuality", "params": { "quality": "" } }
+  ],
+  "maxResults": 10,
+  "entropy": null
+}

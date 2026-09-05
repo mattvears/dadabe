@@ -43,6 +43,18 @@
       <Link>schemas\chord.schema.json</Link>
       <LogicalName>Dadabe.Cli.schemas.chord.schema.json</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\..\schemas\voice-lead-result.schema.json">
+      <Link>schemas\voice-lead-result.schema.json</Link>
+      <LogicalName>Dadabe.Cli.schemas.voice-lead-result.schema.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\schemas\transform-result.schema.json">
+      <Link>schemas\transform-result.schema.json</Link>
+      <LogicalName>Dadabe.Cli.schemas.transform-result.schema.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\schemas\transformation.schema.json">
+      <Link>schemas\transformation.schema.json</Link>
+      <LogicalName>Dadabe.Cli.schemas.transformation.schema.json</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

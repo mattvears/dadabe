@@ -1,0 +1,43 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.SongsFormModel>
+
+@{
+    var song = Model.Song;
+    var isNew = song is null;
+    var slug = song?.Slug ?? string.Empty;
+    var method = isNew ? "post" : "put";
+    var action = isNew ? "/api/songs" : $"/api/songs/{slug}";
+}
+
+<wa-dialog id="song-dialog" open label="@(isNew ? "New Song" : $"Edit: {song!.Name}")">
+    <form hx-@method="@action" hx-target="#song-list" hx-swap="innerHTML"
+        hx-on::after-request="if(event.detail.successful) document.getElementById('dialog-container').innerHTML=''">
+
+        <div class="form-field">
+            <wa-input label="Name" name="name" value="@(song?.Name ?? "")" required></wa-input>
+        </div>
+        <div class="form-field">
+            <wa-select label="Tuning" name="tuning" value="@(song?.Tuning ?? "DADABE")">
+                @foreach (var t in Model.EmbeddedTunings)
+                {
+                    <wa-option value="@t">@t</wa-option>
+                }
+                @foreach (var t in Model.SavedTunings)
+                {
+                    <wa-option value="@string.Join(",", t.Strings)">@t.Name</wa-option>
+                }
+            </wa-select>
+        </div>
+        <div class="form-field">
+            <wa-input label="Key override (optional)" name="key" value="@(song?.Key ?? "")" placeholder="e.g. A minor"></wa-input>
+        </div>
+        <div class="form-field">
+            <wa-input label="Tempo (optional)" name="tempo" type="number"
+                      value="@(song?.Tempo?.ToString() ?? "")" min="1" max="400"></wa-input>
+        </div>
+
+        <div slot="footer" class="dialog-footer">
+            <wa-button type="button" variant="neutral" onclick="document.getElementById('dialog-container').innerHTML=''">Cancel</wa-button>
+            <wa-button type="submit" variant="brand">Save</wa-button>
+        </div>
+    </form>
+</wa-dialog>

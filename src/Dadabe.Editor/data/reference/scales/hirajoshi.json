@@ -1,0 +1,7 @@
+{
+  "slug": "hirajoshi",
+  "name": "Hirajoshi",
+  "notes": ["C", "D", "Eb", "G", "Ab"],
+  "intervals": [0, 2, 3, 7, 8],
+  "description": "Japanese pentatonic scale with two semitone clusters separated by larger gaps; a melancholic, koto-associated sound quite distinct from Western pentatonic scales."
+}

@@ -1,0 +1,51 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoiceLeadResultModel>
+
+<wa-card style="margin-top:1rem">
+    <div class="card-header">
+        <strong>@Model.Chords [@Model.TuningName]</strong>
+        <wa-button size="small" variant="neutral" onclick="this.closest('wa-card').remove()">
+            <wa-icon name="xmark"></wa-icon>
+        </wa-button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <p style="color:var(--wa-color-danger-600)">@Model.Error</p>
+    }
+    else
+    {
+        @foreach (var sol in Model.Solutions)
+        {
+            <wa-card style="margin-bottom:0.75rem">
+                <p><strong>Solution @sol.SolutionNumber</strong> — total distance: @sol.TotalDistance frets</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chord</th>
+                            <th>ASCII</th>
+                            <th>Structure</th>
+                            <th>Comfort</th>
+                            <th>Distance</th>
+                            <th>Move</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var step in sol.Steps)
+                        {
+                            <tr>
+                                <td><code>@step.Chord</code></td>
+                                <td><code>@step.AsciiNotation</code></td>
+                                <td>
+                                    <abbr title="@Dadabe.Editor.Services.VoicingStructureGlossary.Describe(step.Structure)">@step.Structure</abbr>
+                                </td>
+                                <td>@step.ComfortPct%</td>
+                                <td>@(step.TransitionDistance.HasValue ? $"{step.TransitionDistance} frets" : "—")</td>
+                                <td class="small">@Dadabe.Editor.Services.VoiceMoveSummary.Describe(step.Moves, Model.StringCount)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </wa-card>
+        }
+    }
+</wa-card>

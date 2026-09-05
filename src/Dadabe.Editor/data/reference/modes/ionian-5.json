@@ -1,0 +1,9 @@
+{
+  "slug": "ionian-5",
+  "name": "Ionian #5",
+  "intervals": [0, 2, 4, 5, 8, 9, 11],
+  "parentScale": "Harmonic Minor",
+  "degreeIndex": 2,
+  "noteNames": ["C", "D", "E", "F", "G#", "A", "B"],
+  "description": "Third mode of the harmonic minor scale (also called the augmented major scale); a major scale with a raised 5th, producing an augmented triad on the tonic."
+}

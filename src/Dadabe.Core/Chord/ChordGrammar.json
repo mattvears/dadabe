@@ -222,6 +222,14 @@
       ],
       "required": ["b3", "5"] },
 
+    { "tokens": ["5"], "displayName": "5",
+      "comment": "Power chord — root and perfect fifth, deliberately no third, so it is neither major nor minor. '1' is listed as required (unlike the triad forms, where the third and fifth carry the identity) because a rootless root-and-fifth dyad has no meaning.",
+      "tones": [
+        { "function": "1", "semitones": 0 },
+        { "function": "5", "semitones": 7 }
+      ],
+      "required": ["1", "5"] },
+
     { "tokens": [""], "displayName": "",
       "tones": [
         { "function": "1", "semitones": 0 },

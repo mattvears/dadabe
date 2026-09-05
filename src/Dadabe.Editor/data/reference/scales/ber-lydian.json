@@ -1,0 +1,7 @@
+{
+  "slug": "ber-lydian",
+  "name": "Über-Lydian",
+  "notes": ["C", "D", "E", "F#", "G", "A", "B"],
+  "intervals": [0, 2, 4, 6, 7, 9, 11],
+  "description": "Lydian mode under a deliberately non-ASCII display name; ToSlug treats the accented 'U' as outside [a-z0-9] and strips it entirely, collapsing 'Uber-Lydian' down to the slug 'ber-lydian'."
+}

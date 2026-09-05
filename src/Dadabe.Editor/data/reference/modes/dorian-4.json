@@ -1,0 +1,9 @@
+{
+  "slug": "dorian-4",
+  "name": "Dorian #4",
+  "intervals": [0, 2, 3, 6, 7, 9, 10],
+  "parentScale": "Harmonic Minor",
+  "degreeIndex": 3,
+  "noteNames": ["D", "E", "F", "G#", "A", "B", "C"],
+  "description": "Fourth mode of the harmonic minor scale (also called Ukrainian Dorian or Romanian minor); Dorian with a raised 4th, giving a distinctive augmented-second gap between the 3rd and #4th degrees - a signature sound of Eastern European folk music."
+}

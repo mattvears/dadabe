@@ -66,14 +66,51 @@ public sealed class ChordExpander
             .Select(t => SpellTone(symbol.Root, t))
             .ToImmutableArray();
 
+        if (symbol.Bass is { } bass)
+        {
+            spelledTones = WithBassTone(symbol.Root, spelledTones, bass);
+        }
+
         var spec = new ChordSpec(
             symbol.Root,
             symbol.Quality,
             spelledTones,
-            required.ToImmutableArray());
+            required.ToImmutableArray(),
+            symbol.Bass);
 
         cache?.Put(symbol, spec);
         return spec;
+    }
+
+    /// <summary>
+    /// Ensure a slash-chord bass is reachable on the fretboard.
+    /// <para>
+    /// An inversion (<c>C/G</c>, <c>Cmaj7/B</c>) names a pitch class the chord
+    /// already contains, so nothing is added — the existing tone keeps its own
+    /// function and only the bass constraint in the search distinguishes the
+    /// inversion from root position.
+    /// </para>
+    /// <para>
+    /// A foreign bass (<c>C/D</c>, <c>Dm7/G</c>) is appended as an extra tone.
+    /// Without it <see cref="ChordSpec.PitchClasses"/> would not contain the
+    /// bass at all and the fretboard search could never place it. The tone
+    /// keeps the spelling the user typed (D12) rather than being re-derived by
+    /// the stacked-thirds walk, and is labelled
+    /// <see cref="ChordSpec.BassFunction"/> so it is never mistaken for a
+    /// chord tone.
+    /// </para>
+    /// </summary>
+    private static ImmutableArray<ChordTone> WithBassTone(
+        Note root, ImmutableArray<ChordTone> tones, Note bass)
+    {
+        var bassPc = bass.PitchClass;
+        if (tones.Any(t => t.PitchClass.Value == bassPc.Value))
+        {
+            return tones;
+        }
+
+        var semitones = (bassPc.Value - root.PitchClass.Value + 12) % 12;
+        return tones.Add(new ChordTone(ChordSpec.BassFunction, semitones, bass, bassPc));
     }
 
     private static void ApplyModifier(List<GrammarTone> tones, HashSet<string> required, GrammarModifier mod)

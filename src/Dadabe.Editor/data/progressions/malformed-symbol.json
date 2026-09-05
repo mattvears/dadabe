@@ -1,0 +1,5 @@
+{
+  "slug": "malformed-symbol",
+  "name": "Malformed Symbol in Context",
+  "chords": ["Cmaj7", "Xyz123", "G7"]
+}

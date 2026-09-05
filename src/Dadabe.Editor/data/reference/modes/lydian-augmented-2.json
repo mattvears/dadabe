@@ -1,0 +1,9 @@
+{
+  "slug": "lydian-augmented-2",
+  "name": "Lydian Augmented #2",
+  "intervals": [0, 3, 4, 6, 8, 9, 11],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 5,
+  "noteNames": ["Ab", "B", "C", "D", "E", "F", "G"],
+  "description": "Sixth mode of the harmonic major scale; Lydian Augmented with a raised 2nd, an unusual and rarely-used colour combining augmented brightness with an exotic opening interval."
+}

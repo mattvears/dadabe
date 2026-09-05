@@ -1,0 +1,7 @@
+{
+  "slug": "length-mismatch-probe-scale",
+  "name": "Length-Mismatch Probe Scale",
+  "notes": ["C", "D", "E", "F", "G"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "description": "Has more intervals (7) than notes (5); the schema enforces no cross-field length constraint, so this probes any future code that zips the two arrays index-for-index."
+}

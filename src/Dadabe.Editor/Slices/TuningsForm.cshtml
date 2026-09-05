@@ -7,57 +7,54 @@
   var action = isNew ? "/api/tunings" : $"/api/tunings/{slug}";
 }
 
-<dialog class="active" id="tuning-dialog">
-  <h5>@(isNew ? "New Tuning" : $"Edit: {Model!.Name}")</h5>
+<wa-dialog id="tuning-dialog" open label="@(isNew ? "New Tuning" : $"Edit: {Model!.Name}")">
   <form hx-@method="@action"
         hx-target="#tuning-list"
         hx-swap="innerHTML"
-        hx-on::after-request="if(event.detail.successful) document.getElementById('tuning-dialog').remove()">
+        hx-on::after-request="if(event.detail.successful) document.getElementById('tuning-dialog').hide()">
 
-    <div class="field label border">
-      <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
-      <label>Name</label>
+    <div class="form-field">
+      <wa-input label="Name" name="name" value="@(Model?.Name ?? "")" required
+                @(isNew ? "" : "readonly")></wa-input>
     </div>
 
-    <label>Strings (low to high)</label>
+    <p>Strings (low to high)</p>
     <div id="string-list">
       @{
         var strings = Model?.Strings ?? [];
         for (int i = 0; i < strings.Count; i++)
         {
-          <div class="row string-item" id="string-item-@i">
-            <div class="field border max">
-              <input type="text" name="strings" value="@strings[i]" placeholder="e.g. E2" />
-            </div>
-            <button type="button" class="small border error"
-                    onclick="this.closest('.string-item').remove()">
-              <i>close</i>
-            </button>
+          <div class="list-item string-item" id="string-item-@i">
+            <wa-input name="strings" value="@strings[i]" placeholder="e.g. E2" style="flex:1"></wa-input>
+            <wa-button type="button" variant="neutral" size="small"
+                       onclick="this.closest('.string-item').remove()">
+              <wa-icon name="xmark"></wa-icon>
+            </wa-button>
           </div>
         }
       }
     </div>
-    <button type="button" class="small border" onclick="addString()">
-      <i>add</i> Add string
-    </button>
+    <wa-button type="button" variant="neutral" size="small" onclick="addString()">
+      <wa-icon slot="prefix" name="plus"></wa-icon> Add string
+    </wa-button>
 
-    <nav class="right-align top-margin">
-      <button type="button" class="border" onclick="document.getElementById('tuning-dialog').remove()">Cancel</button>
-      <button type="submit">Save</button>
-    </nav>
+    <div slot="footer" class="dialog-footer">
+      <wa-button variant="neutral" onclick="document.getElementById('tuning-dialog').hide()">Cancel</wa-button>
+      <wa-button type="submit" variant="brand">Save</wa-button>
+    </div>
   </form>
-</dialog>
+</wa-dialog>
 
 <script>
 function addString() {
   var list = document.getElementById('string-list');
   var idx = list.children.length;
   var div = document.createElement('div');
-  div.className = 'row string-item';
+  div.className = 'list-item string-item';
   div.id = 'string-item-' + idx;
-  div.innerHTML = '<div class="field border max"><input type="text" name="strings" placeholder="e.g. E2" /></div>'
-    + '<button type="button" class="small border error" onclick="this.closest(\'.string-item\').remove()"><i>close</i></button>';
+  div.innerHTML = '<wa-input name="strings" placeholder="e.g. E2" style="flex:1"></wa-input>'
+    + '<wa-button type="button" variant="neutral" size="small" onclick="this.closest(\'.string-item\').remove()"><wa-icon name="xmark"></wa-icon></wa-button>';
   list.appendChild(div);
-  div.querySelector('input').focus();
+  div.querySelector('wa-input').focus();
 }
 </script>

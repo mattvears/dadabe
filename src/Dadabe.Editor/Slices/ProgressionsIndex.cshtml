@@ -3,12 +3,12 @@
 @using Dadabe.Editor.Slices
 @{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
 
-<div class="padding">
-  <div class="row">
-    <h4 class="max">Progressions</h4>
-    <button hx-get="/api/progressions/new" hx-target="#dialog-container" hx-swap="innerHTML">
-      <i>add</i> New
-    </button>
+<div class="page-content">
+  <div class="page-header">
+    <h4>Progressions</h4>
+    <wa-button hx-get="/api/progressions/new" hx-target="#dialog-container" hx-swap="innerHTML">
+      <wa-icon slot="prefix" name="plus"></wa-icon> New
+    </wa-button>
   </div>
   <div id="progression-list">
     @{ await RenderPartialAsync<ProgressionsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ProgressionModel>>(Model); }

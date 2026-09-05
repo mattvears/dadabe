@@ -8,42 +8,53 @@
   var action = isNew ? "/api/predictions" : $"/api/predictions/{slug}";
 }
 
-<dialog class="active" id="prediction-dialog">
-  <h5>@(isNew ? "New Prediction Request" : $"Edit: {p!.Name}")</h5>
+<wa-dialog id="prediction-dialog" open label="@(isNew ? "New Prediction Request" : $"Edit: {p!.Name}")">
   <form hx-@method="@action"
         hx-target="#prediction-list"
         hx-swap="innerHTML"
-        hx-on::after-request="if(event.detail.successful) document.getElementById('prediction-dialog').remove()">
+        hx-on::after-request="if(event.detail.successful) document.getElementById('dialog-container').innerHTML=''">
 
-    <div class="field label border">
-      <input type="text" name="name" value="@(p?.Name ?? "")" required @(isNew ? "" : "readonly") />
-      <label>Name</label>
+    <div class="form-field">
+      <wa-input label="Name" name="name" value="@(p?.Name ?? "")" required
+                @(isNew ? "" : "readonly")
+                help-text="A label for this saved request. Not used in the prediction itself."></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="chord" value="@(p?.Chord ?? "")" required placeholder="e.g. Dm7" />
-      <label>Chord</label>
+
+    <div class="form-field">
+      <wa-input label="Chord" name="chord" value="@(p?.Chord ?? "")" required
+                placeholder="e.g. Dm7"
+                help-text="The chord you are currently on. Predictions answer: what chord comes next from here?"></wa-input>
     </div>
-    <div class="field label border">
-      <select name="contextSlug">
-        <option value="">— no context —</option>
+
+    <div class="form-field">
+      <wa-select label="Context progression (optional)" name="contextSlug"
+                 help-text="Preceding chords that hint at the key. Diatonic candidates score ×1.4; unrelated chords ×0.7. Leave blank for pure quality-family rules.">
+        <wa-option value="">— no context —</wa-option>
         @foreach (var prog in Model.Progressions)
         {
-          var selected = p?.ContextSlug == prog.Slug ? "selected" : "";
-          <option value="@prog.Slug" @selected>@prog.Name</option>
+          <wa-option value="@prog.Slug" @(p?.ContextSlug == prog.Slug ? "selected" : "")>@prog.Name</wa-option>
         }
-      </select>
-      <label>Context progression (optional)</label>
-    </div>
-    <div class="field label border">
-      <input type="number" name="maxResults" value="@(p?.MaxResults?.ToString() ?? "")" min="1" max="50" />
-      <label>Max results (optional)</label>
-    </div>
-    <div class="field label border">
-      <input type="number" name="entropy" value="@(p?.Entropy?.ToString() ?? "")" min="0.01" max="10" step="0.01" />
-      <label>Entropy override (optional)</label>
+      </wa-select>
     </div>
 
-    <label>Filters</label>
+    <div class="form-field">
+      <wa-input label="Max results" name="maxResults" type="number"
+                value="@(p?.MaxResults?.ToString() ?? "")" min="1" max="50"
+                placeholder="10"
+                help-text="How many candidates to return before filters are applied (default 10, max 50)."></wa-input>
+    </div>
+
+    <div class="form-field">
+      <wa-input label="Entropy" name="entropy" type="number"
+                value="@(p?.Entropy?.ToString() ?? "")" min="0.01" max="10" step="0.01"
+                placeholder="0.5 (default)"
+                help-text="Low (0.1) = confident/predictable. High (2–5) = exploratory. Leave blank to use the server default (0.5)."></wa-input>
+    </div>
+
+    <div class="form-section-label">
+      Filters
+      <span class="form-hint">Hard filters applied after scoring. They narrow results but don't change scores.</span>
+    </div>
     <div id="filter-list">
       @{
         var filters = p?.Filters ?? [];
@@ -52,44 +63,45 @@
           var f = filters[i];
           var paramKey = f.Type == "byChord" ? "chord" : "quality";
           var paramVal = f.Params.TryGetValue(paramKey, out var v) ? v : "";
-          <div class="row filter-item" id="filter-item-@i">
-            <div class="field border">
-              <select name="filterType">
-                <option value="byChord"   @(f.Type == "byChord"   ? "selected" : "")>byChord</option>
-                <option value="byQuality" @(f.Type == "byQuality" ? "selected" : "")>byQuality</option>
-              </select>
-            </div>
-            <div class="field border max">
-              <input type="text" name="filterParam" value="@paramVal" placeholder="value" />
-            </div>
-            <button type="button" class="small border error" onclick="this.closest('.filter-item').remove()">
-              <i>close</i>
-            </button>
+          <div class="list-item filter-item" id="filter-item-@i">
+            <wa-select name="filterType" style="width:130px">
+              <wa-option value="byChord"   @(f.Type == "byChord"   ? "selected" : "")>byChord</wa-option>
+              <wa-option value="byQuality" @(f.Type == "byQuality" ? "selected" : "")>byQuality</wa-option>
+            </wa-select>
+            <wa-input name="filterParam" value="@paramVal" placeholder="value" style="flex:1"></wa-input>
+            <wa-button type="button" variant="neutral" size="small"
+                       onclick="this.closest('.filter-item').remove()">
+              <wa-icon name="xmark"></wa-icon>
+            </wa-button>
           </div>
         }
       }
     </div>
-    <button type="button" class="small border" onclick="addFilter()">
-      <i>add</i> Add filter
-    </button>
+    <p class="form-hint" style="margin-top:0.4rem">
+      <strong>byQuality</strong> — keeps chords with a given quality suffix, e.g. <code>m7</code> returns only minor-seventh chords.<br>
+      <strong>byChord</strong> — keeps only an exact symbol match, e.g. <code>G7</code>.
+    </p>
+    <wa-button type="button" variant="neutral" size="small" onclick="addFilter()">
+      <wa-icon slot="prefix" name="plus"></wa-icon> Add filter
+    </wa-button>
 
-    <nav class="right-align top-margin">
-      <button type="button" class="border" onclick="document.getElementById('prediction-dialog').remove()">Cancel</button>
-      <button type="submit">Save</button>
-    </nav>
+    <div slot="footer" class="dialog-footer">
+      <wa-button type="button" variant="neutral" onclick="document.getElementById('dialog-container').innerHTML=''">Cancel</wa-button>
+      <wa-button type="submit" variant="brand">Save</wa-button>
+    </div>
   </form>
-</dialog>
+</wa-dialog>
 
 <script>
 function addFilter() {
   var list = document.getElementById('filter-list');
   var idx = list.children.length;
   var div = document.createElement('div');
-  div.className = 'row filter-item';
+  div.className = 'list-item filter-item';
   div.id = 'filter-item-' + idx;
-  div.innerHTML = '<div class="field border"><select name="filterType"><option value="byChord">byChord</option><option value="byQuality">byQuality</option></select></div>'
-    + '<div class="field border max"><input type="text" name="filterParam" placeholder="value" /></div>'
-    + '<button type="button" class="small border error" onclick="this.closest(\'.filter-item\').remove()"><i>close</i></button>';
+  div.innerHTML = '<wa-select name="filterType" style="width:130px"><wa-option value="byChord">byChord</wa-option><wa-option value="byQuality">byQuality</wa-option></wa-select>'
+    + '<wa-input name="filterParam" placeholder="value" style="flex:1"></wa-input>'
+    + '<wa-button type="button" variant="neutral" size="small" onclick="this.closest(\'.filter-item\').remove()"><wa-icon name="xmark"></wa-icon></wa-button>';
   list.appendChild(div);
 }
 </script>

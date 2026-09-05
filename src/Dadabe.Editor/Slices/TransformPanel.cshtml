@@ -1,0 +1,126 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.TransformPanelModel>
+@{
+    var slug = Model.Progression.Slug;
+}
+
+<wa-dialog id="transform-dialog" open label="Transform: @Model.Progression.Name" style="--width:640px">
+    <p class="form-hint">Source: <code>@string.Join(" ", Model.Progression.Chords)</code></p>
+
+    <form id="transform-form" hx-post="/api/progressions/@slug/transform/apply"
+          hx-target="#transform-output" hx-swap="innerHTML">
+        <input type="hidden" name="tuning" id="form-tuning" />
+        <input type="hidden" name="tuningName" id="form-tuning-name" />
+
+        <p class="form-section-label">Chain</p>
+        <div id="chain-steps">
+            <div class="chain-step-wrap" id="chain-step-0">
+                <div class="list-item chain-step">
+                    <wa-select name="type" size="small" style="width:180px" onchange="window.onChainStepTypeChange(this)">
+                        <wa-option value="transpose">transpose</wa-option>
+                        <wa-option value="retrograde">retrograde</wa-option>
+                        <wa-option value="rotate">rotate</wa-option>
+                        <wa-option value="invert">invert</wa-option>
+                        <wa-option value="interval-negate">interval-negate</wa-option>
+                        <wa-option value="interval-reverse">interval-reverse</wa-option>
+                        <wa-option value="interval-multiply">interval-multiply</wa-option>
+                        <wa-option value="quality-map">quality-map</wa-option>
+                        <wa-option value="reduce">reduce</wa-option>
+                        <wa-option value="tritone-sub">tritone-sub</wa-option>
+                        <wa-option value="plr">plr</wa-option>
+                    </wa-select>
+                    <wa-input name="paramsRaw" size="small" style="flex:1"></wa-input>
+                    <wa-button type="button" variant="neutral" size="small" onclick="this.closest('.chain-step-wrap').remove()">
+                        <wa-icon name="xmark"></wa-icon>
+                    </wa-button>
+                </div>
+                <p class="chain-step-hint form-hint"></p>
+            </div>
+        </div>
+        <wa-button type="button" variant="neutral" size="small" onclick="window.addChainStep()">
+            <wa-icon slot="prefix" name="plus"></wa-icon> Add step
+        </wa-button>
+
+        <div class="form-row" style="margin-top:0.75rem">
+            <wa-button type="submit" variant="brand" size="small">
+                <wa-icon slot="prefix" name="play"></wa-icon> Apply
+            </wa-button>
+            <wa-button type="button" variant="neutral" appearance="outlined" size="small"
+                    onclick="window.exploreTransforms('@slug')">
+                <wa-icon slot="prefix" name="compass"></wa-icon> Explore
+            </wa-button>
+            <wa-button type="button" variant="neutral" size="small" onclick="document.getElementById('dialog-container').innerHTML=''">
+                Close
+            </wa-button>
+        </div>
+    </form>
+
+    <div id="transform-output" style="margin-top:1rem"></div>
+</wa-dialog>
+
+<script>
+    // Kept in sync with TransformCommand.SingleArgKey and each transform's Apply()
+    // in Dadabe.Core.Transform — the key names here are exactly what the server parses.
+    window.TRANSFORM_PARAM_HELP = {
+        'transpose': 'interval=M2 (named interval, e.g. m2/M2/m3/M3/P4/A4/P5/M6/M7) — or semitones=2',
+        'retrograde': null,
+        'rotate': 'by=1 (positions to rotate; negative rotates the other way)',
+        'invert': 'axis=C (note the roots are mirrored about)',
+        'interval-negate': null,
+        'interval-reverse': null,
+        'interval-multiply': 'factor=7 (5 or 7 — serial M5/M7)',
+        'quality-map': 'to=m7 (target quality in the grammar, e.g. maj7, m, 7, dim)',
+        'reduce': 'level=triad (triad or seventh)',
+        'tritone-sub': 'positions=0,2 (optional 0-based chord indices; omit to affect every dominant)',
+        'plr': 'op=P (P, L, or R)',
+    };
+
+    window.onChainStepTypeChange = function (select) {
+        var wrap = select.closest('.chain-step-wrap');
+        if (!wrap) { return; }
+        var input = wrap.querySelector('wa-input[name="paramsRaw"]');
+        var hint = wrap.querySelector('.chain-step-hint');
+        var help = window.TRANSFORM_PARAM_HELP[select.value];
+
+        if (help) {
+            input.readOnly = false;
+            input.classList.remove('chain-param-disabled');
+            input.placeholder = help;
+            hint.textContent = help;
+            hint.style.display = '';
+        } else {
+            // readonly, not disabled: a disabled form-associated element is
+            // excluded from FormData entirely, which would misalign this row's
+            // type/paramsRaw with every other row's when the server pairs them
+            // up positionally. readonly still submits (as an empty string).
+            input.value = '';
+            input.readOnly = true;
+            input.classList.add('chain-param-disabled');
+            input.placeholder = '';
+            hint.textContent = 'No parameters for this transform.';
+            hint.style.display = '';
+        }
+    };
+
+    window.addChainStep = function () {
+        var list = document.getElementById('chain-steps');
+        var idx = list.children.length;
+        var div = document.createElement('div');
+        div.className = 'chain-step-wrap';
+        div.id = 'chain-step-' + idx;
+        div.innerHTML = list.children[0].innerHTML;
+        list.appendChild(div);
+        window.onChainStepTypeChange(div.querySelector('wa-select'));
+    };
+    window.onChainStepTypeChange(document.querySelector('#chain-steps wa-select'));
+    // Explore shares the form's tuning fields but is not itself a form submit —
+    // htmx only reliably intercepts one hx-post per <form> (the submit action,
+    // wired to Apply above), so this is issued via the JS API instead.
+    window.exploreTransforms = function (slug) {
+        htmx.ajax('POST', '/api/progressions/' + slug + '/transform/explore', {
+            source: document.getElementById('transform-form'),
+            target: '#transform-output',
+            swap: 'innerHTML',
+        });
+    };
+    window.bindTuningSelect();
+</script>

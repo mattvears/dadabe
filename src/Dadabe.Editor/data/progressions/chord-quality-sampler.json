@@ -1,0 +1,5 @@
+{
+  "slug": "chord-quality-sampler",
+  "name": "Chord Quality Sampler",
+  "chords": ["C6", "Cmaj9", "Cm7", "CmMaj7", "C13", "Cm7b5", "Cdim7", "Caug", "Csus2", "Csus4"]
+}

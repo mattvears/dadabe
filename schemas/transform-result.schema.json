@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dadabe.dev/schemas/transform-result.schema.json",
+  "title": "TransformResult",
+  "type": "object",
+  "description": "Response shape for the transform subcommand (v0.5.2 §6).",
+  "required": ["tool", "version", "schemaVersion", "command", "input", "data", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "tool":          { "const": "dadabe" },
+    "version":       { "type": "string" },
+    "schemaVersion": { "const": "1" },
+    "command":       { "const": "transform" },
+    "input":         { "type": "object" },
+    "warnings":      { "type": "array", "items": { "type": "string" } },
+    "data": {
+      "type": "object",
+      "required": ["source", "results"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/variant" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "transpose", "retrograde", "rotate", "invert",
+            "interval-negate", "interval-reverse", "interval-multiply",
+            "quality-map", "reduce", "tritone-sub", "plr"
+          ]
+        },
+        "params": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "required": ["chain", "chords", "notes"],
+      "additionalProperties": false,
+      "properties": {
+        "chain": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/step" }
+        },
+        "chords": { "type": "array", "items": { "type": "string" } },
+        "playability": {
+          "type": "object",
+          "required": ["worstComfort", "totalDistance", "minFret", "maxFret", "unplayable"],
+          "additionalProperties": false,
+          "properties": {
+            "worstComfort": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "totalDistance": { "type": "integer", "minimum": 0 },
+            "minFret": { "type": "integer", "minimum": 0 },
+            "maxFret": { "type": "integer", "minimum": 0 },
+            "unplayable": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "keyBefore": { "type": "string" },
+        "keyAfter": { "type": "string" },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "message"],
+            "additionalProperties": false,
+            "properties": {
+              "index": { "type": "integer", "minimum": 0 },
+              "kind": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

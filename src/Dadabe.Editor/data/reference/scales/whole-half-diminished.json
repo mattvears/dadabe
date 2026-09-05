@@ -1,0 +1,8 @@
+{
+  "slug": "whole-half-diminished",
+  "name": "Whole-Half Diminished",
+  "notes": ["C", "D", "Eb", "F", "Gb", "Ab", "A", "B"],
+  "intervals": [0, 2, 3, 5, 6, 8, 9, 11],
+  "modeOf": "Diminished Seventh Arpeggio",
+  "description": "Octatonic symmetric scale alternating whole- and half-steps; the 'diminished' scale played over diminished-seventh chords, with four distinct transpositions."
+}

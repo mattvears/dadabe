@@ -1,0 +1,7 @@
+{
+  "slug": "authentic-minor-key",
+  "type": "authentic",
+  "resolution": "V7->i",
+  "exampleProgression": ["E7", "Am"],
+  "description": "Minor-key authentic cadence (harmonic-minor flavour): the raised leading tone in E7 (G#) creates a strong pull into A minor, mirroring the major-key V7->I motion."
+}

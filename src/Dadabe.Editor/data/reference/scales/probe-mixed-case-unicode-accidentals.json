@@ -1,0 +1,7 @@
+{
+  "slug": "probe-mixed-case-unicode-accidentals",
+  "name": "Probe: Mixed Case & Unicode Accidentals",
+  "notes": ["c", "D♯", "e", "F♭", "g", "A", "b"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "description": "Deliberately mixes lower-case letters and Unicode sharp/flat accidentals (D♯, F♭) in its note spellings, to probe the unvalidated ParseStringList path and the looser ScaleModel.Notes layer relative to Note.TryParse's stricter handling."
+}

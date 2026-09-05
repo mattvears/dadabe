@@ -1,0 +1,8 @@
+{
+  "slug": "gb-major-pentatonic",
+  "name": "Gb Major Pentatonic",
+  "notes": ["Gb", "Ab", "Bb", "Db", "Eb"],
+  "intervals": [0, 2, 4, 7, 9],
+  "modeOf": "Major Pentatonic",
+  "description": "Major pentatonic transposed to Gb; flat spelling chosen over the enharmonic F# pentatonic to match guitar fretboard flat-key conventions."
+}

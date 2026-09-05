@@ -1,0 +1,7 @@
+{
+  "slug": "deceptive-g7-iv-ambiguous",
+  "type": "deceptive",
+  "resolution": "V7->IV (ambiguous - could also read as the approach into a half cadence)",
+  "exampleProgression": ["V7", "IV"],
+  "description": "Compound/ambiguous case: V7-IV could be analysed as a deceptive resolution toward a borrowed/modal IV, or as the setup for a half cadence depending on what follows - a tie-breaker test for using description/resolution to disambiguate."
+}

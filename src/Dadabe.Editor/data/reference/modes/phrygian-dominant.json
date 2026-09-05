@@ -1,0 +1,9 @@
+{
+  "slug": "phrygian-dominant",
+  "name": "Phrygian Dominant",
+  "intervals": [0, 1, 4, 5, 7, 8, 10],
+  "parentScale": "Harmonic Minor",
+  "degreeIndex": 4,
+  "noteNames": ["E", "F", "G#", "A", "B", "C", "D"],
+  "description": "Fifth mode of the harmonic minor scale (also called the Spanish or Freygish scale); a dominant 7th sound with a flattened 2nd and major 3rd - the quintessential flamenco and klezmer colour."
+}

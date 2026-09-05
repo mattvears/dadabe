@@ -1,0 +1,9 @@
+{
+  "slug": "borderline-coverage-high-entropy",
+  "name": "Borderline Coverage Context, High Entropy",
+  "chord": "G",
+  "context": "borderline-coverage",
+  "filters": [],
+  "maxResults": 10,
+  "entropy": 9.0
+}

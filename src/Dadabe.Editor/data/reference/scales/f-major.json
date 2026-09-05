@@ -1,0 +1,8 @@
+{
+  "slug": "f-major",
+  "name": "F# Major",
+  "notes": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "modeOf": "Major",
+  "description": "Major scale on F#, spelled with six sharps including the theoretical E# rather than its enharmonic equivalent F; paired with 'Gb Major' as an enharmonic-twin fixture - note that ToSlug collapses its name to 'f-major', which would collide with a hypothetical 'F Major' entry."
+}

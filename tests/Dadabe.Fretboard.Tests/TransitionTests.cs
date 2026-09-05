@@ -6,9 +6,8 @@ using FluentAssertions;
 namespace Dadabe.Fretboard.Tests;
 
 /// <summary>
-/// Validates Transition / VoiceMove content-hash invariants (D16/D17).
-/// Transition is type-only in v0.1; these tests ensure the hash is stable
-/// and that From/To order matters (so the hash distinguishes direction).
+/// Validates Transition / VoiceMove content-hash invariants (D16/D17) and
+/// the fret-distance metric used by VoiceLeadSolver (D29).
 /// </summary>
 public class TransitionTests
 {
@@ -32,8 +31,9 @@ public class TransitionTests
         var voicings = GetVoicings("Cmaj7");
         voicings.Length.Should().BeGreaterThanOrEqualTo(2);
 
-        var t1 = new Transition(voicings[0], voicings[1], ImmutableArray<VoiceMove>.Empty, 0);
-        var t2 = new Transition(voicings[0], voicings[1], ImmutableArray<VoiceMove>.Empty, 0);
+        var moves = Array.Empty<VoiceMove>();
+        var t1 = new Transition(voicings[0], voicings[1], moves, 0);
+        var t2 = new Transition(voicings[0], voicings[1], moves, 0);
 
         t1.ContentHash.Should().Be(t2.ContentHash);
     }
@@ -44,21 +44,59 @@ public class TransitionTests
         var voicings = GetVoicings("Cmaj7");
         voicings.Length.Should().BeGreaterThanOrEqualTo(2);
 
-        var forward = new Transition(voicings[0], voicings[1], ImmutableArray<VoiceMove>.Empty, 0);
-        var backward = new Transition(voicings[1], voicings[0], ImmutableArray<VoiceMove>.Empty, 0);
+        var moves = Array.Empty<VoiceMove>();
+        var forward  = new Transition(voicings[0], voicings[1], moves, 0);
+        var backward = new Transition(voicings[1], voicings[0], moves, 0);
 
         forward.ContentHash.Should().NotBe(backward.ContentHash);
     }
 
     [Fact]
-    public void VoiceMove_carries_semitone_displacement()
+    public void VoiceMove_carries_fret_displacement()
     {
-        var c4 = new Pitch(new Note(Letter.C, 0), 4);
-        var e4 = new Pitch(new Note(Letter.E, 0), 4);
-        var move = new VoiceMove(c4, e4, 4);
+        var move = new VoiceMove(StringIndex: 2, FromFret: 3, ToFret: 5, Distance: 2);
 
-        move.Semitones.Should().Be(4);
-        move.From.Should().Be(c4);
-        move.To.Should().Be(e4);
+        move.StringIndex.Should().Be(2);
+        move.FromFret.Should().Be(3);
+        move.ToFret.Should().Be(5);
+        move.Distance.Should().Be(2);
+    }
+
+    [Fact]
+    public void VoiceMove_muted_string_uses_null_fret()
+    {
+        var move = new VoiceMove(StringIndex: 0, FromFret: null, ToFret: 3, Distance: 4);
+
+        move.FromFret.Should().BeNull();
+        move.Distance.Should().Be(4);
+    }
+
+    [Fact]
+    public void TotalFretDistance_same_voicing_is_zero()
+    {
+        var voicings = GetVoicings("G");
+        voicings.Length.Should().BeGreaterThanOrEqualTo(1);
+
+        VoiceLeadSolver.TotalFretDistance(voicings[0], voicings[0]).Should().Be(0);
+    }
+
+    [Fact]
+    public void TotalFretDistance_is_symmetric()
+    {
+        var voicings = GetVoicings("Cmaj7");
+        voicings.Length.Should().BeGreaterThanOrEqualTo(2);
+
+        int ab = VoiceLeadSolver.TotalFretDistance(voicings[0], voicings[1]);
+        int ba = VoiceLeadSolver.TotalFretDistance(voicings[1], voicings[0]);
+        ab.Should().Be(ba);
+    }
+
+    [Fact]
+    public void TotalFretDistance_is_non_negative()
+    {
+        var voicings = GetVoicings("Dm7", take: 5);
+        for (int i = 0; i < voicings.Length; i++)
+        for (int j = 0; j < voicings.Length; j++)
+            VoiceLeadSolver.TotalFretDistance(voicings[i], voicings[j]).Should().BeGreaterThanOrEqualTo(0);
     }
 }

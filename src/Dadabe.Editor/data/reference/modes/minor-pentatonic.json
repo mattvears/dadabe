@@ -1,0 +1,9 @@
+{
+  "slug": "minor-pentatonic",
+  "name": "Minor Pentatonic",
+  "intervals": [0, 3, 5, 7, 10],
+  "parentScale": "Major Pentatonic",
+  "degreeIndex": 4,
+  "noteNames": ["A", "C", "D", "E", "G"],
+  "description": "Fifth mode of the major pentatonic scale; the ubiquitous minor pentatonic of blues, rock, and metal soloing - the relative minor of its parent major pentatonic, sharing every pitch class."
+}

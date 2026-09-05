@@ -1,0 +1,7 @@
+{
+  "slug": "half-with-blanks",
+  "type": "half",
+  "resolution": "iv->V",
+  "exampleProgression": ["iv", "  ", "V", ""],
+  "description": "Hand-edited/imported catalog entry containing whitespace-only and empty-string progression entries; the editor's form-parsing filter normally drops these (ReferenceRoutes.cs:169) - this fixture probes whether direct catalog loading and rendering tolerate the same shapes a hand-edited file could contain."
+}

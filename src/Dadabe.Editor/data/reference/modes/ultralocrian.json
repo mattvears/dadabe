@@ -1,0 +1,9 @@
+{
+  "slug": "ultralocrian",
+  "name": "Ultralocrian",
+  "intervals": [0, 1, 3, 4, 6, 8, 9],
+  "parentScale": "Harmonic Minor",
+  "degreeIndex": 6,
+  "noteNames": ["G#", "A", "B", "C", "D", "E", "F"],
+  "description": "Seventh mode of the harmonic minor scale (also called Altered Diminished or Super Locrian bb7); the darkest of its modes, with a diminished 7th replacing the altered scale's minor 7th."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "8-tone-spanish",
+  "name": "8-Tone Spanish",
+  "notes": ["C", "Db", "D", "E", "F", "G", "Ab", "Bb"],
+  "intervals": [0, 1, 2, 4, 5, 7, 8, 10],
+  "modeOf": "Phrygian Dominant",
+  "description": "Eight-note 'Spanish' scale blending major and Phrygian colours; its leading-numeral name probes slug generation for digits, and its modeOf deliberately references a scale absent from this batch (a dangling reference)."
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "g-all-eliminated-target",
+  "name": "G, Impossible Target (All Eliminated)",
+  "chord": "G",
+  "context": "mostly-valid-snippet",
+  "filters": [
+    { "type": "byChord", "params": { "chord": "Zb13#11" } }
+  ],
+  "maxResults": 10,
+  "entropy": null
+}

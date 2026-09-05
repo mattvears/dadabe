@@ -1,0 +1,39 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.TransformExploreModel>
+@using Dadabe.Editor.Routes
+
+<p class="form-hint">Ranked best-playable first on the active tuning. Click <strong>Use</strong> to load a transform into the chain.</p>
+<table>
+    <thead>
+        <tr><th>Transform</th><th>Result</th><th>Playability</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Results)
+        {
+            <tr>
+                <td>@row.DisplayName</td>
+                <td><code>@string.Join(" ", row.Chords)</code></td>
+                <td class="small">
+                    @if (row.Playability is { } p)
+                    {
+                        @(p.Unplayable.Count > 0
+                            ? "unplayable: " + string.Join(", ", p.Unplayable)
+                            : $"{p.WorstComfortPct}% worst · {p.TotalDistance} frets")
+                    }
+                    else
+                    {
+                        <text>—</text>
+                    }
+                    @(row.NoteCount > 0 ? $" · {row.NoteCount} note(s)" : "")
+                </td>
+                <td>
+                    <form hx-post="/api/progressions/@Model.SourceSlug/transform/apply" hx-target="#transform-output" hx-swap="innerHTML"
+                          hx-include="#form-tuning, #form-tuning-name">
+                        <input type="hidden" name="type" value="@row.Type" />
+                        <input type="hidden" name="paramsRaw" value="@TransformRoutes.DefaultParamsRawFor(row.Type)" />
+                        <wa-button type="submit" size="small" variant="neutral">Use</wa-button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

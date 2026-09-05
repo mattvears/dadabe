@@ -1,0 +1,46 @@
+@inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.SongModel>>
+
+@if (Model.Count == 0)
+{
+  <p class="empty-state">No songs yet. Click <strong>New</strong> to add one.</p>
+}
+else
+{
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Tuning</th><th>Sections</th><th>Unpinned</th><th></th></tr>
+    </thead>
+    <tbody>
+      @foreach (var s in Model)
+      {
+        var totalSlots = s.Sections.Sum(sec => sec.Slots.Count);
+        var unpinned = s.Sections.Sum(sec => sec.Slots.Count(sl => sl.Voicing is null));
+        <tr id="song-@s.Slug">
+          <td>
+            <a href="/songs/@s.Slug" hx-get="/songs/@s.Slug" hx-target="#main-content" hx-select="#page-body" hx-swap="innerHTML" hx-push-url="true">
+              @s.Name
+            </a>
+          </td>
+          <td>@(s.Tuning ?? "—")</td>
+          <td>@s.Sections.Count</td>
+          <td>@(totalSlots == 0 ? "—" : unpinned == 0 ? "complete" : $"{unpinned} of {totalSlots}")</td>
+          <td class="no-wrap">
+            <wa-button size="small" variant="neutral"
+                    hx-get="/api/songs/@s.Slug/edit"
+                    hx-target="#dialog-container"
+                    hx-swap="innerHTML">
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="danger"
+                    hx-delete="/api/songs/@s.Slug"
+                    hx-target="#song-@s.Slug"
+                    hx-swap="outerHTML"
+                    hx-confirm="Delete '@s.Name'?">
+              <wa-icon name="trash"></wa-icon>
+            </wa-button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

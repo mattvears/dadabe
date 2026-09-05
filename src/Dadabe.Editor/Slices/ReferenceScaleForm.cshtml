@@ -9,37 +9,36 @@
   var intervalsStr = Model is null ? "" : string.Join(", ", Model.Intervals);
 }
 
-<dialog class="active" id="scale-dialog">
-  <h5>@(isNew ? "New Scale" : $"Edit: {Model!.Name}")</h5>
+<wa-dialog id="scale-dialog" open label="@(isNew ? "New Scale" : $"Edit: {Model!.Name}")">
   <form hx-@method="@action"
         hx-target="#ref-content"
         hx-swap="innerHTML"
-        hx-on::after-request="if(event.detail.successful) document.getElementById('scale-dialog').remove()">
+        hx-on::after-request="if(event.detail.successful) document.getElementById('scale-dialog').hide()">
 
-    <div class="field label border">
-      <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
-      <label>Name</label>
+    <div class="form-field">
+      <wa-input label="Name" name="name" value="@(Model?.Name ?? "")" required
+                @(isNew ? "" : "readonly")></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="notes" value="@notesStr" required placeholder="e.g. C, D, E, F, G, A, B" />
-      <label>Notes (comma-separated)</label>
+    <div class="form-field">
+      <wa-input label="Notes (comma-separated)" name="notes"
+                value="@notesStr" required placeholder="e.g. C, D, E, F, G, A, B"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="intervals" value="@intervalsStr" required placeholder="e.g. 0, 2, 4, 5, 7, 9, 11" />
-      <label>Intervals (comma-separated semitones)</label>
+    <div class="form-field">
+      <wa-input label="Intervals (comma-separated semitones)" name="intervals"
+                value="@intervalsStr" required placeholder="e.g. 0, 2, 4, 5, 7, 9, 11"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="modeOf" value="@(Model?.ModeOf ?? "")" />
-      <label>Mode of (optional)</label>
+    <div class="form-field">
+      <wa-input label="Mode of (optional)" name="modeOf"
+                value="@(Model?.ModeOf ?? "")"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="description" value="@(Model?.Description ?? "")" />
-      <label>Description (optional)</label>
+    <div class="form-field">
+      <wa-input label="Description (optional)" name="description"
+                value="@(Model?.Description ?? "")"></wa-input>
     </div>
 
-    <nav class="right-align top-margin">
-      <button type="button" class="border" onclick="document.getElementById('scale-dialog').remove()">Cancel</button>
-      <button type="submit">Save</button>
-    </nav>
+    <div slot="footer" class="dialog-footer">
+      <wa-button variant="neutral" onclick="document.getElementById('scale-dialog').hide()">Cancel</wa-button>
+      <wa-button type="submit" variant="brand">Save</wa-button>
+    </div>
   </form>
-</dialog>
+</wa-dialog>

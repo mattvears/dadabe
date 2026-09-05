@@ -1,5 +1,8 @@
-﻿using Dadabe.Editor.Services;
+﻿using System.Net;
+using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
+using Dadabe.Fretboard;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dadabe.Editor.Routes;
 
@@ -7,6 +10,26 @@ public static class TuningRoutes
 {
     public static void MapTuningRoutes(this WebApplication app)
     {
+        app.MapGet("/api/tunings/options", (
+            [FromServices] Catalogs catalogs,
+            [FromServices] TuningService tunings) =>
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var t in catalogs.Tunings.All.OrderBy(t => t.Name, StringComparer.Ordinal))
+            {
+                var val = WebUtility.HtmlEncode(t.Name);
+                var selected = t.Name == "DADABE" ? " selected" : "";
+                sb.Append(System.Globalization.CultureInfo.InvariantCulture, $"""<wa-option value="{val}"{selected}>{val}</wa-option>""");
+            }
+            foreach (var t in tunings.ListAll())
+            {
+                var spec = WebUtility.HtmlEncode(string.Join(",", t.Strings));
+                var name = WebUtility.HtmlEncode(t.Name);
+                sb.Append(System.Globalization.CultureInfo.InvariantCulture, $"""<wa-option value="{spec}" data-name="{name}">{name}</wa-option>""");
+            }
+            return Results.Content(sb.ToString(), "text/html");
+        });
+
         app.MapGet("/tunings", (TuningService svc) =>
             Results.RazorSlice<TuningsIndex,
                 IReadOnlyList<TuningModel>>(svc.ListAll()));

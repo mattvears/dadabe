@@ -1,0 +1,10 @@
+{
+  "slug": "c-sharp-m7-sevenths-only",
+  "name": "C#m7 Filtered to Sevenths",
+  "chord": "C#m7",
+  "filters": [
+    { "type": "byQuality", "params": { "quality": "7" } }
+  ],
+  "maxResults": 10,
+  "entropy": 2.5
+}

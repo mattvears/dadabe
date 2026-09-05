@@ -1,19 +1,19 @@
 @inherits RazorSlices.RazorSlice<System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.ModeModel>>
 
-<div class="row bottom-margin">
-  <span class="max"></span>
-  <button hx-get="/api/reference/modes/new" hx-target="#dialog-container" hx-swap="innerHTML">
-    <i>add</i> New
-  </button>
+<div class="list-header">
+  <span></span>
+  <wa-button hx-get="/api/reference/modes/new" hx-target="#dialog-container" hx-swap="innerHTML">
+    <wa-icon slot="prefix" name="plus"></wa-icon> New
+  </wa-button>
 </div>
 
 @if (Model.Count == 0)
 {
-  <p class="italic">No modes yet.</p>
+  <p class="empty-state">No modes yet.</p>
 }
 else
 {
-  <table class="border">
+  <table>
     <thead><tr><th>Name</th><th>Parent Scale</th><th>Intervals</th><th></th></tr></thead>
     <tbody>
       @foreach (var m in Model)
@@ -23,17 +23,17 @@ else
           <td>@(m.ParentScale ?? "—")</td>
           <td>@string.Join(", ", m.Intervals)</td>
           <td class="no-wrap">
-            <button class="small border"
+            <wa-button size="small" variant="neutral"
                     hx-get="/api/reference/modes/@m.Slug/edit"
                     hx-target="#dialog-container" hx-swap="innerHTML">
-              <i>edit</i>
-            </button>
-            <button class="small border error"
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="danger"
                     hx-delete="/api/reference/modes/@m.Slug"
                     hx-target="#mode-@m.Slug" hx-swap="outerHTML"
                     hx-confirm="Delete '@m.Name'?">
-              <i>delete</i>
-            </button>
+              <wa-icon name="trash"></wa-icon>
+            </wa-button>
           </td>
         </tr>
       }

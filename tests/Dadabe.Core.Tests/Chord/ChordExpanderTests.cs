@@ -38,6 +38,58 @@ public class ChordExpanderTests
     }
 
     [Fact]
+    public void Inversion_carries_bass_without_adding_a_tone()
+    {
+        var spec = Expand("C/G");
+        spec.Bass.Should().Be(new Note(Letter.G, 0));
+        // G is already the 5th, so the tone set is untouched and keeps its function.
+        Notes(spec).Should().Equal("C", "E", "G");
+        Functions(spec).Should().Equal("1", "3", "5");
+    }
+
+    [Fact]
+    public void Foreign_bass_is_appended_as_a_bass_function_tone()
+    {
+        var spec = Expand("C/D");
+        spec.Bass.Should().Be(new Note(Letter.D, 0));
+        Notes(spec).Should().Equal("C", "E", "G", "D");
+        Functions(spec).Should().Equal("1", "3", "5", ChordSpec.BassFunction);
+    }
+
+    [Fact]
+    public void Foreign_bass_keeps_the_spelling_the_user_typed()
+    {
+        // F# must not be re-spelled Gb by a stacked-thirds walk (D12).
+        Notes(Expand("C/F#")).Should().Equal("C", "E", "G", "F#");
+        Notes(Expand("C/Gb")).Should().Equal("C", "E", "G", "Gb");
+    }
+
+    [Fact]
+    public void Foreign_bass_does_not_enter_the_required_set()
+    {
+        // The bass is enforced by the search's lowest-pitch check, not by the
+        // required-tone floor — keeping one source of truth for the constraint.
+        Expand("C/D").Required.Should().Equal(Expand("C").Required);
+    }
+
+    [Fact]
+    public void Slash_chord_hashes_differently_from_its_root_position_form()
+    {
+        Expand("C/G").ContentHash.Should().NotBe(Expand("C").ContentHash);
+        Expand("C/G").ContentHash.Should().NotBe(Expand("C/E").ContentHash);
+    }
+
+    [Fact]
+    public void Root_position_hash_is_unaffected_by_the_bass_field()
+    {
+        // Bass bytes are appended only when present, so specs that predate slash
+        // chords keep their canonical form and published voicing ids do not churn.
+        var withNullBass = new ChordSpec(
+            Expand("C").Root, Expand("C").Quality, Expand("C").Tones, Expand("C").Required);
+        Expand("C").ContentHash.Should().Be(withNullBass.ContentHash);
+    }
+
+    [Fact]
     public void BDim_spells_B_D_F()
     {
         var spec = Expand("Bdim");

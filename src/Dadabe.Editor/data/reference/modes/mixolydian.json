@@ -1,0 +1,9 @@
+{
+  "slug": "mixolydian",
+  "name": "Mixolydian",
+  "intervals": [0, 2, 4, 5, 7, 9, 10],
+  "parentScale": "Major",
+  "degreeIndex": 4,
+  "noteNames": ["G", "A", "B", "C", "D", "E", "F"],
+  "description": "Fifth mode of the major scale; major scale with a flattened 7th degree - the dominant-7th sound of blues, rock, and folk."
+}

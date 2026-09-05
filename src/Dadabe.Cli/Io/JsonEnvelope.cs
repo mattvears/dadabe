@@ -14,6 +14,8 @@ namespace Dadabe.Cli.Io;
 [JsonSerializable(typeof(Envelope<TuningPayload>))]
 [JsonSerializable(typeof(Envelope<ChordPayload>))]
 [JsonSerializable(typeof(Envelope<PredictionResultDto>))]
+[JsonSerializable(typeof(Envelope<VoiceLeadingResultDto>))]
+[JsonSerializable(typeof(Envelope<TransformResultDto>))]
 public partial class DadabeJsonContext : JsonSerializerContext
 {
 }
@@ -26,6 +28,8 @@ public partial class DadabeJsonContext : JsonSerializerContext
 [JsonSerializable(typeof(Envelope<TuningPayload>))]
 [JsonSerializable(typeof(Envelope<ChordPayload>))]
 [JsonSerializable(typeof(Envelope<PredictionResultDto>))]
+[JsonSerializable(typeof(Envelope<VoiceLeadingResultDto>))]
+[JsonSerializable(typeof(Envelope<TransformResultDto>))]
 public partial class DadabeJsonContextPretty : JsonSerializerContext
 {
 }
@@ -37,7 +41,7 @@ public partial class DadabeJsonContextPretty : JsonSerializerContext
 public static class JsonEnvelope
 {
     /// <summary>Tool semver (envelope <c>version</c>).</summary>
-    public const string ToolVersion = "0.4.0";
+    public const string ToolVersion = "0.5.0";
 
     /// <summary>JSON contract version (envelope <c>schemaVersion</c>, D13).</summary>
     public const string SchemaVersion = "1";
@@ -101,7 +105,13 @@ public static class JsonEnvelope
             ? File.ReadAllText(output.FilePath)
             : Serialize(envelope, output.Pretty);
 
-        var schemaFile = command == "predict" ? "prediction-result.schema.json" : "envelope.schema.json";
+        var schemaFile = command switch
+        {
+            "predict"    => "prediction-result.schema.json",
+            "voice-lead" => "voice-lead-result.schema.json",
+            "transform"  => "transform-result.schema.json",
+            _            => "envelope.schema.json",
+        };
         var schema = LoadSchema(schemaFile, workingDirectory);
 
         var node = JsonNode.Parse(json);

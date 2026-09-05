@@ -69,13 +69,13 @@ This project asks:
   - Finds minimal motion transitions between chords
   - Inner-line generator - generate moving voices inside static harmony.
 
-## v0.3 — current release
+## v0.5 — current release
 
-v0.1 shipped the core voicing engine. v0.2 added next-chord prediction
-(rules-based, softmax-scored). v0.3 is a polish release: expanded tests,
-schema scaffolding for future features, and CLI/output refinements.
-See [docs/v0.3/plan.md](docs/v0.3/plan.md) for the full scope and
-[CHANGELOG.md](CHANGELOG.md) for release notes.
+v0.1 shipped the core voicing engine. v0.2 added next-chord prediction. v0.3 was a
+scaffolding polish release. v0.4 made the prediction pipeline operational. v0.5 adds
+progression voice leading, context-weighted prediction, the Web Awesome UI migration,
+and full exposure of hand-model options in the Editor. See [CHANGELOG.md](CHANGELOG.md)
+for details.
 
 ### Build and run
 
@@ -84,23 +84,35 @@ dotnet build
 dotnet run --project src/Dadabe.Cli -- voicings Cmaj7 --tuning DADABE --pretty
 ```
 
-Three subcommands ship:
+Four subcommands ship:
 
 ```sh
 dadabe voicings <chord> [--tuning ...] [--frets N] [--span N]
                         [--min-strings N] [--max-strings N]
                         [--allow-open] [--allow-barre] [--allow-thumb]
                         [--categories <csv>] [--limit N]
-                        [--top-n N] [--entropy F]
-                        [--pretty] [--out <path>]
-dadabe tuning   <name|spec> [--pretty] [--out <path>]
-dadabe chord    <symbol>    [--pretty] [--out <path>]
+                        [--top-n N] [--entropy F] [--min-comfort F]
+                        [--pretty] [--out <path>] [--validate-schema]
+dadabe predict  --input <request.json>
+                        [--entropy F]
+                        [--pretty] [--out <path>] [--validate-schema]
+dadabe tuning   <name|spec> [--pretty] [--out <path>] [--validate-schema]
+dadabe chord    <symbol>    [--pretty] [--out <path>] [--validate-schema]
 ```
 
-Exit codes: `0` success, `1` bad input (unparseable chord/tuning), `2`
-unexpected error. JSON `id` fields are content hashes — the same chord on
-the same tuning produces the same id across runs and machines (D17). The
-JSON shape is pinned by `schemas/*.schema.json`.
+**Slash chords** (`C/E`, `Cmaj7/G`) are supported by the parser. The bass note
+is included in `chord.bassNote` in the JSON output. The `voicings` subcommand
+currently treats slash chords identically to their root chord (bass-note
+enforcement in voicing search is deferred to v0.5).
+
+**Prediction request** (`dadabe predict`) reads a JSON file matching
+`schemas/prediction.schema.json`. The `chord` field is required; `context`,
+`filters`, `maxResults`, and `entropy` are optional.
+See `docs/v0.4/examples/prediction-request.json` for a full example.
+
+Exit codes: `0` success, `1` bad input, `2` unexpected error, `3` schema
+violation (`--validate-schema` detected invalid output). JSON `id` fields are
+content hashes — same inputs produce the same id across runs and machines (D17).
 
 ### Schemas
 
@@ -112,14 +124,14 @@ Subcommand payloads are pinned by:
 | `voicings` | `schemas/voicings.schema.json` |
 | `tuning`   | `schemas/tuning.schema.json`   |
 | `chord`    | `schemas/chord.schema.json`    |
+| `predict`  | `schemas/prediction-result.schema.json` |
 
-Scaffolding schemas for future features (not yet emitted by the CLI):
+Supplementary schemas (used as input or for data files):
 
 | Schema | Purpose |
 |--------|---------|
+| `schemas/prediction.schema.json`        | `predict --input` request shape |
 | `schemas/progression.schema.json`       | Chord progression |
-| `schemas/prediction.schema.json`        | Next-chord prediction request |
-| `schemas/prediction-result.schema.json` | Prediction response |
 | `schemas/scale.schema.json`             | Named scale |
 | `schemas/mode.schema.json`              | Musical mode |
 | `schemas/cadence.schema.json`           | Cadence type |
@@ -129,4 +141,4 @@ Scaffolding schemas for future features (not yet emitted by the CLI):
 ### Library status
 
 `Dadabe.Core` and `Dadabe.Fretboard` are part of the solution but **not
-published to NuGet** (D7). No public API guarantees yet; revisit post-v0.3.
+published to NuGet** (D7). No public API guarantees yet; revisit post-v0.4.

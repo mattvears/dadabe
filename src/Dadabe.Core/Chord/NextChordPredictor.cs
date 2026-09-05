@@ -20,15 +20,47 @@ public static class NextChordPredictor
     /// Controls prediction diversity. Lower → sharper / more confident.
     /// Higher → flatter / more exploratory.
     /// </param>
-    public static IReadOnlyList<NextChordCandidate> Predict(ChordSpec spec, int topN, double entropy)
+    /// <param name="context">
+    /// Optional preceding chord specs. When non-null and key inference succeeds,
+    /// candidates are weighted toward the implied key (D33).
+    /// </param>
+    public static IReadOnlyList<NextChordCandidate> Predict(
+        ChordSpec spec,
+        int topN,
+        double entropy,
+        IReadOnlyList<ChordSpec>? context = null)
     {
         if (topN <= 0) { return Array.Empty<NextChordCandidate>(); }
 
         var rootPc = spec.Root.PitchClass.Value;
         var rawCandidates = BuildCandidates(rootPc, spec.Quality);
 
-        var scores = rawCandidates.Select(c => c.Score).ToArray();
-        var probs = Softmax(scores, EntropyToTemperature(entropy));
+        // Scale raw scores by entropy temperature before context multipliers (D33).
+        double temperature = EntropyToTemperature(entropy);
+        var scores = rawCandidates.Select(c => c.Score / temperature).ToArray();
+
+        // Context-weighted scoring (D33): only when context is non-null and key is inferred.
+        if (context is { Count: > 0 })
+        {
+            var inferred = KeyInference.InferKey(context);
+            if (inferred.HasValue)
+            {
+                int lastRootPc = context[^1].Root.PitchClass.Value;
+                for (int i = 0; i < rawCandidates.Count; i++)
+                {
+                    var rel = KeyInference.Classify(rawCandidates[i].Symbol, inferred.Value, lastRootPc);
+                    scores[i] *= rel switch
+                    {
+                        CandidateRelationship.Diatonic         => 1.4,
+                        CandidateRelationship.ValidNonDiatonic => 1.0,
+                        _                                       => 0.7,
+                    };
+                }
+            }
+        }
+
+        // Final softmax with temperature=1 (already applied above).
+        var probs = Softmax(scores, 1.0);
 
         return rawCandidates
             .Zip(probs, (c, p) => new NextChordCandidate(c.Symbol, Math.Round(p, 4)))
@@ -150,7 +182,10 @@ public static class NextChordPredictor
 
     private static ChordQualityFamily ClassifyQuality(string quality) => quality switch
     {
-        "maj" or "6" => ChordQualityFamily.Major,
+        // A power chord has no third, so it belongs to neither the major nor the
+        // minor family. It is mapped to Major deliberately: the family's IV / V /
+        // bVII candidates are exactly the moves the '5' chord idiom expects.
+        "maj" or "6" or "5" => ChordQualityFamily.Major,
         "maj7" or "maj9" or "maj11" or "maj13" => ChordQualityFamily.Maj7,
         "m" or "m6" => ChordQualityFamily.Minor,
         "m7" or "m9" or "m11" or "m13"

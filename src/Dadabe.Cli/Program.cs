@@ -43,6 +43,7 @@ internal static class Program
         var allowOpenOption = new Option<bool>("--allow-open") { Description = "Allow open strings (default: true).", DefaultValueFactory = _ => true };
         var allowBarreOption = new Option<bool>("--allow-barre") { Description = "Allow barre voicings (default: true).", DefaultValueFactory = _ => true };
         var allowThumbOption = new Option<bool>("--allow-thumb") { Description = "Allow thumb-over fretting (default: false).", DefaultValueFactory = _ => false };
+        var requireRootOption = new Option<bool>("--require-root") { Description = "Require the chord root to sound (default: false — most forms only require 3rd/7th or 3rd/5th, per D4).", DefaultValueFactory = _ => false };
         var categoriesOption = new Option<string?>("--categories") { Description = "Restrict to comma-separated category list." };
         var limitOption = new Option<int>("--limit") { Description = "Cap on returned voicings (default: 100).", DefaultValueFactory = _ => 100 };
         var handProfileOption = new Option<string>("--hand-profile") { Description = "Named hand profile (default: Default).", DefaultValueFactory = _ => "Default" };
@@ -61,6 +62,7 @@ internal static class Program
             allowOpenOption,
             allowBarreOption,
             allowThumbOption,
+            requireRootOption,
             categoriesOption,
             limitOption,
             handProfileOption,
@@ -82,7 +84,8 @@ internal static class Program
                 AllowOpen: parse.GetValue(allowOpenOption),
                 AllowBarre: parse.GetValue(allowBarreOption),
                 AllowThumb: parse.GetValue(allowThumbOption),
-                Categories: SplitCsv(parse.GetValue(categoriesOption)));
+                Categories: SplitCsv(parse.GetValue(categoriesOption)),
+                RequireRoot: parse.GetValue(requireRootOption));
             VoicingsCommand.Run(env,
                 chordSymbol: parse.GetRequiredValue(chordArg),
                 tuningName: parse.GetValue(tuningOption)!,
@@ -126,6 +129,37 @@ internal static class Program
                 validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
+        // --- voice-lead ---
+        var chordsOption = new Option<string>("--chords") { Description = "Whitespace-separated chord progression, e.g. \"Cmaj7 Am7 Dm7 G7\" (required)." };
+        var solutionsOption = new Option<int>("--solutions") { Description = "Number of distinct solutions to return (1–10, default: 1).", DefaultValueFactory = _ => 1 };
+        var minComfortVlOption = new Option<double>("--min-comfort") { Description = "Minimum voicing comfort 0.0–1.0 (default: 0.0).", DefaultValueFactory = _ => 0.0 };
+
+        var voiceLead = new Command("voice-lead", "Find the minimum-motion voicing path through a chord progression.")
+        {
+            chordsOption,
+            tuningOption,
+            handProfileOption,
+            solutionsOption,
+            minComfortVlOption,
+            requireRootOption,
+            outOption,
+            prettyOption,
+            validateSchemaOption,
+        };
+        voiceLead.SetAction(parse => SafeRun(() =>
+        {
+            var env = BuildEnvironment(parse, outOption, prettyOption, handProfileOption);
+            var chords = parse.GetValue(chordsOption)
+                ?? throw new FormatException("--chords is required for the voice-lead subcommand.");
+            VoiceLeadCommand.Run(env,
+                chordsRaw: chords,
+                tuningName: parse.GetValue(tuningOption)!,
+                solutions: parse.GetValue(solutionsOption),
+                minComfort: parse.GetValue(minComfortVlOption),
+                validateSchema: parse.GetValue(validateSchemaOption),
+                requireRoot: parse.GetValue(requireRootOption));
+        }));
+
         // --- predict ---
         var inputOption = new Option<string?>("--input") { Description = "Prediction request JSON file (required)." };
         var predict = new Command("predict", "Predict the next chord from a JSON request file.")
@@ -147,10 +181,44 @@ internal static class Program
                 validateSchema: parse.GetValue(validateSchemaOption));
         }));
 
+        // --- transform ---
+        var transformChordsOption = new Option<string?>("--chords") { Description = "Whitespace-separated chord progression, e.g. \"C F G\"." };
+        var transformProgressionOption = new Option<string?>("--progression") { Description = "Saved progression slug (alternative to --chords)." };
+        var chainOption = new Option<string?>("--chain") { Description = "Comma-separated transform steps, e.g. \"retrograde,transpose:M2\"." };
+        var allOption = new Option<bool>("--all") { Description = "Ignore --chain and run the whole catalogue, ranked by playability." };
+        var minComfortTransformOption = new Option<double>("--min-comfort") { Description = "Minimum voicing comfort 0.0-1.0 for playability ranking (default: 0.0).", DefaultValueFactory = _ => 0.0 };
+
+        var transform = new Command("transform", "Apply a transform chain (or the whole catalogue) to a chord progression.")
+        {
+            transformChordsOption,
+            transformProgressionOption,
+            chainOption,
+            allOption,
+            tuningOption,
+            minComfortTransformOption,
+            outOption,
+            prettyOption,
+            validateSchemaOption,
+        };
+        transform.SetAction(parse => SafeRun(() =>
+        {
+            var env = BuildEnvironment(parse, outOption, prettyOption, handProfileOption: null);
+            TransformCommand.Run(env,
+                chordsRaw: parse.GetValue(transformChordsOption),
+                progressionSlug: parse.GetValue(transformProgressionOption),
+                chainRaw: parse.GetValue(chainOption),
+                all: parse.GetValue(allOption),
+                tuningName: parse.GetValue(tuningOption)!,
+                minComfort: parse.GetValue(minComfortTransformOption),
+                validateSchema: parse.GetValue(validateSchemaOption));
+        }));
+
         root.Add(voicings);
+        root.Add(voiceLead);
         root.Add(tuning);
         root.Add(chord);
         root.Add(predict);
+        root.Add(transform);
         return root;
     }
 

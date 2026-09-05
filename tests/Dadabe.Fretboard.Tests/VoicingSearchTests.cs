@@ -25,6 +25,88 @@ public class VoicingSearchTests
         set.Voicings.Should().NotBeEmpty();
     }
 
+    private static VoicingSet SearchIn(string symbol, string tuningName = "STANDARD", SearchParams? p = null)
+    {
+        var spec = Expander.Expand(Parser.Parse(symbol));
+        var tuning = Env.Catalogs.Tunings.Get(tuningName);
+        return VoicingSearch.Search(spec, tuning, Env.HandModel, p ?? SearchParams.Default,
+            Env.Catalogs.VoicingCategories);
+    }
+
+    private static int LowestPitchClass(Voicing v) => v.BassNote!.Value.PitchClass.Value;
+
+    /// <summary>Fret shape as a comparable string, e.g. "x,3,2,0,1,0".</summary>
+    private static string Shape(Voicing v) => string.Join(",", v.Positions
+        .OrderBy(p => p.String)
+        .Select(p => p.Fret?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "x"));
+
+    [Theory]
+    [InlineData("C/G", 7)]   // inversion — G is already the 5th
+    [InlineData("C/E", 4)]   // inversion — E is already the 3rd
+    [InlineData("C/D", 2)]   // foreign bass — D is appended to the spec
+    [InlineData("Cmaj7/B", 11)]
+    public void Slash_chord_voicings_all_put_the_requested_bass_lowest(string symbol, int expectedBassPc)
+    {
+        var set = SearchIn(symbol);
+        set.Voicings.Should().NotBeEmpty();
+        foreach (var v in set.Voicings)
+        {
+            LowestPitchClass(v).Should().Be(expectedBassPc);
+        }
+    }
+
+    [Fact]
+    public void Slash_chord_result_is_a_strict_subset_of_the_root_position_result()
+    {
+        var rootPosition = SearchIn("C").Voicings.Select(v => v.ContentHash.ToString()).ToHashSet();
+        var overG = SearchIn("C/G").Voicings.Select(v => v.ContentHash.ToString()).ToList();
+
+        overG.Should().NotBeEmpty();
+        overG.Count.Should().BeLessThan(rootPosition.Count, "the bass constraint must actually filter");
+        // Ids differ because ChordSpec.Bass participates in the hash, so compare
+        // on the shape instead: every C/G voicing must be a playable C voicing.
+        SearchIn("C/G").Voicings.Select(Shape)
+            .Should().BeSubsetOf(SearchIn("C").Voicings.Select(Shape));
+    }
+
+    [Fact]
+    public void Foreign_bass_voicings_carry_the_bass_function_label()
+    {
+        var set = SearchIn("C/D");
+        set.Voicings.Should().NotBeEmpty();
+        foreach (var v in set.Voicings)
+        {
+            var lowest = v.Sounded.OrderBy(p => p.SoundingPitch!.Value.Midi).First();
+            lowest.Function.Should().Be(ChordSpec.BassFunction);
+        }
+    }
+
+    [Fact]
+    public void Unplayable_bass_yields_an_empty_set_rather_than_falling_back()
+    {
+        // Deliberately starved search: 3 frets, span 1, no open strings.
+        var starved = SearchParams.Default with { MaxFret = 3, MaxSpan = 1, AllowOpen = false };
+        SearchIn("C/D", p: starved).Voicings.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Power_chord_search_yields_only_root_and_fifth_voicings()
+    {
+        var spec = Expander.Expand(Parser.Parse("C5"));
+        var tuning = Env.Catalogs.Tunings.Get("STANDARD");
+        var set = VoicingSearch.Search(spec, tuning, Env.HandModel, SearchParams.Default,
+            Env.Catalogs.VoicingCategories);
+
+        set.Voicings.Should().NotBeEmpty();
+        foreach (var v in set.Voicings)
+        {
+            var functions = v.Sounded.Select(p => p.Function).ToHashSet();
+            functions.Should().BeSubsetOf(["1", "5"], "a power chord has no third");
+            functions.Should().Contain("1").And.Contain("5");
+            v.Structure.Should().Be("power");
+        }
+    }
+
     [Fact]
     public void Every_voicing_only_contains_chord_pitch_classes()
     {
@@ -162,5 +244,35 @@ public class VoicingSearchTests
             var b = Encode(second.Positions[s].Fret);
             if (a != b) { a.Should().BeLessThan(b); break; }
         }
+    }
+
+    // ---- RequireRoot (D4 opt-in) ----
+
+    private static bool HasRootFunction(Voicing v) =>
+        v.Positions.Any(p => !p.Muted && p.Function == "1");
+
+    [Fact]
+    public void By_default_rootless_voicings_are_returned_for_m7()
+    {
+        // m7's `required` list is ["b3", "b7"] — the root is deliberately not required
+        // (D4): a shell voicing's identity is carried by the 3rd/7th.
+        var set = SearchIn("Fm7");
+        set.Voicings.Should().Contain(v => !HasRootFunction(v), "the default floor omits the root for tertian sevenths");
+    }
+
+    [Fact]
+    public void RequireRoot_excludes_every_rootless_voicing()
+    {
+        var withRoot = SearchIn("Fm7", p: SearchParams.Default with { RequireRoot = true });
+        withRoot.Voicings.Should().NotBeEmpty();
+        withRoot.Voicings.Should().OnlyContain(v => HasRootFunction(v));
+    }
+
+    [Fact]
+    public void RequireRoot_is_a_no_op_for_the_power_chord_form_which_already_requires_it()
+    {
+        var normal = SearchIn("F5");
+        var strict = SearchIn("F5", p: SearchParams.Default with { RequireRoot = true });
+        strict.Voicings.Length.Should().Be(normal.Voicings.Length);
     }
 }

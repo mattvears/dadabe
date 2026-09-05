@@ -1,0 +1,9 @@
+{
+  "slug": "lydian-augmented",
+  "name": "Lydian Augmented",
+  "intervals": [0, 2, 4, 6, 8, 9, 11],
+  "parentScale": "Melodic Minor",
+  "degreeIndex": 2,
+  "noteNames": ["C", "D", "E", "F#", "G#", "A", "B"],
+  "description": "Third mode of the melodic minor scale; Lydian with a raised 5th, giving an augmented triad on the tonic - shimmering, unresolved brightness used over maj7#5 chords."
+}

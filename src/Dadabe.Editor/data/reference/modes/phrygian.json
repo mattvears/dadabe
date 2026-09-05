@@ -1,0 +1,9 @@
+{
+  "slug": "phrygian",
+  "name": "Phrygian",
+  "intervals": [0, 1, 3, 5, 7, 8, 10],
+  "parentScale": "Major",
+  "degreeIndex": 2,
+  "noteNames": ["E", "F", "G", "A", "B", "C", "D"],
+  "description": "Third mode of the major scale; minor scale with a flattened 2nd degree - dark, Spanish/flamenco-tinged colour."
+}

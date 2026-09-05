@@ -1,0 +1,7 @@
+{
+  "slug": "melodic-minor",
+  "name": "Melodic Minor",
+  "notes": ["A", "B", "C", "D", "E", "F#", "G#"],
+  "intervals": [0, 2, 3, 5, 7, 9, 11],
+  "description": "Minor scale with raised 6th and 7th degrees (ascending form); the jazz 'minor-major' sound and source scale for the altered and Lydian-dominant modes."
+}

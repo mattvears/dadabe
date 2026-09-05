@@ -1,0 +1,7 @@
+{
+  "slug": "deceptive-extended-harmony",
+  "type": "deceptive",
+  "resolution": "V7#9->Imaj9",
+  "exampleProgression": ["G7#9", "Cmaj9"],
+  "description": "Invented extended-harmony deceptive cadence; probes whether free-text chord symbols carrying alterations and extensions round-trip and render correctly through the catalog."
+}

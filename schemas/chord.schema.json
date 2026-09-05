@@ -34,7 +34,8 @@
             }
           }
         },
-        "required":    { "type": "array", "items": { "type": "string" } }
+        "required":    { "type": "array", "items": { "type": "string" } },
+        "bassNote":    { "type": "string" }
       }
     }
   }

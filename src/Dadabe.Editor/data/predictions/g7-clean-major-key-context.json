@@ -1,0 +1,9 @@
+{
+  "slug": "g7-clean-major-key-context",
+  "name": "G7 with Clean Major-Key Context",
+  "chord": "G7",
+  "context": "canonical-major-ii-v",
+  "filters": [],
+  "maxResults": 8,
+  "entropy": 0.2
+}

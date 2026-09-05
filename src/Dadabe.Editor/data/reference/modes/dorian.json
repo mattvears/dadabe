@@ -1,0 +1,9 @@
+{
+  "slug": "dorian",
+  "name": "Dorian",
+  "intervals": [0, 2, 3, 5, 7, 9, 10],
+  "parentScale": "Major",
+  "degreeIndex": 1,
+  "noteNames": ["D", "E", "F", "G", "A", "B", "C"],
+  "description": "Second mode of the major scale; minor scale with a raised (natural) 6th degree - the brighter, jazzier minor sound of 'So What' and countless modal-jazz tunes."
+}

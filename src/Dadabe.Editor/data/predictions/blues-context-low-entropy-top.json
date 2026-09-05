@@ -1,0 +1,9 @@
+{
+  "slug": "blues-context-low-entropy-top",
+  "name": "Long Blues Context, Low Entropy, Top Pick",
+  "chord": "C7",
+  "context": "twelve-bar-blues",
+  "filters": [],
+  "maxResults": 1,
+  "entropy": 0.01
+}

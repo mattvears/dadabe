@@ -1,0 +1,9 @@
+{
+  "slug": "dorian-b2",
+  "name": "Dorian b2",
+  "intervals": [0, 1, 3, 5, 7, 9, 10],
+  "parentScale": "Melodic Minor",
+  "degreeIndex": 1,
+  "noteNames": ["B", "C", "D", "E", "F#", "G#", "A"],
+  "description": "Second mode of the melodic minor scale (also called Phrygian #6); a Dorian minor sound with a flattened 2nd, blending Phrygian darkness with Dorian's raised 6th."
+}

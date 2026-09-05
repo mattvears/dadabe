@@ -1,0 +1,9 @@
+{
+  "slug": "ionian",
+  "name": "Ionian",
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "parentScale": "Major",
+  "degreeIndex": 0,
+  "noteNames": ["C", "D", "E", "F", "G", "A", "B"],
+  "description": "First mode of the major scale - identical to the major scale itself; bright, stable tonic colour and the reference point for all other diatonic modes."
+}

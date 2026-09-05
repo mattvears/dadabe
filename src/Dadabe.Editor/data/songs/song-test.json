@@ -1,0 +1,165 @@
+{
+  "slug": "song-test",
+  "name": "Song Test",
+  "tuning": "STANDARD",
+  "key": "F minor",
+  "sections": [
+    {
+      "id": "e0cdec2a",
+      "name": "verse",
+      "slots": [
+        {
+          "symbol": "Fm7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "fret": 8,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 1,
+                "fret": 8,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 8,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 71,
+            "structure": "spread"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "Bbm7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 6,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 6,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 6,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "fret": 6,
+                "muted": false,
+                "open": false
+              }
+            ],
+            "comfortPct": 70,
+            "structure": "spread"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "Abmin7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 1,
+                "fret": 6,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "fret": 4,
+                "muted": false,
+                "open": false
+              }
+            ],
+            "comfortPct": 72,
+            "structure": "spread"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        }
+      ]
+    }
+  ]
+}

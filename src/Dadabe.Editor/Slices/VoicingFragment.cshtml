@@ -1,0 +1,43 @@
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoicingFragmentModel>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+  <p style="color:#dc2626;font-size:0.85rem;margin:0.5rem 0">@Model.Error</p>
+}
+else
+{
+  <div class="vf-header">
+    <strong>Voicings for <code>@Model.Chord</code></strong>
+    <span class="form-hint">@Model.TuningName · showing @Model.Voicings.Count of first 12</span>
+  </div>
+  @if (Model.Voicings.Count == 0)
+  {
+    <p class="empty-state" style="margin:0.5rem 0">No playable voicings found.</p>
+  }
+  else
+  {
+    <table class="vf-table">
+      <thead>
+        <tr>
+          <th>ASCII</th>
+          <th>Structure</th>
+          <th style="text-align:right">Comfort</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var v in Model.Voicings)
+        {
+          <tr>
+            <td><code>@v.AsciiNotation</code></td>
+            <td>
+              @* wa-tooltip's default slot is the tooltip body, not the anchor —
+                 wrapping the label here hid the whole column. *@
+              <abbr title="@Dadabe.Editor.Services.VoicingStructureGlossary.Describe(v.Structure)">@v.Structure</abbr>
+            </td>
+            <td style="text-align:right">@v.ComfortPct%</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

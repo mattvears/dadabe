@@ -1,0 +1,8 @@
+{
+  "slug": "lydian-dominant",
+  "name": "Lydian Dominant",
+  "notes": ["C", "D", "E", "F#", "G", "A", "Bb"],
+  "intervals": [0, 2, 4, 6, 7, 9, 10],
+  "modeOf": "Melodic Minor",
+  "description": "Fourth mode of the melodic minor scale (raised 4th, flat 7th); the classic 'altered dominant' colour over V7#11 chords, catalogued here as its own scale rather than a derived mode."
+}

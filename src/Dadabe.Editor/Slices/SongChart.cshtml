@@ -1,0 +1,55 @@
+@removeTagHelper *, *
+@inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.SongChartModel>
+@using Dadabe.Editor.Slices
+@{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
+
+<div class="page-content song-chart">
+    <div class="page-header">
+        <div>
+            <h4 style="margin-bottom:0.25rem">@Model.Song.Name</h4>
+            <p class="form-hint">
+                @(Model.Song.Tuning ?? "—")
+                &nbsp;·&nbsp; @Model.KeyDisplay
+                @if (Model.Song.Tempo is { } tempo) { <text>&nbsp;·&nbsp; @tempo bpm</text> }
+                @{
+                    var ranges = Model.Sections.Where(s => s.PositionRange is not null).Select(s => $"{s.Section.Name}: {s.PositionRange}");
+                    var rangeText = string.Join(" · ", ranges);
+                }
+                @if (!string.IsNullOrEmpty(rangeText)) { <text><br />@rangeText</text> }
+            </p>
+        </div>
+        <wa-button size="small" variant="neutral" class="no-print" onclick="window.print()">
+            <wa-icon slot="prefix" name="print"></wa-icon> Print
+        </wa-button>
+    </div>
+
+    @foreach (var sv in Model.Sections)
+    {
+        <section class="song-chart-section">
+            <h5>@sv.Section.Name</h5>
+            @if (sv.Slots.Count == 0)
+            {
+                <p class="empty-state">No chords in this section.</p>
+            }
+            else
+            {
+                <div class="song-chart-slots">
+                    @foreach (var slotView in sv.Slots)
+                    {
+                        var slot = slotView.Slot;
+                        <div class="song-chart-slot">
+                            <div class="song-chart-chord"><code>@slot.Symbol</code></div>
+                            <div class="song-chart-bars">@slot.Bars bar@(slot.Bars == 1 ? "" : "s")</div>
+                            @if (slotView.Diagram is not null)
+                            {
+                                await RenderPartialAsync<ChordDiagramPartial, ChordDiagram>(slotView.Diagram);
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+</div>
+
+@{ WriteLiteral(Dadabe.Editor.PageShell.Footer); }

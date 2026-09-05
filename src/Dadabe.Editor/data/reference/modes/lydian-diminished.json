@@ -1,0 +1,9 @@
+{
+  "slug": "lydian-diminished",
+  "name": "Lydian Diminished",
+  "intervals": [0, 2, 3, 6, 7, 9, 11],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 3,
+  "noteNames": ["F", "G", "Ab", "B", "C", "D", "E"],
+  "description": "Fourth mode of the harmonic major scale (also called Lydian b3 or melodic minor #4); Lydian's raised 4th combined with a minor 3rd, giving a bittersweet major/minor blend."
+}

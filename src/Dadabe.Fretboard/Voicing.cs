@@ -130,22 +130,139 @@ public sealed record Voicing : IContentHashable
         }
     }
 
+    /// <summary>Barre cost when nothing about the barre is awkward.</summary>
+    private const double BarreBaseCost = 0.03;
+
+    /// <summary>
+    /// Fret at or above which a barre stops being fought by the nut. Barres
+    /// are easiest from here up to roughly the octave.
+    /// </summary>
+    private const int EasyBarreFret = 5;
+
+    /// <summary>Extra cost of a barre right at the nut, decaying to zero by <see cref="EasyBarreFret"/>.</summary>
+    private const double NutBarreSurcharge = 0.18;
+
+    /// <summary>Extra cost of a barre up where the frets crowd together and the body blocks the hand.</summary>
+    private const double HighBarreSurcharge = 0.05;
+
+    /// <summary>Extra cost of a full-width barre over a two-string partial.</summary>
+    private const double WideBarreSurcharge = 0.03;
+
+    /// <summary>Barring with anything but the index finger is far harder.</summary>
+    private const double NonIndexBarreMultiplier = 1.7;
+
+    /// <summary>
+    /// Difficulty of one barre, in comfort points.
+    /// <para>
+    /// Barre difficulty is dominated by <em>where</em> the barre sits, not by
+    /// how many strings it covers. At the nut the string is at its longest and
+    /// tightest and the frets are at their widest, which is why the fret-1
+    /// barre is the wall every player hits; by the third or fourth fret the
+    /// same shape is routine. The nut surcharge therefore decays
+    /// <em>quadratically</em> to zero at <see cref="EasyBarreFret"/> — a linear
+    /// ramp would still be charging half price at fret 3, where the hand is
+    /// already comfortable.
+    /// </para>
+    /// <para>
+    /// Width is a much weaker signal: once the finger is flat, covering six
+    /// strings is not greatly worse than covering two, so it contributes at
+    /// most <see cref="WideBarreSurcharge"/>. Barring with a finger other than
+    /// the index is the genuinely awkward case and is scaled, not just
+    /// incremented.
+    /// </para>
+    /// </summary>
+    public static double BarrePenalty(BarreGroup barre, int maxFret)
+    {
+        ArgumentNullException.ThrowIfNull(barre);
+
+        var width = barre.HighStringInclusive - barre.LowStringInclusive + 1;
+
+        var towardNut = Math.Clamp(
+            (EasyBarreFret - barre.Fret) / (double)Math.Max(1, EasyBarreFret - 1), 0.0, 1.0);
+        var nut = NutBarreSurcharge * towardNut * towardNut;
+
+        var high = HighBarreSurcharge * Math.Clamp(
+            (barre.Fret - EasyBarreFret) / (double)Math.Max(1, maxFret - EasyBarreFret), 0.0, 1.0);
+
+        var wide = WideBarreSurcharge * Math.Clamp((width - 2) / 4.0, 0.0, 1.0);
+
+        var cost = BarreBaseCost + nut + high + wide;
+        return barre.Finger == Finger.Index ? cost : cost * NonIndexBarreMultiplier;
+    }
+
+    /// <summary>
+    /// Muted strings forming an unbroken run off either end of the neck.
+    /// <para>
+    /// These are not really muted: the picking hand simply never strikes them,
+    /// so they cost the fretting hand nothing and carry no comfort penalty.
+    /// Only mutes with sounded strings on both sides require actual deadening.
+    /// </para>
+    /// <para><paramref name="positions"/> must be ordered by string index.</para>
+    /// </summary>
+    public static int CountEdgeMutes(IReadOnlyList<FretPosition> positions)
+    {
+        ArgumentNullException.ThrowIfNull(positions);
+        var n = positions.Count;
+
+        var leading = 0;
+        while (leading < n && positions[leading].Muted) { leading++; }
+        if (leading == n) { return n; }  // nothing sounded at all
+
+        var trailing = 0;
+        while (trailing < n - leading && positions[n - 1 - trailing].Muted) { trailing++; }
+        return leading + trailing;
+    }
+
+    /// <summary>
+    /// Counts muted strings that sit between two sounded strings — these
+    /// require deadening one string with a finger while neighbours on both
+    /// sides are actively fretted/picked, which is harder than muting a
+    /// block of adjacent strings or strings at the edge of the chord.
+    /// <para><paramref name="positions"/> must be ordered by string index.</para>
+    /// </summary>
+    public static int CountIsolatedMutes(IReadOnlyList<FretPosition> positions)
+    {
+        ArgumentNullException.ThrowIfNull(positions);
+        var count = 0;
+        for (var i = 1; i < positions.Count - 1; i++)
+        {
+            if (positions[i].Muted && !positions[i - 1].Muted && !positions[i + 1].Muted)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /// <summary>
     /// v0.1 comfort score (D15 / design.md §7 step 8). Reported, not used
     /// for ordering — emission order is deterministic per D5.
     /// </summary>
+    /// <param name="interiorMutedStrings">
+    /// Muted strings that are <em>not</em> part of an edge run — i.e. total
+    /// mutes minus <see cref="CountEdgeMutes"/>. Edge mutes are excluded
+    /// deliberately: an unstruck string is free.
+    /// </param>
     public static double ComputeComfort(
         int span,
-        int mutedStrings,
-        int barreCount,
+        int interiorMutedStrings,
+        int isolatedMutedStrings,
+        ImmutableArray<BarreGroup> barres,
         int lowestFret,
         int maxSpan,
         int maxFret)
     {
+        var barreCost = 0.0;
+        if (!barres.IsDefault)
+        {
+            foreach (var barre in barres) { barreCost += BarrePenalty(barre, maxFret); }
+        }
+
         var raw = 1.0
             - (0.40 * ((double)span / Math.Max(1, maxSpan)))
-            - (0.10 * mutedStrings)
-            - (0.15 * barreCount)
+            - (0.10 * interiorMutedStrings)
+            - (0.15 * isolatedMutedStrings)
+            - barreCost
             - (0.05 * ((double)lowestFret / Math.Max(1, maxFret)));
         return Math.Clamp(raw, 0.0, 1.0);
     }

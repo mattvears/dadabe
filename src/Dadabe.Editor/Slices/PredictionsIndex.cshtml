@@ -3,14 +3,56 @@
 @using Dadabe.Editor.Slices
 @{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
 
-<div class="padding">
-  <div class="row">
-    <h4 class="max">Predictions</h4>
-    <button hx-get="/api/predictions/new" hx-target="#dialog-container" hx-swap="innerHTML">
-      <i>add</i> New
-    </button>
+<div class="page-content">
+  <div class="page-header">
+    <h4>Predictions</h4>
+    <wa-button hx-get="/api/predictions/new" hx-target="#dialog-container" hx-swap="innerHTML">
+      <wa-icon slot="prefix" name="plus"></wa-icon> New
+    </wa-button>
   </div>
-  <div id="prediction-list">
+
+  <wa-details class="help-panel">
+    <span slot="summary"><wa-icon name="circle-question"></wa-icon> What are predictions?</span>
+    <div class="help-body">
+      <p>
+        A <strong>prediction request</strong> asks: <em>"Given that I'm on chord X, what chord should come next?"</em>
+        Dadabe uses a rules-based model of harmonic resolution — dominant chords resolve, tonic chords spread,
+        and so on — to score every plausible candidate and return a ranked list.
+      </p>
+      <p>
+        Each saved request is a reusable configuration. Hit <strong>▶</strong> to run it at any time and see fresh results.
+      </p>
+      <dl class="help-dl">
+        <dt>Chord</dt>
+        <dd>The chord you are currently on. The predictor asks what comes next from here.</dd>
+        <dt>Context progression</dt>
+        <dd>
+          An optional sequence of preceding chords (saved on the Progressions page).
+          When supplied, Dadabe infers the probable key from the context and boosts
+          diatonic candidates (×1.4) while penalising unrelated ones (×0.7) — so the
+          predictions are shaped by where the music has been, not just the current chord.
+        </dd>
+        <dt>Entropy</dt>
+        <dd>
+          Controls how concentrated the probability mass is.
+          <strong>Low (0.1–0.3)</strong>: confident, predictable — the top candidate wins by a wide margin.
+          <strong>Default (0.5)</strong>: balanced.
+          <strong>High (2–5)</strong>: exploratory — surprising but harmonically valid moves surface.
+        </dd>
+        <dt>Max results</dt>
+        <dd>How many candidates to return before filters are applied (default 10, max 50).</dd>
+        <dt>Filters</dt>
+        <dd>
+          Hard filters that trim the candidate list after scoring.
+          <em>byQuality</em> keeps only chords with a given suffix (e.g. <code>m7</code> returns only minor-seventh chords).
+          <em>byChord</em> keeps only an exact symbol match (useful for checking whether a specific resolution is predicted).
+          Filters narrow results but do not change the scores.
+        </dd>
+      </dl>
+    </div>
+  </wa-details>
+
+  <div id="prediction-list" style="margin-top:1rem">
     @{ await RenderPartialAsync<PredictionsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.PredictionModel>>(Model.Predictions); }
   </div>
   <div id="result-panel"></div>

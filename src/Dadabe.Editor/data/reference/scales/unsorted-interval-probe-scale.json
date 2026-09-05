@@ -1,0 +1,7 @@
+{
+  "slug": "unsorted-interval-probe-scale",
+  "name": "Unsorted Interval Probe Scale",
+  "notes": ["E", "C", "G", "D", "A"],
+  "intervals": [4, 0, 7, 2, 9],
+  "description": "Intervals are neither sorted ascending nor zero-rooted (schema-legal); probes assumptions baked into rendering or future scale-degree maths that expect a canonical root-first ordering starting at 0."
+}

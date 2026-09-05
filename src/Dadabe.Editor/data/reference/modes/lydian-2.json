@@ -1,0 +1,9 @@
+{
+  "slug": "lydian-2",
+  "name": "Lydian #2",
+  "intervals": [0, 3, 4, 6, 7, 9, 11],
+  "parentScale": "Harmonic Minor",
+  "degreeIndex": 5,
+  "noteNames": ["F", "G#", "A", "B", "C", "D", "E"],
+  "description": "Sixth mode of the harmonic minor scale; Lydian with a raised 2nd, opening an augmented-second gap between the root and 2nd degree - rare and exotic in character."
+}

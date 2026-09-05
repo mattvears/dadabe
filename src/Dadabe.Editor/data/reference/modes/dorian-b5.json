@@ -1,0 +1,9 @@
+{
+  "slug": "dorian-b5",
+  "name": "Dorian b5",
+  "intervals": [0, 2, 3, 5, 6, 9, 10],
+  "parentScale": "Harmonic Major",
+  "degreeIndex": 1,
+  "noteNames": ["D", "E", "F", "G", "Ab", "B", "C"],
+  "description": "Second mode of the harmonic major scale; a Dorian minor colour with a flattened 5th, blending modal-jazz minor sound with a Locrian-like instability on the 5th degree."
+}

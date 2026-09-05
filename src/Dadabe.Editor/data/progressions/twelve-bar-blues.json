@@ -1,0 +1,6 @@
+{
+  "slug": "twelve-bar-blues",
+  "name": "12-Bar Blues (Full)",
+  "chords": ["C7", "C7", "C7", "C7", "F7", "F7", "C7", "C7", "G7", "F7", "C7", "G7"],
+  "tempo": 120
+}

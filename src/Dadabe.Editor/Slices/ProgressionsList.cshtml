@@ -2,11 +2,11 @@
 
 @if (Model.Count == 0)
 {
-  <p class="italic">No progressions yet. Click <strong>New</strong> to add one.</p>
+  <p class="empty-state">No progressions yet. Click <strong>New</strong> to add one.</p>
 }
 else
 {
-  <table class="border">
+  <table>
     <thead>
       <tr><th>Name</th><th>Chords</th><th>Tempo</th><th></th></tr>
     </thead>
@@ -18,19 +18,26 @@ else
           <td>@string.Join(", ", p.Chords)</td>
           <td>@(p.Tempo?.ToString() ?? "—")</td>
           <td class="no-wrap">
-            <button class="small border"
+            <wa-button size="small" variant="brand" appearance="outlined"
+                    hx-get="/api/progressions/@p.Slug/transform"
+                    hx-target="#dialog-container"
+                    hx-swap="innerHTML"
+                    title="Transform">
+              <wa-icon name="shuffle"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="neutral"
                     hx-get="/api/progressions/@p.Slug/edit"
                     hx-target="#dialog-container"
                     hx-swap="innerHTML">
-              <i>edit</i>
-            </button>
-            <button class="small border error"
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
+            <wa-button size="small" variant="danger"
                     hx-delete="/api/progressions/@p.Slug"
                     hx-target="#progression-@p.Slug"
                     hx-swap="outerHTML"
                     hx-confirm="Delete '@p.Name'?">
-              <i>delete</i>
-            </button>
+              <wa-icon name="trash"></wa-icon>
+            </wa-button>
           </td>
         </tr>
       }

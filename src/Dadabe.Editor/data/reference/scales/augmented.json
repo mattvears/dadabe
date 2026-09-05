@@ -1,0 +1,7 @@
+{
+  "slug": "augmented",
+  "name": "Augmented",
+  "notes": ["C", "D#", "E", "G", "G#", "B"],
+  "intervals": [0, 3, 4, 7, 8, 11],
+  "description": "Symmetric hexatonic scale alternating minor-third and half-step intervals, built from two augmented triads a major third apart; only two distinct transpositions exist."
+}

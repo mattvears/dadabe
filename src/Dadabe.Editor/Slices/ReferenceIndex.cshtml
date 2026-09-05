@@ -3,19 +3,19 @@
 @using Dadabe.Editor.Slices
 @{ WriteLiteral(Dadabe.Editor.PageShell.Header); }
 
-<div class="padding">
+<div class="page-content">
   <h4>Reference Data</h4>
 
-  <div class="tabs">
-    <a class="@(Model.Tab == "cadences" ? "active" : "")"
-       hx-get="/api/reference/tab/cadences" hx-target="#ref-content">Cadences</a>
-    <a class="@(Model.Tab == "modes" ? "active" : "")"
-       hx-get="/api/reference/tab/modes" hx-target="#ref-content">Modes</a>
-    <a class="@(Model.Tab == "scales" ? "active" : "")"
-       hx-get="/api/reference/tab/scales" hx-target="#ref-content">Scales</a>
-    <a class="@(Model.Tab == "voicing-categories" ? "active" : "")"
-       hx-get="/api/reference/tab/voicing-categories" hx-target="#ref-content">Voicing Categories</a>
-  </div>
+  <wa-tab-group>
+    <wa-tab slot="nav" panel="cadences" @(Model.Tab == "cadences" ? "active" : "")
+            hx-get="/api/reference/tab/cadences" hx-target="#ref-content">Cadences</wa-tab>
+    <wa-tab slot="nav" panel="modes" @(Model.Tab == "modes" ? "active" : "")
+            hx-get="/api/reference/tab/modes" hx-target="#ref-content">Modes</wa-tab>
+    <wa-tab slot="nav" panel="scales" @(Model.Tab == "scales" ? "active" : "")
+            hx-get="/api/reference/tab/scales" hx-target="#ref-content">Scales</wa-tab>
+    <wa-tab slot="nav" panel="voicing-categories" @(Model.Tab == "voicing-categories" ? "active" : "")
+            hx-get="/api/reference/tab/voicing-categories" hx-target="#ref-content">Voicing Categories</wa-tab>
+  </wa-tab-group>
 
   <div id="ref-content" style="margin-top:1rem">
     @{

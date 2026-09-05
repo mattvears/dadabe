@@ -1,0 +1,7 @@
+{
+  "slug": "major",
+  "name": "Major",
+  "notes": ["C", "D", "E", "F", "G", "A", "B"],
+  "intervals": [0, 2, 4, 5, 7, 9, 11],
+  "description": "Diatonic major scale (Ionian mode); the parent of the major/minor tonal system - bright, stable, and foundational."
+}

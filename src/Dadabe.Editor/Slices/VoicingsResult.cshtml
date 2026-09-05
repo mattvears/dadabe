@@ -1,23 +1,39 @@
 @inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoicingResultModel>
+@using Dadabe.Editor.Slices
 
-<article class="border top-margin">
-    <div class="padding">
-        <div class="row">
-            <h6 class="max">@Model.Chord [@Model.TuningName]</h6>
-            <button class="small border" onclick="this.closest('article').remove()">
-                <i>close</i>
-            </button>
-        </div>
-        @if (!string.IsNullOrEmpty(Model.Error))
+<div class="result-card" style="margin-top:1rem">
+    <div class="card-header">
+        <strong>@Model.Chord [@Model.TuningName]</strong>
+        <button class="result-card-close" onclick="this.closest('.result-card').remove()">
+            ✕
+        </button>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <p style="color:var(--wa-color-danger-600)">@Model.Error</p>
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.Notice))
         {
-            <p class="error-text">@Model.Error</p>
+            <p style="color:var(--wa-color-warning-600)">@Model.Notice</p>
         }
-        else
+
+        if (Model.NextChords.Count > 0)
         {
-            if (Model.NextChords.Count > 0)
-            {
-                <p><strong>Next chords</strong></p>
-                <table class="small-padding">
+            <wa-details>
+                <span slot="summary"><strong>Next chords</strong> — @Model.NextChords.Count candidate(s)</span>
+                <p class="theory-note">
+                    <strong>How predictions work:</strong> Dadabe uses a rules-based model: chord quality families
+                    (dominant, tonic, subdominant, …) have weighted resolution tendencies drawn from
+                    common-practice and jazz harmony. Entropy controls how concentrated or spread the
+                    distribution is — lower entropy favours the strongest resolutions; higher entropy
+                    surfaces surprising but valid moves.
+                </p>
+                <p class="form-hint" style="margin-bottom:0.5rem">
+                    Click a row to see voicings for that chord.
+                </p>
+                <table>
                     <thead>
                         <tr>
                             <th>Chord</th>
@@ -29,43 +45,76 @@
                         {
                             var pct = (int)Math.Round(nc.Probability * 100);
                             var barW = (int)Math.Round(nc.Probability * 150);
-                            <tr>
+                            <tr class="pred-row"
+                                hx-get="/api/voicings/fragment"
+                                hx-vals='{"chord":"@nc.Symbol","tuning":"@(Model.TuningValue ?? Model.TuningName)"}'
+                                hx-target="next .voicing-panel-inline"
+                                hx-swap="innerHTML"
+                                onclick="window.selectChordRow(this)"
+                                style="cursor:pointer">
                                 <td><code>@nc.Symbol</code></td>
                                 <td>
-                                    <div style="display:flex;align-items:center;gap:6px">
-                                        <div style="background:var(--primary);height:8px;width:@(barW)px;border-radius:4px"></div>
-                                        <span>@pct%</span>
+                                    <div class="prob-cell">
+                                        <div class="prob-bar" style="width:@(barW)px"></div>
+                                        <span class="prob-pct">@pct%</span>
                                     </div>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-                <div class="divider top-margin bottom-margin"></div>
-            }
-
-            <p class="small">@Model.TotalCount voicing(s)@(Model.TotalCount > Model.Voicings.Count ? $", showing            {Model.Voicings.Count}" : "")</p>
-            <table class="stripes">
-                <thead>
-                    <tr>
-                        <th>Voicing</th>
-                        <th>ASCII</th>
-                        <th>Structure</th>
-                        <th>Comfort</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var v in Model.Voicings)
-                    {
-                        <tr>
-                            <td>@v.Index</td>
-                            <td><code>@v.AsciiNotation</code></td>
-                            <td>@v.Structure</td>
-                            <td>@v.ComfortPct%</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                <div class="voicing-panel-inline"></div>
+            </wa-details>
+            <hr style="margin:0.75rem 0" />
         }
-    </div>
-</article>
+
+        <p class="small">@Model.TotalCount voicing(s)@(Model.TotalCount > Model.Voicings.Count ? $", showing {Model.Voicings.Count}" : "")</p>
+        <div class="pin-status form-hint"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ASCII</th>
+                    <th>Structure</th>
+                    <th>Notes</th>
+                    <th>Intervals</th>
+                    <th>Comfort</th>
+                    <th>Diagram</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Voicings)
+                {
+                    var positionsJson = System.Text.Json.JsonSerializer.Serialize(
+                        v.Diagram.Strings.Select((s, idx) => new { @string = idx, fret = s.FrettedAt, muted = s.Muted, open = s.Open }));
+                    <tr>
+                        <td><code>@v.AsciiNotation</code></td>
+                        <td>
+                            <abbr title="@Dadabe.Editor.Services.VoicingStructureGlossary.Describe(v.Structure)">@v.Structure</abbr>
+                        </td>
+                        <td><code>@v.Notes</code></td>
+                        <td><code>@v.Intervals</code></td>
+                        <td>@v.ComfortPct%</td>
+                        <td>
+                            <details class="vcd-toggle">
+                                <summary>Show</summary>
+                                @{ await RenderPartialAsync<ChordDiagramPartial, ChordDiagram>(v.Diagram); }
+                            </details>
+                        </td>
+                        <td class="no-wrap">
+                            <wa-button size="small" variant="brand" appearance="outlined"
+                                    onclick="window.pinVoicing(this)"
+                                    data-symbol="@Model.Chord"
+                                    data-comfort="@v.ComfortPct"
+                                    data-structure="@v.Structure"
+                                    data-positions='@positionsJson'
+                                    title="Pin to the active song section">
+                                <wa-icon name="thumbtack"></wa-icon>
+                            </wa-button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

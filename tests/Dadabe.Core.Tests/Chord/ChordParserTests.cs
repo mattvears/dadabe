@@ -135,6 +135,30 @@ public class ChordParserTests
         act.Should().Throw<FormatException>();
     }
 
+    [Theory]
+    [InlineData("C5",  Letter.C, 0)]
+    [InlineData("F#5", Letter.F, 1)]
+    [InlineData("Bb5", Letter.B, -1)]
+    public void Power_chords_parse_to_the_fifth_form(string input, Letter letter, int accidental)
+    {
+        var chord = Parser.Parse(input);
+        chord.Root.Should().Be(new Note(letter, accidental));
+        chord.Quality.Should().Be("5");
+        chord.Extensions.Should().BeEmpty();
+        chord.Alterations.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("Cm7b5", "m7b5")]
+    [InlineData("C7b5",  "7")]
+    [InlineData("C7#5",  "7")]
+    public void Fifth_form_does_not_shadow_altered_fifths(string input, string expectedQuality)
+    {
+        // The '5' form must only match a bare "5" straight after the root — the
+        // 'b5'/'#5' alteration tokens and the 'm7b5' form still win.
+        Parser.Parse(input).Quality.Should().Be(expectedQuality);
+    }
+
     [Fact]
     public void Enharmonic_roots_produce_distinct_symbols()
     {

@@ -1,0 +1,9 @@
+{
+  "slug": "mixolydian-b6",
+  "name": "Mixolydian b6",
+  "intervals": [0, 2, 4, 5, 7, 8, 10],
+  "parentScale": "Melodic Minor",
+  "degreeIndex": 4,
+  "noteNames": ["E", "F#", "G#", "A", "B", "C", "D"],
+  "description": "Fifth mode of the melodic minor scale (also called Aeolian Dominant or Hindu scale); a dominant 7th sound with a flattened 6th, common over V7 chords resolving to a minor tonic."
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "minor-pentatonic",
+  "name": "Minor Pentatonic",
+  "notes": ["A", "C", "D", "E", "G"],
+  "intervals": [0, 3, 5, 7, 10],
+  "modeOf": "Major Pentatonic",
+  "description": "Relative minor pentatonic; the backbone of blues and rock improvisation - no half-steps, and forgiving over many chord changes."
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "harmonic-minor",
+  "name": "Harmonic Minor",
+  "notes": ["A", "B", "C", "D", "E", "F", "G#"],
+  "intervals": [0, 2, 3, 5, 7, 8, 11],
+  "description": "Natural minor with a raised 7th degree, opening an augmented-second gap between degrees 6 and 7 - exotic 'Gypsy' colour and a strong pull from V7 to the tonic."
+}

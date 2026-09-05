@@ -9,41 +9,40 @@
   var noteNamesStr = Model?.NoteNames is null ? "" : string.Join(", ", Model.NoteNames);
 }
 
-<dialog class="active" id="mode-dialog">
-  <h5>@(isNew ? "New Mode" : $"Edit: {Model!.Name}")</h5>
+<wa-dialog id="mode-dialog" open label="@(isNew ? "New Mode" : $"Edit: {Model!.Name}")">
   <form hx-@method="@action"
         hx-target="#ref-content"
         hx-swap="innerHTML"
-        hx-on::after-request="if(event.detail.successful) document.getElementById('mode-dialog').remove()">
+        hx-on::after-request="if(event.detail.successful) document.getElementById('mode-dialog').hide()">
 
-    <div class="field label border">
-      <input type="text" name="name" value="@(Model?.Name ?? "")" required @(isNew ? "" : "readonly") />
-      <label>Name</label>
+    <div class="form-field">
+      <wa-input label="Name" name="name" value="@(Model?.Name ?? "")" required
+                @(isNew ? "" : "readonly")></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="parentScale" value="@(Model?.ParentScale ?? "")" />
-      <label>Parent scale (optional)</label>
+    <div class="form-field">
+      <wa-input label="Parent scale (optional)" name="parentScale"
+                value="@(Model?.ParentScale ?? "")"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="number" name="degreeIndex" value="@(Model?.DegreeIndex?.ToString() ?? "")" min="0" />
-      <label>Degree index (optional)</label>
+    <div class="form-field">
+      <wa-input label="Degree index (optional)" name="degreeIndex" type="number"
+                value="@(Model?.DegreeIndex?.ToString() ?? "")" min="0"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="intervals" value="@intervalsStr" required placeholder="e.g. 0, 2, 4, 5, 7, 9, 11" />
-      <label>Intervals (comma-separated semitones)</label>
+    <div class="form-field">
+      <wa-input label="Intervals (comma-separated semitones)" name="intervals"
+                value="@intervalsStr" required placeholder="e.g. 0, 2, 4, 5, 7, 9, 11"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="noteNames" value="@noteNamesStr" placeholder="e.g. C, D, E, F, G, A, B" />
-      <label>Note names (optional)</label>
+    <div class="form-field">
+      <wa-input label="Note names (optional)" name="noteNames"
+                value="@noteNamesStr" placeholder="e.g. C, D, E, F, G, A, B"></wa-input>
     </div>
-    <div class="field label border">
-      <input type="text" name="description" value="@(Model?.Description ?? "")" />
-      <label>Description (optional)</label>
+    <div class="form-field">
+      <wa-input label="Description (optional)" name="description"
+                value="@(Model?.Description ?? "")"></wa-input>
     </div>
 
-    <nav class="right-align top-margin">
-      <button type="button" class="border" onclick="document.getElementById('mode-dialog').remove()">Cancel</button>
-      <button type="submit">Save</button>
-    </nav>
+    <div slot="footer" class="dialog-footer">
+      <wa-button variant="neutral" onclick="document.getElementById('mode-dialog').hide()">Cancel</wa-button>
+      <wa-button type="submit" variant="brand">Save</wa-button>
+    </div>
   </form>
-</dialog>
+</wa-dialog>

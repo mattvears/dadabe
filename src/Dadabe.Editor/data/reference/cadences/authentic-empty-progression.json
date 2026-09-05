@@ -1,0 +1,7 @@
+{
+  "slug": "authentic-empty-progression",
+  "type": "authentic",
+  "resolution": "",
+  "exampleProgression": [],
+  "description": "Edge case: an authentic-cadence entry whose example progression was emptied out (e.g. via the editor's chord-removal UI); exercises the empty-array and empty-string-resolution shapes, both schema-legal. Hand-authored slug deliberately ignores the type-hash generation convention."
+}

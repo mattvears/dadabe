@@ -1,0 +1,15 @@
+{
+  "slug": "fm7",
+  "name": "Fm7",
+  "chord": "Fm7",
+  "filters": [
+    {
+      "type": "byQuality",
+      "params": {
+        "quality": "m7"
+      }
+    }
+  ],
+  "maxResults": 20,
+  "entropy": 0.2
+}

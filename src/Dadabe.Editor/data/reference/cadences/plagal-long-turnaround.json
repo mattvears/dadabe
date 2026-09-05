@@ -1,0 +1,7 @@
+{
+  "slug": "plagal-long-turnaround",
+  "type": "plagal",
+  "resolution": "ii->V->I, then IV->I",
+  "exampleProgression": ["Dm7", "G7", "Cmaj7", "Am7", "Fmaj7", "Bb6", "C"],
+  "description": "Long cadential approach (7 chords) folding a ii-V-I turnaround into a final plagal close - stress-tests rendering and storage round-tripping of longer progressions."
+}

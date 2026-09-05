@@ -1,0 +1,9 @@
+{
+  "slug": "c-major-single-chord-context",
+  "name": "C Major, Single-Chord Context Probe",
+  "chord": "C",
+  "context": "one-chord-vamp",
+  "filters": [],
+  "maxResults": 10,
+  "entropy": null
+}

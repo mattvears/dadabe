@@ -1,0 +1,9 @@
+{
+  "slug": "locrian-2",
+  "name": "Locrian #2",
+  "intervals": [0, 2, 3, 5, 6, 8, 10],
+  "parentScale": "Melodic Minor",
+  "degreeIndex": 5,
+  "noteNames": ["F#", "G#", "A", "B", "C", "D", "E"],
+  "description": "Sixth mode of the melodic minor scale (also called the half-diminished scale); Locrian with a natural 2nd, the standard choice over m7b5 chords in minor ii-V-i progressions."
+}
