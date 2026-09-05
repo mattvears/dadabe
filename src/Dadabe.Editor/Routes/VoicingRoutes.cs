@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Microsoft.Extensions.Primitives;
 using Dadabe.Core.Chord;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
@@ -14,6 +15,7 @@ public static class VoicingRoutes
     {
         // Inline voicing fragment — used by the predictions result card.
         app.MapGet("/api/voicings/fragment", (
+            HttpRequest req,
             [FromQuery] string chord,
             [FromQuery] string tuning,
             [FromServices] Catalogs catalogs,
@@ -36,11 +38,19 @@ public static class VoicingRoutes
                     new VoicingFragmentModel(chord, tuning, [], ex.Message));
             }
 
+            var searchParams = BuildSearchParams(key => req.Query[key]);
+            var minComfortPct = int.TryParse(req.Query["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
+            var minComfort = minComfortPct / 100.0;
+
             var spec = expander.Expand(symbol);
             var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default,
-                SearchParams.Default, catalogs.VoicingCategories);
+                searchParams, catalogs.VoicingCategories);
 
-            var rows = set.Voicings
+            var voicings = set.Voicings;
+            if (minComfort > 0.0)
+                voicings = voicings.Where(v => v.Comfort >= minComfort).ToImmutableArray();
+
+            var rows = voicings
                 .Take(12)
                 .Select(v =>
                 {
@@ -85,26 +95,7 @@ public static class VoicingRoutes
             var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
             var minComfort  = minComfortPct / 100.0;
 
-            // Advanced options — fall back to SearchParams.Default values when absent.
-            var frets      = int.TryParse(form["frets"],      out var fr) ? fr : 15;
-            var span       = int.TryParse(form["span"],       out var sp) ? sp : 4;
-            var minStr     = int.TryParse(form["minStrings"], out var mn) ? mn : 3;
-            var maxStr     = int.TryParse(form["maxStrings"], out var mx) ? mx : 6;
-            var allowOpen  = form["allowOpen"].Contains("true");
-            var allowBarre = form["allowBarre"].Contains("true");
-            var allowThumb = form["allowThumb"].Contains("true");
-            var requireRoot = form["requireRoot"].Contains("true");
-
-            var checkedCats = AllCategories
-                .Where(cat => form["cat_" + cat.Replace("-", "")].Contains(cat))
-                .ToImmutableArray();
-            // If all are checked (or none explicitly unchecked), pass empty = no filter.
-            var categories = checkedCats.Length == AllCategories.Length
-                ? ImmutableArray<string>.Empty
-                : checkedCats;
-
-            var searchParams = new SearchParams(frets, span, minStr, maxStr,
-                allowOpen, allowBarre, allowThumb, categories, requireRoot);
+            var searchParams = BuildSearchParams(key => form[key]);
 
             if (string.IsNullOrWhiteSpace(chord))
                 return Results.RazorSlice<VoicingsResult, VoicingResultModel>(
@@ -184,6 +175,37 @@ public static class VoicingRoutes
 
     public static Dadabe.Core.Tuning ResolveTuningPublic(Catalogs catalogs, string nameOrSpec, string displayName)
         => ResolveTuning(catalogs, nameOrSpec, displayName);
+
+    /// <summary>
+    /// Parses the shared "Voicing options" panel fields (see
+    /// <c>VoicingOptionsFields.cshtml</c>) into a <see cref="SearchParams"/>,
+    /// falling back to <see cref="SearchParams.Default"/> for any field the
+    /// caller's request doesn't carry. <paramref name="get"/> abstracts over
+    /// <c>IFormCollection</c> and <c>IQueryCollection</c>, which both expose
+    /// the same string-keyed indexer.
+    /// </summary>
+    public static SearchParams BuildSearchParams(Func<string, StringValues> get)
+    {
+        var d = SearchParams.Default;
+        var frets      = int.TryParse(get("frets"),      out var fr) ? fr : d.MaxFret;
+        var span       = int.TryParse(get("span"),       out var sp) ? sp : d.MaxSpan;
+        var minStr     = int.TryParse(get("minStrings"), out var mn) ? mn : d.MinStrings;
+        var maxStr     = int.TryParse(get("maxStrings"), out var mx) ? mx : d.MaxStrings;
+        var allowOpen  = get("allowOpen").Contains("true");
+        var allowBarre = get("allowBarre").Contains("true");
+        var allowThumb = get("allowThumb").Contains("true");
+        var requireRoot = get("requireRoot").Contains("true");
+
+        var checkedCats = AllCategories
+            .Where(cat => get("cat_" + cat.Replace("-", "")).Contains(cat))
+            .ToImmutableArray();
+        // If all are checked (or none explicitly unchecked), pass empty = no filter.
+        var categories = checkedCats.Length == AllCategories.Length
+            ? ImmutableArray<string>.Empty
+            : checkedCats;
+
+        return new SearchParams(frets, span, minStr, maxStr, allowOpen, allowBarre, allowThumb, categories, requireRoot);
+    }
 
     private static Dadabe.Core.Tuning ResolveTuning(Catalogs catalogs, string nameOrSpec, string displayName)
     {

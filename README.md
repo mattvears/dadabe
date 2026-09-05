@@ -69,13 +69,21 @@ This project asks:
   - Finds minimal motion transitions between chords
   - Inner-line generator - generate moving voices inside static harmony.
 
-## v0.5 — current release
+## v0.5.3 — current release
 
 v0.1 shipped the core voicing engine. v0.2 added next-chord prediction. v0.3 was a
-scaffolding polish release. v0.4 made the prediction pipeline operational. v0.5 adds
+scaffolding polish release. v0.4 made the prediction pipeline operational. v0.5 added
 progression voice leading, context-weighted prediction, the Web Awesome UI migration,
-and full exposure of hand-model options in the Editor. See [CHANGELOG.md](CHANGELOG.md)
-for details.
+and full exposure of hand-model options in the Editor.
+
+v0.5.3 brings:
+- **Comfort model fixes**: `HandAnglePenalty` (Rule 1) now correctly penalizes barred inner fingers once per finger, not once per string.
+- **Voicing options everywhere**: A shared "Advanced options" panel (frets, span, string constraints, allow-flags, require-root, min-comfort, categories) now appears in Predictions, Songs, and Voicings pages. The Predictions "click a chord to see voicings" flow respects these settings.
+- **Voice Lead chart display**: Each voice-lead solution step now renders as a chord diagram, mirroring the song chart layout.
+- **Voice Lead song integration**: The Voice Lead page can source chords from an active song section (with the existing header selects) and push a chosen solution back as that section's pinned voicings, enabling seamless hand-curated voice leading within a song.
+- **Tuning inheritance in Predictions**: When a song is active, its tuning is used for voicing lookups instead of the local dropdown.
+
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ### Build and run
 
@@ -83,6 +91,11 @@ for details.
 dotnet build
 dotnet run --project src/Dadabe.Cli -- voicings Cmaj7 --tuning DADABE --pretty
 ```
+
+For the full picture — building/running the Editor web UI, running the test
+suite, schema validation, and (for the Editor) how to point it at a scratch
+data directory instead of the tracked sample data — see
+[docs/development.md](docs/development.md).
 
 Four subcommands ship:
 

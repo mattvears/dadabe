@@ -313,8 +313,9 @@ public static class SongRoutes
             var form = await req.ReadFormAsync();
             var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
             var solutionsCount = int.TryParse(form["solutions"], out var s) ? Math.Clamp(s, 1, 5) : 1;
+            var searchParams = VoicingRoutes.BuildSearchParams(key => form[key]);
 
-            var error = Fill(slug, id, songs, catalogs, parser, expander, minComfortPct / 100.0, solutionsCount);
+            var error = Fill(slug, id, songs, catalogs, parser, expander, minComfortPct / 100.0, solutionsCount, searchParams);
             return DetailFragment(slug, songs, progressions, catalogs, parser, expander, error);
         });
     }
@@ -374,7 +375,8 @@ public static class SongRoutes
     /// </summary>
     internal static string? Fill(
         string slug, string sectionId, SongService songs, Catalogs catalogs,
-        ChordParser parser, ChordExpander expander, double minComfort, int solutionsCount)
+        ChordParser parser, ChordExpander expander, double minComfort, int solutionsCount,
+        SearchParams? searchParamsOverride = null)
     {
         var (song, section) = songs.FindSection(slug, sectionId);
         if (song is null || section is null) { return "Song or section not found."; }
@@ -386,7 +388,7 @@ public static class SongRoutes
         catch (FormatException ex) { return ex.Message; }
 
         var hand = SongHandResolver.ResolveHandModel(song.Hand);
-        var searchParams = SongHandResolver.ResolveSearchParams(song.Hand);
+        var searchParams = searchParamsOverride ?? SongHandResolver.ResolveSearchParams(song.Hand);
 
         var voicingsPerSlot = new List<ImmutableArray<Voicing>>(section.Slots.Count);
         foreach (var slot in section.Slots)
@@ -480,12 +482,15 @@ public static class SongRoutes
         foreach (var section in song.Sections)
         {
             var slotViews = new List<SlotViewModel>();
+            var sectionSpecs = new List<ChordSpec>();
             for (var i = 0; i < section.Slots.Count; i++)
             {
                 var slot = section.Slots[i];
                 if (parser.TryParse(slot.Symbol, out var symbol, out _))
                 {
-                    allSpecs.Add(expander.Expand(symbol));
+                    var spec = expander.Expand(symbol);
+                    allSpecs.Add(spec);
+                    sectionSpecs.Add(spec);
                 }
 
                 ChordDiagram? diagram = slot.Voicing is not null && tuning is not null
@@ -497,7 +502,8 @@ public static class SongRoutes
 
             sectionViews.Add(new SectionViewModel(
                 section, slotViews, BuildPositionRange(section), BuildHardestChordLabel(section),
-                section.Slots.Count(s => s.Voicing is not null)));
+                section.Slots.Count(s => s.Voicing is not null),
+                BuildPredictions(sectionSpecs)));
         }
 
         var keyDisplay = BuildKeyDisplay(song, allSpecs);
@@ -510,6 +516,21 @@ public static class SongRoutes
         if (prov.ModelVersion != (int)ModelVersion.V1) { return true; }
         if (song.Tuning is not null && !string.Equals(prov.Tuning, song.Tuning, StringComparison.Ordinal)) { return true; }
         return !string.Equals(prov.HandHash, currentHand.ContentHash.ToString(), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A section with at least one parseable chord always gets a "what comes
+    /// next" read-out: predict from the last chord, weighted toward the key
+    /// implied by everything before it (D33).
+    /// </summary>
+    private static IReadOnlyList<NextChordEntry> BuildPredictions(IReadOnlyList<ChordSpec> sectionSpecs)
+    {
+        if (sectionSpecs.Count == 0) { return []; }
+        var current = sectionSpecs[sectionSpecs.Count - 1];
+        var context = sectionSpecs.Count > 1 ? sectionSpecs.Take(sectionSpecs.Count - 1).ToList() : null;
+        return NextChordPredictor.Predict(current, topN: 3, entropy: 0.5, context: context)
+            .Select(c => new NextChordEntry(c.Symbol, c.Probability))
+            .ToList();
     }
 
     private static string? BuildPositionRange(SongSection section)

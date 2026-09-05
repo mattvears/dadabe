@@ -55,6 +55,13 @@
   <div id="prediction-list" style="margin-top:1rem">
     @{ await RenderPartialAsync<PredictionsList, System.Collections.Generic.IReadOnlyList<Dadabe.Editor.Services.PredictionModel>>(Model.Predictions); }
   </div>
+
+  <wa-details style="margin-top:0.75rem">
+    <span slot="summary">Voicing options</span>
+    <p class="form-hint" style="margin-top:0">Applied when you click a chord below to see its voicings.</p>
+    @{ await RenderPartialAsync<VoicingOptionsFields, string>("pred-voicing-options"); }
+  </wa-details>
+
   <div id="result-panel"></div>
 </div>
 <div id="dialog-container"></div>

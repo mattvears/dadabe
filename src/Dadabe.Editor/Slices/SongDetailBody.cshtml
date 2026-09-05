@@ -38,6 +38,12 @@
         </wa-button>
     </form>
 
+    <wa-details style="margin-bottom:0.75rem">
+        <span slot="summary">Voicing options</span>
+        <p class="form-hint" style="margin-top:0">Used by "Fill unpinned" below.</p>
+        @{ await RenderPartialAsync<VoicingOptionsFields, string>("song-voicing-options"); }
+    </wa-details>
+
     @if (Model.Sections.Count == 0)
     {
         <p class="empty-state">No sections yet. Add one above, then paste a chart or pin voicings into it.</p>
@@ -112,6 +118,18 @@
                         }
                     </tbody>
                 </table>
+
+                @if (sv.Predictions.Count > 0)
+                {
+                    <p class="form-hint" style="margin-top:0.4rem">
+                        Predicted next:
+                        @for (var i = 0; i < sv.Predictions.Count; i++)
+                        {
+                            var pred = sv.Predictions[i];
+                            <text>@(i > 0 ? ", " : "")<code>@pred.Symbol</code> (@((int)Math.Round(pred.Probability * 100))%)</text>
+                        }
+                    </p>
+                }
             }
 
             <div class="form-row" style="margin-top:0.5rem">
@@ -121,8 +139,8 @@
                     <wa-button type="submit" size="small" variant="neutral">Add</wa-button>
                 </form>
 
-                <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/fill" hx-target="#song-detail-body" hx-swap="outerHTML">
-                    <input type="hidden" name="minComfort" value="70" />
+                <form hx-post="/api/songs/@song.Slug/sections/@sec.Id/fill" hx-target="#song-detail-body" hx-swap="outerHTML"
+                      hx-include="#song-voicing-options">
                     <wa-button type="submit" size="small" variant="brand">
                         <wa-icon slot="prefix" name="wand-magic-sparkles"></wa-icon> Fill unpinned
                     </wa-button>

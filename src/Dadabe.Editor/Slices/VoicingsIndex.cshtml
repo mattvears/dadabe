@@ -20,34 +20,11 @@
             <div class="form-row" style="margin-top:0.5rem">
                 <wa-input label="Next chords (top N)" name="topN" type="number" value="5" min="0" max="20" style="flex:1"></wa-input>
                 <wa-input label="Entropy" name="entropy" type="number" value="0.5" min="0.01" max="10" step="0.01" style="flex:1"></wa-input>
-                <wa-input label="Min comfort %" name="minComfort" type="number" value="70" min="0" max="100" step="1" style="flex:1"></wa-input>
             </div>
 
             <wa-details style="margin-top:0.75rem">
                 <span slot="summary">Advanced options</span>
-                <div class="form-row">
-                    <wa-input label="Max fret" name="frets" type="number" value="15" min="1" max="24" style="flex:1"></wa-input>
-                    <wa-input label="Max span" name="span" type="number" value="4" min="1" max="12" style="flex:1"></wa-input>
-                    <wa-input label="Min strings" name="minStrings" type="number" value="3" min="2" max="6" style="flex:1"></wa-input>
-                    <wa-input label="Max strings" name="maxStrings" type="number" value="6" min="2" max="6" style="flex:1"></wa-input>
-                </div>
-                <div class="form-row" style="margin-top:0.5rem;align-items:center;gap:1.5rem">
-                    <wa-checkbox name="allowOpen" value="true" checked>Allow open strings</wa-checkbox>
-                    <wa-checkbox name="allowBarre" value="true" checked>Allow barre</wa-checkbox>
-                    <wa-checkbox name="allowThumb" value="true">Allow thumb</wa-checkbox>
-                    <wa-checkbox name="requireRoot" value="true" title="Most forms only require the 3rd/7th (or 3rd/5th) by default — check this to require the root note too.">Require root note</wa-checkbox>
-                </div>
-                <div style="margin-top:0.75rem">
-                    <p style="margin:0 0 0.25rem">Categories (uncheck to filter)</p>
-                    <div class="form-row" style="flex-wrap:wrap;gap:0.75rem">
-                        <wa-checkbox name="cat_power"  value="power"  checked>power</wa-checkbox>
-                        <wa-checkbox name="cat_triad"  value="triad"  checked>triad</wa-checkbox>
-                        <wa-checkbox name="cat_shell"  value="shell"  checked>shell</wa-checkbox>
-                        <wa-checkbox name="cat_drop2"  value="drop-2" checked>drop-2</wa-checkbox>
-                        <wa-checkbox name="cat_drop3"  value="drop-3" checked>drop-3</wa-checkbox>
-                        <wa-checkbox name="cat_spread" value="spread" checked>spread</wa-checkbox>
-                    </div>
-                </div>
+                @{ await RenderPartialAsync<VoicingOptionsFields, string>("vo-voicing-options"); }
             </wa-details>
 
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;margin-top:0.75rem">

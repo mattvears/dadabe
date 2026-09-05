@@ -1,4 +1,5 @@
 @inherits RazorSlices.RazorSlice<Dadabe.Editor.Slices.VoiceLeadResultModel>
+@using Dadabe.Editor.Slices
 
 <wa-card style="margin-top:1rem">
     <div class="card-header">
@@ -17,7 +18,45 @@
         @foreach (var sol in Model.Solutions)
         {
             <wa-card style="margin-bottom:0.75rem">
-                <p><strong>Solution @sol.SolutionNumber</strong> — total distance: @sol.TotalDistance frets</p>
+                <div class="card-header">
+                    <p style="margin:0"><strong>Solution @sol.SolutionNumber</strong> — total distance: @sol.TotalDistance frets</p>
+                    @if (Model.SongSlug is not null && Model.SectionId is not null)
+                    {
+                        var stepsJson = System.Text.Json.JsonSerializer.Serialize(
+                            sol.Steps.Select(st => new
+                            {
+                                symbol = st.Chord,
+                                bars = st.Bars,
+                                comfortPct = st.ComfortPct,
+                                structure = st.Structure,
+                                positions = st.Positions!.Select(p => new { @string = p.String, fret = p.Fret, muted = p.Muted, open = p.Open }),
+                            }));
+                        <wa-button size="small" variant="brand" appearance="outlined"
+                                onclick="window.applyVoiceLead(this)"
+                                data-slug="@Model.SongSlug"
+                                data-section="@Model.SectionId"
+                                data-steps='@stepsJson'
+                                title="Replace this section's pinned voicings with this solution">
+                            <wa-icon slot="prefix" name="thumbtack"></wa-icon> Replace pinned voicings
+                        </wa-button>
+                    }
+                </div>
+                <div class="apply-status form-hint"></div>
+
+                @{ var diagrammed = sol.Steps.Where(s => s.Diagram is not null).ToList(); }
+                @if (diagrammed.Count > 0)
+                {
+                    <div class="song-chart-slots" style="margin-bottom:0.75rem">
+                        @foreach (var step in diagrammed)
+                        {
+                            <div class="song-chart-slot">
+                                <div class="song-chart-chord"><code>@step.Chord</code></div>
+                                @{ await RenderPartialAsync<ChordDiagramPartial, ChordDiagram>(step.Diagram!); }
+                            </div>
+                        }
+                    </div>
+                }
+
                 <table>
                     <thead>
                         <tr>

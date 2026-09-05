@@ -234,14 +234,175 @@ public sealed record Voicing : IContentHashable
         return count;
     }
 
+    // ── hand-biomechanics penalties ──
+    // Rules 1/2/4 read finger assignments; rule 3 reads the sounded/open/muted
+    // shape of the string set. Both are optional (default empty) so existing
+    // callers that only have the scalar summary (span, mute counts, …) keep
+    // their prior comfort values unchanged — only VoicingSearch, which has the
+    // full Fingering and Positions in scope, supplies them.
+
+    /// <summary>Flat cost per qualifying reverse-stretch pair (Rule 1), scaled by how far the fret gap is.</summary>
+    private const double HandAnglePerFret = 0.05;
+
+    /// <summary>Cap on the total Rule-1 penalty regardless of how many qualifying pairs exist.</summary>
+    private const double HandAngleCap = 0.30;
+
+    /// <summary>Flat spike when the middle/ring tendon-interdependence condition fires (Rule 2).</summary>
+    private const double TendonInterdependenceSpike = 0.35;
+
+    /// <summary>Base cost per inner sounded string left open between two fretted neighbours (Rule 3).</summary>
+    private const double ArchBaseCost = 0.08;
+
+    /// <summary>Exponent base for the per-fret abduction surcharge on non-adjacent-string finger pairs (Rule 4).</summary>
+    private const double AbductionExponentBase = 1.6;
+
+    /// <summary>Scale applied to the abduction exponential before it is added to the comfort deduction.</summary>
+    private const double AbductionScale = 0.02;
+
     /// <summary>
-    /// v0.1 comfort score (D15 / design.md §7 step 8). Reported, not used
-    /// for ordering — emission order is deterministic per D5.
+    /// Rule 1 — Natural Cascade vs. Reverse Stretch (hand-angle penalty).
+    /// Baseline: the index finger sits toward the nut/bass side of a shape
+    /// and the middle/ring fingers reach toward the body/treble side as fret
+    /// and string both climb together. A <em>reverse stretch</em> is the
+    /// same climb happening on the index while an inner finger is pinned
+    /// further down the neck on a more treble string — an outer finger
+    /// reaching past an inner one forces the wrist to supinate to keep the
+    /// inner finger's joint upright. Penalty scales with how many frets the
+    /// index has to reach past the inner finger, capped so one extreme
+    /// outlier can't zero out an otherwise fine voicing on its own.
+    /// </summary>
+    private static double HandAnglePenalty(ImmutableArray<FingerAssignment> assignments)
+    {
+        if (assignments.IsDefaultOrEmpty) { return 0.0; }
+
+        var index = assignments.FirstOrDefault(a => a.Finger == Fretboard.Finger.Index);
+        if (index is null) { return 0.0; }
+
+        var total = 0.0;
+        foreach (var inner in assignments
+            .Where(a => a.Finger is Fretboard.Finger.Middle or Fretboard.Finger.Ring)
+            .GroupBy(a => a.Finger)
+            .Select(g => g.First()))
+        {
+            if (index.String < inner.String && index.Fret < inner.Fret)
+            {
+                total += HandAnglePerFret * (inner.Fret - index.Fret);
+            }
+        }
+        return Math.Min(total, HandAngleCap);
+    }
+
+    /// <summary>
+    /// Rule 2 — Tendon Interdependence (flexor digitorum profundus
+    /// constraint). The middle and ring fingers share tendon sheaths, so
+    /// asking them to fret adjacent strings at different frets already
+    /// fights their coupled mobility; asking that <em>while</em> the index
+    /// and pinky are stretched away from each other in opposite directions
+    /// (index below, pinky above the middle/ring pair) compounds it into a
+    /// single severe spike rather than a graded cost — there's no "a little"
+    /// version of this shape.
+    /// </summary>
+    private static double TendonInterdependencePenalty(ImmutableArray<FingerAssignment> assignments)
+    {
+        if (assignments.IsDefaultOrEmpty) { return 0.0; }
+
+        var middle = assignments.FirstOrDefault(a => a.Finger == Fretboard.Finger.Middle);
+        var ring = assignments.FirstOrDefault(a => a.Finger == Fretboard.Finger.Ring);
+        var index = assignments.FirstOrDefault(a => a.Finger == Fretboard.Finger.Index);
+        var pinky = assignments.FirstOrDefault(a => a.Finger == Fretboard.Finger.Pinky);
+        if (middle is null || ring is null || index is null || pinky is null) { return 0.0; }
+
+        var adjacentStrings = Math.Abs(middle.String - ring.String) == 1;
+        var differentFrets = middle.Fret != ring.Fret;
+        if (!adjacentStrings || !differentFrets) { return 0.0; }
+
+        var innerLow = Math.Min(middle.Fret, ring.Fret);
+        var innerHigh = Math.Max(middle.Fret, ring.Fret);
+        var oppositeStretch = index.Fret < innerLow && pinky.Fret > innerHigh;
+
+        return oppositeStretch ? TendonInterdependenceSpike : 0.0;
+    }
+
+    /// <summary>
+    /// Rule 3 — Inner-String Clearance &amp; Joint Collapsing (the arch
+    /// penalty). A sounded-but-open string sandwiched between two fretted
+    /// neighbours (fret the G and high E, leave the B ringing) needs the
+    /// fretting fingers to arch clear of it at the proximal interphalangeal
+    /// joint — the joint that flexes most naturally, so holding it extended
+    /// mid-chord is a genuinely different ask than muting or a flat barre.
+    /// Cost scales with the voicing's overall span: fingers already braced
+    /// for a wide lateral stretch have less articulation left to spare for
+    /// the arch, so the same open-string gap is worse in a wide shape than
+    /// a narrow one.
+    /// <para><paramref name="positions"/> must be ordered by string index.</para>
+    /// </summary>
+    private static double ArchPenalty(ImmutableArray<FretPosition> positions, int span, int maxSpan)
+    {
+        if (positions.IsDefaultOrEmpty) { return 0.0; }
+
+        var isolatedOpens = 0;
+        for (var i = 1; i < positions.Length - 1; i++)
+        {
+            if (!positions[i].Open) { continue; }
+            var before = positions[i - 1];
+            var after = positions[i + 1];
+            if (before.Fret is > 0 && after.Fret is > 0) { isolatedOpens++; }
+        }
+        if (isolatedOpens == 0) { return 0.0; }
+
+        var lateralTension = 1.0 + Math.Clamp((double)span / Math.Max(1, maxSpan), 0.0, 1.0);
+        return ArchBaseCost * isolatedOpens * lateralTension;
+    }
+
+    /// <summary>
+    /// Rule 4 — Abduction &amp; Fret Spacing Scale. The flat linear span term
+    /// treats a 3-fret cascade across adjacent strings as the baseline cost
+    /// of a wide shape. Skipping over a string entirely — the next fretted
+    /// finger landing on a non-adjacent string — asks the hand to abduct
+    /// (spread sideways) rather than just reach forward, and that gets
+    /// harder <em>exponentially</em>, not linearly, as the fret distance
+    /// between the two fingers grows: a one-fret gap across a skip is barely
+    /// noticeable, a five-fret gap across the same skip is a very different
+    /// shape.
+    /// </summary>
+    private static double AbductionPenalty(ImmutableArray<FingerAssignment> assignments)
+    {
+        if (assignments.IsDefaultOrEmpty || assignments.Length < 2) { return 0.0; }
+
+        var ordered = assignments.OrderBy(a => a.String).ToArray();
+        var total = 0.0;
+        for (var i = 1; i < ordered.Length; i++)
+        {
+            var prev = ordered[i - 1];
+            var next = ordered[i];
+            var stringGap = next.String - prev.String;
+            if (stringGap <= 1) { continue; }
+
+            var fretDistance = Math.Abs(next.Fret - prev.Fret);
+            total += AbductionScale * (Math.Pow(AbductionExponentBase, fretDistance) - 1.0);
+        }
+        return total;
+    }
+
+    /// <summary>
+    /// v0.1 comfort score (D15 / design.md §7 step 8), extended with four
+    /// hand-biomechanics penalties (v0.5.3): reverse-stretch hand angle,
+    /// middle/ring tendon interdependence, inner-string arch, and lateral
+    /// abduction across skipped strings. Reported, not used for ordering —
+    /// emission order is deterministic per D5.
     /// </summary>
     /// <param name="interiorMutedStrings">
     /// Muted strings that are <em>not</em> part of an edge run — i.e. total
     /// mutes minus <see cref="CountEdgeMutes"/>. Edge mutes are excluded
     /// deliberately: an unstruck string is free.
+    /// </param>
+    /// <param name="assignments">
+    /// Finger-to-string/fret assignments driving Rules 1, 2, and 4. Defaults
+    /// to empty (no penalty) for callers that only have the scalar summary.
+    /// </param>
+    /// <param name="orderedPositions">
+    /// Full per-string positions, ordered by string index, driving Rule 3.
+    /// Defaults to empty (no penalty) for callers without the full shape.
     /// </param>
     public static double ComputeComfort(
         int span,
@@ -250,7 +411,9 @@ public sealed record Voicing : IContentHashable
         ImmutableArray<BarreGroup> barres,
         int lowestFret,
         int maxSpan,
-        int maxFret)
+        int maxFret,
+        ImmutableArray<FingerAssignment> assignments = default,
+        ImmutableArray<FretPosition> orderedPositions = default)
     {
         var barreCost = 0.0;
         if (!barres.IsDefault)
@@ -263,7 +426,11 @@ public sealed record Voicing : IContentHashable
             - (0.10 * interiorMutedStrings)
             - (0.15 * isolatedMutedStrings)
             - barreCost
-            - (0.05 * ((double)lowestFret / Math.Max(1, maxFret)));
+            - (0.05 * ((double)lowestFret / Math.Max(1, maxFret)))
+            - HandAnglePenalty(assignments)
+            - TendonInterdependencePenalty(assignments)
+            - ArchPenalty(orderedPositions, span, maxSpan)
+            - AbductionPenalty(assignments);
         return Math.Clamp(raw, 0.0, 1.0);
     }
 }

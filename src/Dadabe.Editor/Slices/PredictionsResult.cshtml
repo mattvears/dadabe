@@ -7,7 +7,8 @@
         Next chords after
         <code class="chord-link"
               hx-get="/api/voicings/fragment"
-              hx-vals='js:{"chord":"@Model.Chord","tuning":document.getElementById("pred-tuning-select")?.value||"DADABE"}'
+              hx-include="#pred-voicing-options"
+              hx-vals='js:{"chord":"@Model.Chord","tuning":window.resolveVoicingTuning("pred-tuning-select")}'
               hx-target="next .voicing-panel-inline"
               hx-swap="innerHTML"
               onclick="window.selectChordRow(this)"
@@ -72,7 +73,8 @@
           var barW = (int)Math.Round(r.Score * 200);
           <tr class="pred-row"
               hx-get="/api/voicings/fragment"
-              hx-vals='js:{"chord":"@r.Chord","tuning":document.getElementById("pred-tuning-select")?.value||"DADABE"}'
+              hx-include="#pred-voicing-options"
+              hx-vals='js:{"chord":"@r.Chord","tuning":window.resolveVoicingTuning("pred-tuning-select")}'
               hx-target="next .voicing-panel-inline"
               hx-swap="innerHTML"
               onclick="window.selectChordRow(this)"

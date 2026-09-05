@@ -1,0 +1,36 @@
+@inherits RazorSlices.RazorSlice<string>
+@{
+    // A single shared "voicing options" panel (frets/span/string count/allow
+    // flags/categories) reused wherever a page needs to control voicing
+    // search params — the /voicings form, the Predictions "click a chord to
+    // see voicings" flow, and a song's "Fill unpinned" action. Each caller
+    // wraps one copy of this in a container with a unique id (`Model`) and
+    // points an `hx-include` at that id, so htmx serializes these named
+    // fields into the request without any bespoke JS.
+}
+<div id="@Model">
+    <div class="form-row">
+        <wa-input label="Max fret" name="frets" type="number" value="15" min="1" max="24" style="flex:1"></wa-input>
+        <wa-input label="Max span" name="span" type="number" value="4" min="1" max="12" style="flex:1"></wa-input>
+        <wa-input label="Min strings" name="minStrings" type="number" value="3" min="2" max="6" style="flex:1"></wa-input>
+        <wa-input label="Max strings" name="maxStrings" type="number" value="6" min="2" max="6" style="flex:1"></wa-input>
+        <wa-input label="Min comfort %" name="minComfort" type="number" value="70" min="0" max="100" step="1" style="flex:1"></wa-input>
+    </div>
+    <div class="form-row" style="margin-top:0.5rem;align-items:center;gap:1.5rem">
+        <wa-checkbox name="allowOpen" value="true" checked>Allow open strings</wa-checkbox>
+        <wa-checkbox name="allowBarre" value="true" checked>Allow barre</wa-checkbox>
+        <wa-checkbox name="allowThumb" value="true">Allow thumb</wa-checkbox>
+        <wa-checkbox name="requireRoot" value="true" checked title="Most forms only require the 3rd/7th (or 3rd/5th) by default — uncheck this to allow voicings that omit the root.">Require root note</wa-checkbox>
+    </div>
+    <div style="margin-top:0.75rem">
+        <p style="margin:0 0 0.25rem">Categories (uncheck to filter)</p>
+        <div class="form-row" style="flex-wrap:wrap;gap:0.75rem">
+            <wa-checkbox name="cat_power"  value="power"  checked>power</wa-checkbox>
+            <wa-checkbox name="cat_triad"  value="triad"  checked>triad</wa-checkbox>
+            <wa-checkbox name="cat_shell"  value="shell"  checked>shell</wa-checkbox>
+            <wa-checkbox name="cat_drop2"  value="drop-2" checked>drop-2</wa-checkbox>
+            <wa-checkbox name="cat_drop3"  value="drop-3" checked>drop-3</wa-checkbox>
+            <wa-checkbox name="cat_spread" value="spread" checked>spread</wa-checkbox>
+        </div>
+    </div>
+</div>

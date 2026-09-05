@@ -108,7 +108,9 @@ public sealed record VoiceLeadResultModel(
     string TuningName,
     IReadOnlyList<VoiceLeadSolutionRow> Solutions,
     string? Error,
-    int StringCount = 6)
+    int StringCount = 6,
+    string? SongSlug = null,
+    string? SectionId = null)
 {
     public static VoiceLeadResultModel FromError(string chords, string tuning, string error) =>
         new(chords, tuning, [], error);
@@ -125,7 +127,13 @@ public sealed record VoiceLeadStepRow(
     string Structure,
     int ComfortPct,
     int? TransitionDistance,
-    IReadOnlyList<VoiceMoveRow>? Moves = null);
+    IReadOnlyList<VoiceMoveRow>? Moves = null,
+    ChordDiagram? Diagram = null,
+    int Bars = 1,
+    IReadOnlyList<VoiceLeadPositionRow>? Positions = null);
+
+/// <summary>Raw fret positions behind a step's voicing — carried so the result can be applied back to a song section (D57 bug #6).</summary>
+public sealed record VoiceLeadPositionRow(int String, int? Fret, bool Muted, bool Open);
 
 /// <summary>Per-string transition detail (v0.5.2 §10) — "only the B string moves, 2 frets".</summary>
 public sealed record VoiceMoveRow(int String, int? FromFret, int? ToFret, int Distance);
@@ -147,7 +155,8 @@ public sealed record SectionViewModel(
     IReadOnlyList<SlotViewModel> Slots,
     string? PositionRange,
     string? HardestChordLabel,
-    int PinnedCount);
+    int PinnedCount,
+    IReadOnlyList<NextChordEntry> Predictions);
 
 public sealed record SlotViewModel(
     int Index,

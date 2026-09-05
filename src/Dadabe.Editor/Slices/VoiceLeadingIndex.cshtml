@@ -13,10 +13,21 @@
 
             <input type="hidden" name="tuning" id="form-tuning" />
             <input type="hidden" name="tuningName" id="form-tuning-name" />
+            <input type="hidden" name="songSlug" id="form-song" />
+            <input type="hidden" name="sectionId" id="form-section" />
             <div class="form-field">
                 <wa-textarea label="Chords" name="chords" rows="3"
-                             placeholder="Cmaj7 Am7 Dm7 G7  (space or newline separated)" required></wa-textarea>
+                             placeholder="Cmaj7 Am7 Dm7 G7  (space or newline separated)"></wa-textarea>
             </div>
+            <div class="form-row" style="align-items:center">
+                <wa-checkbox name="useActiveSection" value="true">
+                    Use the active song section (top right) instead of the chords above
+                </wa-checkbox>
+            </div>
+            <p class="form-hint" style="margin:0.25rem 0 0">
+                When checked, chords, bars, and tuning come from the active song section's own chart —
+                the result can then be pushed straight back into that section.
+            </p>
             <div class="form-row">
                 <wa-input label="Solutions" name="solutions" type="number" value="1" min="1" max="5" style="width:110px"></wa-input>
                 <wa-input label="Min comfort %" name="minComfort" type="number" value="70" min="0" max="100" style="width:130px"></wa-input>
@@ -51,6 +62,7 @@
 
 <script>
     window.bindTuningSelect();
+    window.bindSongSelect();
 </script>
 
 @{

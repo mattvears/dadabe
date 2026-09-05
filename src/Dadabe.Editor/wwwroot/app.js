@@ -39,6 +39,19 @@ window.selectChordRow = function (el) {
     el.classList.add(el.classList.contains('chord-link') ? 'chord-link--active' : 'pred-row--active');
 };
 
+// Resolves which tuning a voicing lookup should use: while a song is active
+// its tuning owns the shape (the global select mirrors it, see the song
+// binding below), so that wins over any page-local tuning dropdown.
+window.resolveVoicingTuning = function (fallbackSelectId) {
+    var songSel = document.getElementById('global-song-select');
+    if (songSel && songSel.value) {
+        var globalTuningSel = document.getElementById('global-tuning-select');
+        if (globalTuningSel && globalTuningSel.value) { return globalTuningSel.value; }
+    }
+    var fallback = fallbackSelectId && document.getElementById(fallbackSelectId);
+    return (fallback && fallback.value) || 'DADABE';
+};
+
 // Pins a voicing-result row to the active song section (v0.5.2 §9). Reads
 // the row's static data via attributes (set server-side) and the dynamic
 // active song/section straight from the header selects.
@@ -64,6 +77,22 @@ window.pinVoicing = function (btn) {
     body.set('positions', btn.getAttribute('data-positions') || '[]');
 
     fetch('/api/songs/pin', { method: 'POST', body: body })
+        .then(function (r) { return r.text(); })
+        .then(function (html) { if (status) { status.innerHTML = html; } });
+};
+
+// Replaces a song section's pinned voicings with one voice-lead solution
+// (v0.5.3 bug #6). The slug/section/steps are baked into the button's
+// data attributes server-side, since the section that produced this
+// result may no longer be the active one by the time the user clicks.
+window.applyVoiceLead = function (btn) {
+    var status = btn.closest('wa-card') && btn.closest('wa-card').querySelector('.apply-status');
+    var body = new URLSearchParams();
+    body.set('slug', btn.getAttribute('data-slug') || '');
+    body.set('sectionId', btn.getAttribute('data-section') || '');
+    body.set('steps', btn.getAttribute('data-steps') || '[]');
+
+    fetch('/api/voiceleading/apply', { method: 'POST', body: body })
         .then(function (r) { return r.text(); })
         .then(function (html) { if (status) { status.innerHTML = html; } });
 };

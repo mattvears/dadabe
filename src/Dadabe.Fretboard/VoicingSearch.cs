@@ -262,7 +262,9 @@ public static class VoicingSearch
             fingering.Barres,
             lowestFret,
             hand.MaxSpan,
-            hand.MaxFret);
+            hand.MaxFret,
+            fingering.Assignments,
+            positions);
 
         output.Add(new Voicing(spec, tuning, hand, positions, fingering, structure, comfort, functions));
     }
