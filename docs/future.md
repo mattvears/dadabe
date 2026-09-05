@@ -10,6 +10,7 @@ Scheduled work has moved out of this file. See:
 
 What remains genuinely unscheduled:
 
+- The hand model should be fully customizable.
 - Harmonic transformations not covered by v0.5.2/v0.6: chromatic planing and parallel
   harmony. (Tritone substitution ships in v0.5.2; modal interchange, secondary dominants,
   diminished substitution, and negative harmony are scheduled for v0.6.)

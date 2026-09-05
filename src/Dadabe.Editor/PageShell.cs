@@ -43,14 +43,9 @@ public static class PageShell
                       hx-trigger="load"
                       hx-swap="innerHTML">
               </wa-select>
+              <span id="song-tuning-display" class="form-hint" style="display:none;"></span>
               <wa-button id="color-scheme-button" appearance="plain" aria-label="Toggle light/dark mode">🌓 Theme</wa-button>
             </header>
-            <wa-callout id="song-tuning-warning" variant="warning" style="display:none; margin: 0 1.5rem;">
-              <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-              The active tuning no longer matches <strong id="song-tuning-warning-name"></strong>'s tuning —
-              every pinned shape in this song was fingered for a different tuning.
-              <wa-button size="small" id="song-tuning-relock" appearance="outlined">Restore song tuning</wa-button>
-            </wa-callout>
             <main id="main-content" style="padding: 1.5rem; overflow-y: auto;">
               <div id="page-body">
         """;

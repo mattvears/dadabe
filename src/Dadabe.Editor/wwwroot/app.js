@@ -127,16 +127,15 @@ window.pinVoicing = function (btn) {
     };
 })();
 
-// Active song / section (v0.5.2 §8, D37/D38). Selecting a song sets the
-// active tuning to the song's tuning (D38) and shows a warning callout if
-// the user then changes tuning while a song is active — every pinned shape
-// in the song is meaningless in another tuning.
+// Active song / section (v0.5.2 §8, D37/D38). A song owns its tuning: while
+// a song is active, the global tuning select is hidden entirely (nothing to
+// choose — every pinned shape in the song is meaningless in another tuning)
+// and replaced with a plain text display of the song's own tuning.
 (function () {
     var SONG_KEY = 'dadabe-active-song';
     var SECTION_KEY = 'dadabe-active-section';
-    var songSel, sectionSel, warning, warningName, relockBtn, tuningSel;
+    var songSel, sectionSel, tuningSel, tuningDisplay;
     var activeSongTuning = null;
-    var activeSongName = null;
 
     function songField() { return document.getElementById('form-song'); }
     function sectionField() { return document.getElementById('form-section'); }
@@ -145,18 +144,6 @@ window.pinVoicing = function (btn) {
         var sf = songField(), ef = sectionField();
         if (sf) { sf.value = (songSel && songSel.value) || ''; }
         if (ef) { ef.value = (sectionSel && sectionSel.value) || ''; }
-    }
-
-    function hideWarning() { if (warning) { warning.style.display = 'none'; } }
-
-    function showWarningIfMismatched() {
-        if (!activeSongTuning || !tuningSel || !warning) { return; }
-        if (tuningSel.value && tuningSel.value !== activeSongTuning) {
-            if (warningName) { warningName.textContent = activeSongName || 'this song'; }
-            warning.style.display = '';
-        } else {
-            hideWarning();
-        }
     }
 
     function loadSections(slug, restoreId) {
@@ -190,11 +177,11 @@ window.pinVoicing = function (btn) {
         localStorage.setItem(SONG_KEY, slug || '');
         var opt = slug ? songSel.querySelector('wa-option[value="' + slug + '"]') : null;
         activeSongTuning = opt ? opt.getAttribute('data-tuning') : null;
-        activeSongName = opt ? opt.getAttribute('data-name') : null;
 
         if (!slug) {
+            if (tuningSel) { tuningSel.style.display = ''; }
+            if (tuningDisplay) { tuningDisplay.style.display = 'none'; }
             loadSections(null);
-            hideWarning();
             writeHiddenFields();
             return;
         }
@@ -202,7 +189,11 @@ window.pinVoicing = function (btn) {
         if (activeSongTuning && window.setActiveTuning) {
             window.setActiveTuning(activeSongTuning);
         }
-        hideWarning();
+        if (tuningSel) { tuningSel.style.display = 'none'; }
+        if (tuningDisplay) {
+            tuningDisplay.textContent = activeSongTuning || '(tuning not set)';
+            tuningDisplay.style.display = '';
+        }
         loadSections(slug, localStorage.getItem(SECTION_KEY));
     }
 
@@ -223,9 +214,7 @@ window.pinVoicing = function (btn) {
         songSel = document.getElementById('global-song-select');
         sectionSel = document.getElementById('global-section-select');
         tuningSel = document.getElementById('global-tuning-select');
-        warning = document.getElementById('song-tuning-warning');
-        warningName = document.getElementById('song-tuning-warning-name');
-        relockBtn = document.getElementById('song-tuning-relock');
+        tuningDisplay = document.getElementById('song-tuning-display');
         if (!songSel) { return; }
 
         songSel.removeEventListener('change', onSongChange);
@@ -237,24 +226,9 @@ window.pinVoicing = function (btn) {
             sectionSel.removeEventListener('change', onSectionChange);
             sectionSel.addEventListener('change', onSectionChange);
         }
-        if (tuningSel) {
-            tuningSel.removeEventListener('change', showWarningIfMismatched);
-            tuningSel.addEventListener('change', showWarningIfMismatched);
-        }
-        if (relockBtn) {
-            relockBtn.removeEventListener('click', relock);
-            relockBtn.addEventListener('click', relock);
-        }
 
         restore();
     };
-
-    function relock() {
-        if (activeSongTuning && window.setActiveTuning) {
-            window.setActiveTuning(activeSongTuning);
-        }
-        hideWarning();
-    }
 
     document.addEventListener('DOMContentLoaded', function () { window.bindSongSelect(); });
 })();
