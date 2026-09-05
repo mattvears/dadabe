@@ -87,15 +87,24 @@ See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ### Build and run
 
+**CLI:**
+
 ```sh
 dotnet build
 dotnet run --project src/Dadabe.Cli -- voicings Cmaj7 --tuning DADABE --pretty
 ```
 
-For the full picture — building/running the Editor web UI, running the test
-suite, schema validation, and (for the Editor) how to point it at a scratch
-data directory instead of the tracked sample data — see
-[docs/development.md](docs/development.md).
+**Editor (web UI):**
+
+```sh
+dotnet run --project src/Dadabe.Editor -- --urls http://localhost:5299
+```
+
+Then navigate to `http://localhost:5299`.
+
+For the full picture — running the test suite, schema validation, and how to
+point the Editor at a scratch data directory instead of the tracked sample data —
+see [docs/development.md](docs/development.md).
 
 Four subcommands ship:
 
