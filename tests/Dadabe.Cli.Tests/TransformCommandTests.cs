@@ -37,7 +37,7 @@ public class TransformCommandTests
         var doc = JsonDocument.Parse(json);
         var results = doc.RootElement.GetProperty("data").GetProperty("results");
 
-        results.GetArrayLength().Should().Be(11);
+        results.GetArrayLength().Should().Be(15);
 
         var unplayableCounts = results.EnumerateArray()
             .Select(r => r.TryGetProperty("playability", out var p)

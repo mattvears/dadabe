@@ -161,21 +161,16 @@ public sealed class InvertTransform : ITransformation
 
         var results = chords.Select(chord =>
         {
-            var mirroredRootPc = (2 * axisPc) - chord.Root.PitchClass.Value;
-            var newRoot = Note.Spell(mirroredRootPc, chord.Root.Letter);
-
-            Note? newBass = null;
-            if (chord.Bass is { } bass)
-            {
-                var mirroredBassPc = (2 * axisPc) - bass.PitchClass.Value;
-                newBass = Note.Spell(mirroredBassPc, bass.Letter);
-            }
-
+            var newRoot = MirrorRoot(chord.Root, axisPc);
+            var newBass = chord.Bass is { } bass ? MirrorRoot(bass, axisPc) : (Note?)null;
             return chord with { Root = newRoot, Bass = newBass };
         });
 
         return new TransformResult(results.Select(c => c.ToSymbol()).ToArray(), [], Invertible: true);
     }
+
+    /// <summary>Mirrors a root about a pitch-class axis, respelled toward the original letter (D47). Shared with <c>negative-harmony</c> (D51).</summary>
+    internal static Note MirrorRoot(Note root, int axisPc) => Note.Spell((2 * axisPc) - root.PitchClass.Value, root.Letter);
 }
 
 /// <summary><c>interval-negate</c> (D49): negates the root-motion intervals. Its own inverse.</summary>

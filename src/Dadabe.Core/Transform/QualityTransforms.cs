@@ -74,36 +74,6 @@ public sealed class QualityMapTransform : ITransformation
 /// </summary>
 public sealed class ReduceTransform : ITransformation
 {
-    // DisplayName -> (triad core, seventh core).
-    private static readonly Dictionary<string, (string Triad, string Seventh)> CoreByQuality = new(StringComparer.Ordinal)
-    {
-        ["maj7"] = ("", "maj7"),
-        ["maj9"] = ("", "maj7"),
-        ["maj11"] = ("", "maj7"),
-        ["maj13"] = ("", "maj7"),
-        ["maj"] = ("", "maj"),
-        [""] = ("", ""),
-        ["m"] = ("m", "m"),
-        ["m6"] = ("m", "m7"),
-        ["m7"] = ("m", "m7"),
-        ["m9"] = ("m", "m7"),
-        ["m11"] = ("m", "m7"),
-        ["m13"] = ("m", "m7"),
-        ["mMaj7"] = ("m", "mMaj7"),
-        ["6"] = ("", "7"),
-        ["7"] = ("", "7"),
-        ["9"] = ("", "7"),
-        ["11"] = ("", "7"),
-        ["13"] = ("", "7"),
-        ["m7b5"] = ("dim", "m7b5"),
-        ["dim7"] = ("dim", "dim7"),
-        ["dim"] = ("dim", "dim"),
-        ["aug"] = ("aug", "aug"),
-        ["sus4"] = ("sus4", "sus4"),
-        ["sus2"] = ("sus2", "sus2"),
-        ["5"] = ("5", "5"),
-    };
-
     public string Id => "reduce";
     public string DisplayName => "Reduce";
     public bool IsInvertible => false;
@@ -121,7 +91,7 @@ public sealed class ReduceTransform : ITransformation
         for (var i = 0; i < chords.Count; i++)
         {
             var chord = chords[i];
-            if (!CoreByQuality.TryGetValue(chord.Quality, out var core))
+            if (!ChordApproximation.CoreByQuality.TryGetValue(chord.Quality, out var core))
             {
                 notes.Add(new TransformNote(i, "skipped", $"'{chord.ToSymbol()}' has no known reduction core."));
                 results.Add(chord);
@@ -158,7 +128,7 @@ public sealed class TritoneSubTransform : ITransformation
 
     public TransformResult Apply(IReadOnlyList<ChordSymbol> chords, IReadOnlyDictionary<string, object> parameters)
     {
-        var positions = ParsePositions(parameters, chords.Count);
+        var positions = TransformParams.GetPositions(parameters, chords.Count);
         var notes = new List<TransformNote>();
         var results = new List<ChordSymbol>(chords.Count);
 
@@ -189,18 +159,6 @@ public sealed class TritoneSubTransform : ITransformation
         }
 
         return new TransformResult(results.Select(c => c.ToSymbol()).ToArray(), notes, Invertible: true);
-    }
-
-    private static HashSet<int> ParsePositions(IReadOnlyDictionary<string, object> parameters, int count)
-    {
-        var raw = TransformParams.GetString(parameters, "positions");
-        if (string.IsNullOrEmpty(raw))
-        {
-            return [.. Enumerable.Range(0, count)];
-        }
-        return raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(int.Parse)
-            .ToHashSet();
     }
 }
 

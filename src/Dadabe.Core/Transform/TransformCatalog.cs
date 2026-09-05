@@ -31,6 +31,10 @@ public sealed class TransformCatalog : IEnumerable<ITransformation>
         new ReduceTransform(),
         new TritoneSubTransform(grammar),
         new PlrTransform(),
+        new DiatonicTransposeTransform(grammar),
+        new ParallelModeTransform(grammar),
+        new SubstituteTransform(grammar),
+        new NegativeHarmonyTransform(grammar),
     ];
 
     public int Count => _byId.Count;
@@ -57,8 +61,10 @@ public static class TransformChain
         TransformCatalog catalog,
         ChordParser parser,
         IReadOnlyList<string> chords,
-        IReadOnlyList<TransformStep> steps)
+        IReadOnlyList<TransformStep> steps,
+        TransformRequestOptions? options = null)
     {
+        var opts = options ?? TransformRequestOptions.Default;
         var current = chords.Select(parser.Parse).ToArray();
         var notes = new List<TransformNote>();
         var invertible = true;
@@ -66,12 +72,32 @@ public static class TransformChain
         foreach (var step in steps)
         {
             var transform = catalog[step.Type];
-            var result = transform.Apply(current, step.Params);
+            var result = transform.Apply(current, MergeRequestOptions(step.Params, opts));
             notes.AddRange(result.Notes);
             invertible &= result.Invertible;
             current = result.Chords.Select(parser.Parse).ToArray();
         }
 
         return new TransformResult(current.Select(c => c.ToSymbol()).ToArray(), notes, invertible);
+    }
+
+    /// <summary>
+    /// Request-level "strictness"/"key" always win over anything already in
+    /// step.Params for those two reserved keys — D54 rejected a per-step
+    /// policy specifically so it can't be overridden per step. Key-blind
+    /// transforms never read either key and are unaffected.
+    /// </summary>
+    private static Dictionary<string, object> MergeRequestOptions(
+        IReadOnlyDictionary<string, object> stepParams, TransformRequestOptions opts)
+    {
+        var merged = new Dictionary<string, object>(stepParams, StringComparer.Ordinal)
+        {
+            ["strictness"] = opts.Strictness == Strictness.Strict ? "strict" : "loose",
+        };
+        if (opts.KeyOverride is { } key)
+        {
+            merged["key"] = KeyAwareTransform.FormatKey(key.RootPc, key.IsMinor);
+        }
+        return merged;
     }
 }

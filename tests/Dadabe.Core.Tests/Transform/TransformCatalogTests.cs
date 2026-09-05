@@ -13,14 +13,16 @@ public class TransformCatalogTests
     private static ChordSymbol[] ParseAll(params string[] symbols) => symbols.Select(Parser.Parse).ToArray();
 
     [Fact]
-    public void Catalog_contains_all_eleven_key_blind_transforms()
+    public void Catalog_contains_all_eleven_key_blind_transforms_plus_the_key_aware_family()
     {
         var ids = Catalog.Select(t => t.Id).ToArray();
         ids.Should().BeEquivalentTo([
             "transpose", "retrograde", "rotate", "invert",
             "interval-negate", "interval-reverse", "interval-multiply",
             "quality-map", "reduce", "tritone-sub", "plr",
+            "diatonic-transpose", "parallel-mode", "substitute", "negative-harmony",
         ]);
+        Catalog.Count.Should().Be(15);
     }
 
     [Fact]
@@ -93,6 +95,9 @@ public class TransformCatalogTests
         "reduce" => new() { ["level"] = "triad" },
         "tritone-sub" => new(),
         "plr" => new() { ["op"] = "P" },
+        "diatonic-transpose" => new() { ["by"] = 1 },
+        "parallel-mode" => new() { ["mode"] = "mixolydian" },
+        "negative-harmony" => new() { ["axis"] = "C" },
         _ => [],
     };
 }

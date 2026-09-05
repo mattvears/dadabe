@@ -133,6 +133,7 @@ public static class TransformCommand
         "invert" => new() { ["axis"] = "C" },
         "quality-map" => new() { ["to"] = "m7" },
         "plr" => new() { ["op"] = "P" },
+        "parallel-mode" => new() { ["mode"] = "mixolydian" },
         _ => new(),
     };
 
@@ -146,6 +147,10 @@ public static class TransformCommand
         "tritone-sub" => "positions",
         "plr" => "op",
         "interval-multiply" => "factor",
+        "diatonic-transpose" => "by",
+        "parallel-mode" => "mode",
+        "substitute" => "variant",
+        "negative-harmony" => "axis",
         _ => throw new FormatException($"Transform '{type}' does not accept a single positional argument; use k=v."),
     };
 

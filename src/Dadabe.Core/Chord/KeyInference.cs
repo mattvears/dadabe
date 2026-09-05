@@ -9,8 +9,11 @@ public static class KeyInference
     // Diatonic pitch-class sets for all 24 major/minor keys.
     // Major: W W H W W W H  (2 2 1 2 2 2 1 semitones)
     // Natural minor: W H W W H W W
-    private static readonly int[] MajorIntervals = [0, 2, 4, 5, 7, 9, 11];
-    private static readonly int[] MinorIntervals = [0, 2, 3, 5, 7, 8, 10];
+    // internal (not private): DiatonicModes and ScaleTriads (D47 parallel-mode /
+    // diatonic-transpose) share this canonical major/minor scale data rather
+    // than duplicating the semitone tables.
+    internal static readonly int[] MajorIntervals = [0, 2, 4, 5, 7, 9, 11];
+    internal static readonly int[] MinorIntervals = [0, 2, 3, 5, 7, 8, 10];
 
     /// <summary>
     /// Infer the key from context chords.
