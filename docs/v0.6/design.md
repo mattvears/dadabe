@@ -15,14 +15,15 @@ is here for one of four reasons, and every entry below names which:
 - **[EXP]** — genuinely expensive: a new solver mode, a new entity, or a cross-cutting
   display change.
 
-The two anchor decisions for this release are §1 and §2. Neither is large to implement;
-both are large to *decide*, which is exactly why they are not in v0.5.2.
+The two anchor decisions for this release are §1 and §2 — both now resolved. Neither is
+large to implement; both were large to *decide*, which is exactly why they were not in
+v0.5.2.
 
 Decisions continue from D53. New decisions here are numbered D54+.
 
 ---
 
-## 1. Settle the strictness policy (D54) — [OQ]
+## 1. Strictness policy (D54) — Resolved: `loose` by default
 
 *Transforms open question 3.*
 
@@ -41,21 +42,24 @@ where approximation is often what the user actually wants.
 | `strict` | Skip anything the transform cannot express exactly; report every skip |
 | `loose` | Approximate (nearest diatonic, triad-reduce then re-extend) and flag every approximation |
 
-A single setting on the request, defaulting to `strict`, surfaced in the transform panel.
-The alternative — a per-transform policy — was rejected because users cannot predict it and
-because it multiplies the test matrix by the size of the catalogue.
+A single setting on the request, surfaced in the transform panel. The alternative — a
+per-transform policy — was rejected because users cannot predict it and because it
+multiplies the test matrix by the size of the catalogue.
 
-**This blocks §3 and §4.** Do it first.
+**Resolved: defaults to `loose`.** Approximation is what most users reaching for a
+key-aware transform actually want; `strict` remains available but is not the default,
+which reverses the leaning stated earlier in this section.
 
-## 2. Out-of-key chord policy (D46) — [OQ, KEY]
+**This blocked §3 and §4; both are now unblocked on this decision.**
+
+## 2. Out-of-key chord policy (D46) — [KEY] — Resolved
 
 Every key-aware transform must answer: what happens to a chord that is not in the key?
 
-`progression-transforms.md` proposes **chromatic-transpose, leave quality alone** as the
-default, on the grounds that a borrowed chord was usually a deliberate choice and its
-colour should survive. That is almost certainly right, but it interacts with D54 and needs
-to be visible in the diff rather than silent — a policy the user cannot see produces
-results they cannot explain.
+**Resolved: chromatic-transpose, leave quality alone** is the default, on the grounds that
+a borrowed chord was usually a deliberate choice and its colour should survive. This must
+be visible in the diff rather than silent — a policy the user cannot see produces results
+they cannot explain.
 
 Also required here: the **degradation path**. `KeyInference.InferKey` returns null below
 50% coverage, and for a modal or chromatic progression that is the correct answer. Every
@@ -152,7 +156,9 @@ This is why it is not simply "more transforms":
 - **The diff preview** (v0.5.2 §7) aligns original and result by index. Length changes
   break that; it needs an alignment view showing insertions and deletions.
 - **Song slots** carry `bars`. Inserting a chord has to split a slot's bars or push the
-  section longer, and neither is obviously right. Needs a harmonic-rhythm decision.
+  section longer, and neither is obviously right. **Resolved: split the target slot's
+  existing bars** across the inserted chord(s) — section length stays fixed, which keeps
+  form (§5) and loop closure (§6) math stable.
 - **Voice-lead fill** re-runs over a different chord count, so pinned slots have to be
   re-anchored by identity rather than by index.
 
@@ -160,7 +166,7 @@ Ship §3 before §4.
 
 ---
 
-## 5. Song arrangement / form (D40) — [OQ, DEP]
+## 5. Song arrangement / form (D40) — [DEP] — Resolved
 
 *Song-mode open question 2, answered: not v0.5.2.*
 
@@ -168,12 +174,17 @@ Sections as shipped are definitions. How a song actually goes is a sequence of r
 with repeats:
 
 ```
-form: [Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus ×2, Outro]
+form: [Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus, Chorus, Outro]
 ```
 
 Reusing a section rather than duplicating its chords is how charts are written. v0.5.2's
 chart iterates sections in definition order and was built so that adding a form list
 changes only that iteration.
+
+**Resolved: a flat list of section references, each repeat as its own entry** — no `×2`
+count syntax. Simplest to implement against v0.5.2's definition-order chart iteration;
+rendering "Chorus ×2" is a display-time compression of adjacent identical entries, not a
+data-model concern.
 
 What form unlocks, all of which is blocked on it:
 
@@ -213,18 +224,17 @@ Two distinct operations that users will conflate, and that must not be conflated
 Transpose is *"re-learn it in a new key"*; capo is *"play the same shapes higher"*. Anyone
 who plays for a singer will be annoyed if these share a control.
 
-## 8. Retune flow (D55) — [OQ, DEP]
+## 8. Retune flow (D55) — [DEP] — Resolved
 
 *Song-mode open question 3.*
 
 v0.5.2 locks a song's tuning after creation because changing it silently invalidates every
-pinned shape. The proposed answer: an explicit **"retune this song"** action that
-invalidates all pins, keeps every chord symbol, and offers the §5.2 fill to repin
-everything at once.
+pinned shape. **Resolved:** an explicit **"retune this song"** action that invalidates all
+pins, keeps every chord symbol, and offers the §5.2 fill to repin everything at once.
 
 Shared by §7's transpose, which has the same invalidate-and-refill shape. Build it once.
 
-## 9. Slot-inline voicing search (D56) — [OQ]
+## 9. Slot-inline voicing search (D56) — Resolved
 
 *Song-mode open question 1.*
 
@@ -234,8 +244,9 @@ the song's tuning and `SongHand`, with the slot's neighbours known so candidates
 motion cost as well as comfort.
 
 It is a better workflow and a bigger build, and it changes where voicing search *lives* in
-the app rather than adding to it. Decide whether it replaces the voicings tab for song work
-or coexists with it before building either.
+the app rather than adding to it. **Resolved: it coexists with the voicings tab** — the tab
+stays for general lookup/comparison, and slot-inline search is a second, scoped entry point
+for in-song editing.
 
 Subsumes the **alternatives drawer** (§5.3): candidates for a slot, ranked by comfort *and*
 motion cost to actual neighbours, swappable in place with the section re-scoring live. The
@@ -269,8 +280,10 @@ playability filter and auto-pin are the new work.
 - **Scale and mode suggestion.** Given the inferred key and the reference catalogs, list
   the scales whose pitch-class set covers a section's chord tones — "Verse: A dorian, A
   natural minor". The most-asked question about any song a guitarist is learning, and both
-  halves are on disk. Needs a coverage criterion (subset? threshold?) and a catalog audit,
-  which is the design work.
+  halves are on disk. **Resolved: full subset match** — a scale is suggested only if every
+  chord tone in the section is contained in its pitch-class set. Stricter and fewer false
+  positives, at the cost of one passing chromatic tone excluding an otherwise-obvious
+  scale. Still needs the catalog audit, which is the remaining design work.
 - **Cadence detection.** Match each section's tail against `CadenceModel.ExampleProgression`
   transposed to the inferred key: "Chorus ends on a deceptive cadence." Also the
   before/after annotation for transforms — retrograde in particular, since `[C,F,G]`
