@@ -107,10 +107,10 @@ public static class JsonEnvelope
 
         var schemaFile = command switch
         {
-            "predict"    => "prediction-result.schema.json",
+            "predict" => "prediction-result.schema.json",
             "voice-lead" => "voice-lead-result.schema.json",
-            "transform"  => "transform-result.schema.json",
-            _            => "envelope.schema.json",
+            "transform" => "transform-result.schema.json",
+            _ => "envelope.schema.json",
         };
         var schema = LoadSchema(schemaFile, workingDirectory);
 

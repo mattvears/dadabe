@@ -1,4 +1,4 @@
-﻿using Dadabe.Core.Chord;
+using Dadabe.Core.Chord;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
 using Dadabe.Fretboard;

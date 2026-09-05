@@ -1,14 +1,12 @@
 # Future work
 
-Scheduled work has moved out of this file. See:
+## v0.6
 
-- `docs/v0.5.2/design.md` — transform engine (key-blind family, playability ranking),
-  song mode foundation, chord diagram rendering.
 - `docs/v0.6/design.md` — key-aware transforms (modal interchange / parallel mode,
   secondary dominants, negative harmony, functional substitution), song arrangement,
   transposition and capo, setlists.
 
-What remains genuinely unscheduled:
+## Unscheduled
 
 - The hand model should be fully customizable.
 - Harmonic transformations not covered by v0.5.2/v0.6: chromatic planing and parallel

@@ -45,7 +45,7 @@ public class TransitionTests
         voicings.Length.Should().BeGreaterThanOrEqualTo(2);
 
         var moves = Array.Empty<VoiceMove>();
-        var forward  = new Transition(voicings[0], voicings[1], moves, 0);
+        var forward = new Transition(voicings[0], voicings[1], moves, 0);
         var backward = new Transition(voicings[1], voicings[0], moves, 0);
 
         forward.ContentHash.Should().NotBe(backward.ContentHash);
@@ -96,7 +96,7 @@ public class TransitionTests
     {
         var voicings = GetVoicings("Dm7", take: 5);
         for (int i = 0; i < voicings.Length; i++)
-        for (int j = 0; j < voicings.Length; j++)
-            VoiceLeadSolver.TotalFretDistance(voicings[i], voicings[j]).Should().BeGreaterThanOrEqualTo(0);
+            for (int j = 0; j < voicings.Length; j++)
+                VoiceLeadSolver.TotalFretDistance(voicings[i], voicings[j]).Should().BeGreaterThanOrEqualTo(0);
     }
 }

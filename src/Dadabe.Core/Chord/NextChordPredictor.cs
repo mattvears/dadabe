@@ -51,9 +51,9 @@ public static class NextChordPredictor
                     var rel = KeyInference.Classify(rawCandidates[i].Symbol, inferred.Value, lastRootPc);
                     scores[i] *= rel switch
                     {
-                        CandidateRelationship.Diatonic         => 1.4,
+                        CandidateRelationship.Diatonic => 1.4,
                         CandidateRelationship.ValidNonDiatonic => 1.0,
-                        _                                       => 0.7,
+                        _ => 0.7,
                     };
                 }
             }

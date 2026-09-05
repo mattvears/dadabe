@@ -3,6 +3,7 @@
   "language": "en",
   "words": [
     "aeolian",
+    "afterbegin",
     "Bdim",
     "beercss",
     "behaviour",
@@ -33,6 +34,8 @@
     "neighbours",
     "normalises",
     "normalising",
+    "nums",
+    "onclick",
     "Pachelbel",
     "Pavement",
     "plr",
@@ -58,7 +61,8 @@
     "unparseable",
     "unpinned",
     "voicing",
-    "voicings"
+    "voicings",
+    "xmark"
   ],
   "ignorePaths": [
     "node_modules/**",

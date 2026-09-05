@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
 using Dadabe.Fretboard;
@@ -47,8 +47,8 @@ public static class TuningRoutes
 
         app.MapPost("/api/tunings", async (HttpRequest req, TuningService svc) =>
         {
-            var form    = await req.ReadFormAsync();
-            var name    = form["name"].ToString();
+            var form = await req.ReadFormAsync();
+            var name = form["name"].ToString();
             var strings = form["strings"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
 
             var (ok, error) = svc.Create(name, strings);
@@ -60,8 +60,8 @@ public static class TuningRoutes
 
         app.MapPut("/api/tunings/{slug}", async (string slug, HttpRequest req, TuningService svc) =>
         {
-            var form    = await req.ReadFormAsync();
-            var name    = form["name"].ToString();
+            var form = await req.ReadFormAsync();
+            var name = form["name"].ToString();
             var strings = form["strings"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
 
             var (ok, error) = svc.Update(slug, name, strings);

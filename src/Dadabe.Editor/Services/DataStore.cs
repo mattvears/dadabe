@@ -33,12 +33,12 @@ public sealed class DataStore
     }
 
     public string ProgressionsDir => Path.Combine(Root, "progressions");
-    public string TuningsDir      => Path.Combine(Root, "tunings");
-    public string PredictionsDir  => Path.Combine(Root, "predictions");
-    public string CadencesDir     => Path.Combine(Root, "reference", "cadences");
-    public string ModesDir        => Path.Combine(Root, "reference", "modes");
-    public string ScalesDir       => Path.Combine(Root, "reference", "scales");
-    public string SongsDir        => Path.Combine(Root, "songs");
+    public string TuningsDir => Path.Combine(Root, "tunings");
+    public string PredictionsDir => Path.Combine(Root, "predictions");
+    public string CadencesDir => Path.Combine(Root, "reference", "cadences");
+    public string ModesDir => Path.Combine(Root, "reference", "modes");
+    public string ScalesDir => Path.Combine(Root, "reference", "scales");
+    public string SongsDir => Path.Combine(Root, "songs");
     public string VoicingCategoriesFile => Path.Combine(Root, "reference", "voicing-categories.json");
 
     public IReadOnlyList<T> LoadAll<T>(string dir) where T : ISlugged

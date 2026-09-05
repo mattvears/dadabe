@@ -1,0 +1,696 @@
+{
+  "slug": "only-love-can-break-your-heart",
+  "name": "Only Love Can Break Your Heart",
+  "tuning": "STANDARD",
+  "sections": [
+    {
+      "id": "84e1207c",
+      "name": "Intro",
+      "slots": [
+        {
+          "symbol": "A7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 77,
+            "structure": "shell"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "D",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 77,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "G",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 96,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "A",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 72,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "A7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 77,
+            "structure": "shell"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "D",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 77,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "G",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 96,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "A",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 72,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6c00ab07",
+      "name": "Chorus",
+      "slots": [
+        {
+          "symbol": "A7",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 77,
+            "structure": "shell"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "G",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 12,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 96,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "F#m",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 87,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "Em",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 8,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 87,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "G6",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 8,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 87,
+            "structure": "spread"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        },
+        {
+          "symbol": "A",
+          "bars": 1,
+          "voicing": {
+            "positions": [
+              {
+                "string": 0,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 1,
+                "muted": true,
+                "open": false
+              },
+              {
+                "string": 2,
+                "fret": 11,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 3,
+                "fret": 9,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 4,
+                "fret": 10,
+                "muted": false,
+                "open": false
+              },
+              {
+                "string": 5,
+                "muted": true,
+                "open": false
+              }
+            ],
+            "comfortPct": 72,
+            "structure": "triad"
+          },
+          "pinnedUnder": {
+            "modelVersion": 1,
+            "tuning": "STANDARD",
+            "handHash": "hand-model:1:b752495652ff64052ca2bfeb2eb85795"
+          }
+        }
+      ]
+    },
+    {
+      "id": "96af5d62",
+      "name": "Verse",
+      "slots": []
+    }
+  ]
+}

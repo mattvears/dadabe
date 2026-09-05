@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 namespace Dadabe.Editor.Services;
 
 public sealed record TuningModel(
-    [property: JsonPropertyName("slug")]    string Slug,
-    [property: JsonPropertyName("name")]    string Name,
+    [property: JsonPropertyName("slug")] string Slug,
+    [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("strings")] List<string> Strings) : ISlugged;
 
 public sealed class TuningService(DataStore store)

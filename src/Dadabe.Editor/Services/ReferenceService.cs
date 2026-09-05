@@ -4,27 +4,27 @@ using System.Text.Json.Serialization;
 namespace Dadabe.Editor.Services;
 
 public sealed record CadenceModel(
-    [property: JsonPropertyName("slug")]               string Slug,
-    [property: JsonPropertyName("type")]               string Type,
-    [property: JsonPropertyName("resolution")]         string? Resolution,
+    [property: JsonPropertyName("slug")] string Slug,
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("resolution")] string? Resolution,
     [property: JsonPropertyName("exampleProgression")] List<string> ExampleProgression,
-    [property: JsonPropertyName("description")]        string? Description) : ISlugged;
+    [property: JsonPropertyName("description")] string? Description) : ISlugged;
 
 public sealed record ModeModel(
-    [property: JsonPropertyName("slug")]        string Slug,
-    [property: JsonPropertyName("name")]        string Name,
-    [property: JsonPropertyName("intervals")]   List<int> Intervals,
+    [property: JsonPropertyName("slug")] string Slug,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("intervals")] List<int> Intervals,
     [property: JsonPropertyName("parentScale")] string? ParentScale,
     [property: JsonPropertyName("degreeIndex")] int? DegreeIndex,
-    [property: JsonPropertyName("noteNames")]   List<string>? NoteNames,
+    [property: JsonPropertyName("noteNames")] List<string>? NoteNames,
     [property: JsonPropertyName("description")] string? Description) : ISlugged;
 
 public sealed record ScaleModel(
-    [property: JsonPropertyName("slug")]        string Slug,
-    [property: JsonPropertyName("name")]        string Name,
-    [property: JsonPropertyName("notes")]       List<string> Notes,
-    [property: JsonPropertyName("intervals")]   List<int> Intervals,
-    [property: JsonPropertyName("modeOf")]      string? ModeOf,
+    [property: JsonPropertyName("slug")] string Slug,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("notes")] List<string> Notes,
+    [property: JsonPropertyName("intervals")] List<int> Intervals,
+    [property: JsonPropertyName("modeOf")] string? ModeOf,
     [property: JsonPropertyName("description")] string? Description) : ISlugged;
 
 public sealed class ReferenceService(DataStore store)

@@ -12,10 +12,10 @@ public sealed record TransformStepDto(
     [property: JsonPropertyName("params")] Dictionary<string, string> Params);
 
 public sealed record ProgressionModel(
-    [property: JsonPropertyName("slug")]   string Slug,
-    [property: JsonPropertyName("name")]   string Name,
+    [property: JsonPropertyName("slug")] string Slug,
+    [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("chords")] List<string> Chords,
-    [property: JsonPropertyName("tempo")]  int? Tempo,
+    [property: JsonPropertyName("tempo")] int? Tempo,
     [property: JsonPropertyName("derivedFrom")] DerivedFrom? DerivedFrom = null) : ISlugged;
 
 public sealed class ProgressionService(DataStore store)

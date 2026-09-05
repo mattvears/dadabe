@@ -1,10 +1,10 @@
 using System.Collections.Immutable;
-using Microsoft.Extensions.Primitives;
 using Dadabe.Core.Chord;
 using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
 using Dadabe.Fretboard;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 
 namespace Dadabe.Editor.Routes;
 
@@ -43,7 +43,7 @@ public static class VoicingRoutes
             var minComfort = minComfortPct / 100.0;
 
             var spec = expander.Expand(symbol);
-            var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default,
+            var set = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default,
                 searchParams, catalogs.VoicingCategories);
 
             var voicings = set.Voicings;
@@ -83,17 +83,17 @@ public static class VoicingRoutes
             [FromServices] ChordParser parser,
             [FromServices] ChordExpander expander) =>
         {
-            var form        = await req.ReadFormAsync();
-            var chord       = form["chord"].ToString().Trim();
-            var tuning      = form["tuning"].ToString().Trim();
+            var form = await req.ReadFormAsync();
+            var chord = form["chord"].ToString().Trim();
+            var tuning = form["tuning"].ToString().Trim();
             var tuningLabel = ResolveLabel(form["tuningName"].ToString(), tuning, catalogs);
-            var limit       = int.TryParse(form["limit"],      out var l)  ? l  : 200;
-            var topN        = int.TryParse(form["topN"],       out var n)  ? n  : 0;
-            var entropy     = double.TryParse(form["entropy"],
+            var limit = int.TryParse(form["limit"], out var l) ? l : 200;
+            var topN = int.TryParse(form["topN"], out var n) ? n : 0;
+            var entropy = double.TryParse(form["entropy"],
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out var e) ? e : 0.5;
             var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 0;
-            var minComfort  = minComfortPct / 100.0;
+            var minComfort = minComfortPct / 100.0;
 
             var searchParams = BuildSearchParams(key => form[key]);
 
@@ -117,12 +117,12 @@ public static class VoicingRoutes
             }
 
             var spec = expander.Expand(symbol);
-            var set  = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default, searchParams, catalogs.VoicingCategories);
+            var set = VoicingSearch.Search(spec, resolvedTuning, HandModel.Default, searchParams, catalogs.VoicingCategories);
 
             var voicings = set.Voicings;
             if (minComfort > 0.0)
                 voicings = voicings.Where(v => v.Comfort >= minComfort).ToImmutableArray();
-            var total    = voicings.Length;
+            var total = voicings.Length;
             if (limit > 0 && voicings.Length > limit)
                 voicings = voicings[..limit];
 
@@ -187,11 +187,11 @@ public static class VoicingRoutes
     public static SearchParams BuildSearchParams(Func<string, StringValues> get)
     {
         var d = SearchParams.Default;
-        var frets      = int.TryParse(get("frets"),      out var fr) ? fr : d.MaxFret;
-        var span       = int.TryParse(get("span"),       out var sp) ? sp : d.MaxSpan;
-        var minStr     = int.TryParse(get("minStrings"), out var mn) ? mn : d.MinStrings;
-        var maxStr     = int.TryParse(get("maxStrings"), out var mx) ? mx : d.MaxStrings;
-        var allowOpen  = get("allowOpen").Contains("true");
+        var frets = int.TryParse(get("frets"), out var fr) ? fr : d.MaxFret;
+        var span = int.TryParse(get("span"), out var sp) ? sp : d.MaxSpan;
+        var minStr = int.TryParse(get("minStrings"), out var mn) ? mn : d.MinStrings;
+        var maxStr = int.TryParse(get("maxStrings"), out var mx) ? mx : d.MaxStrings;
+        var allowOpen = get("allowOpen").Contains("true");
         var allowBarre = get("allowBarre").Contains("true");
         var allowThumb = get("allowThumb").Contains("true");
         var requireRoot = get("requireRoot").Contains("true");
@@ -233,13 +233,13 @@ public static class VoicingRoutes
         var prefix = function[..i];
         var roman = function[i..] switch
         {
-            "1"       => "I",
-            "2" or "9"  => "II",
-            "3"       => "III",
+            "1" => "I",
+            "2" or "9" => "II",
+            "3" => "III",
             "4" or "11" => "IV",
-            "5"       => "V",
+            "5" => "V",
             "6" or "13" => "VI",
-            "7"       => "VII",
+            "7" => "VII",
             var other => other,
         };
         return prefix + roman;

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:webawesome.com)",
+      "Bash(rtk ls *)",
+      "Bash(rtk *)",
+      "Bash(rtk find *)",
+      "Bash(cd *)",
+      "Bash(npx *)",
+      "Bash(npm ls *)",
+      "Read(//c/tmp/**)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Read(//tmp/**)",
+      "Bash(taskkill //F //IM dadabe-editor.exe)",
+      "Bash(powershell *)",
+      "Bash(python3 -c ' *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)"
+    ]
+  }
+}

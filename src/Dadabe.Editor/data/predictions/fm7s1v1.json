@@ -5,5 +5,5 @@
   "context": "s1v1",
   "filters": [],
   "maxResults": 20,
-  "entropy": 0.8
+  "entropy": 0.2
 }

@@ -69,10 +69,10 @@ public class ChordParserTests
     }
 
     [Theory]
-    [InlineData("C/G",      Letter.C, 0, "",     Letter.G, 0)]
-    [InlineData("Cmaj7/E",  Letter.C, 0, "maj7", Letter.E, 0)]
-    [InlineData("Fmaj7/A",  Letter.F, 0, "maj7", Letter.A, 0)]
-    [InlineData("C/Bb",     Letter.C, 0, "",     Letter.B, -1)]
+    [InlineData("C/G", Letter.C, 0, "", Letter.G, 0)]
+    [InlineData("Cmaj7/E", Letter.C, 0, "maj7", Letter.E, 0)]
+    [InlineData("Fmaj7/A", Letter.F, 0, "maj7", Letter.A, 0)]
+    [InlineData("C/Bb", Letter.C, 0, "", Letter.B, -1)]
     public void Slash_chords_parse_root_quality_and_bass(
         string input, Letter root, int acc, string quality, Letter bassLetter, int bassAcc)
     {
@@ -136,7 +136,7 @@ public class ChordParserTests
     }
 
     [Theory]
-    [InlineData("C5",  Letter.C, 0)]
+    [InlineData("C5", Letter.C, 0)]
     [InlineData("F#5", Letter.F, 1)]
     [InlineData("Bb5", Letter.B, -1)]
     public void Power_chords_parse_to_the_fifth_form(string input, Letter letter, int accidental)
@@ -150,8 +150,8 @@ public class ChordParserTests
 
     [Theory]
     [InlineData("Cm7b5", "m7b5")]
-    [InlineData("C7b5",  "7")]
-    [InlineData("C7#5",  "7")]
+    [InlineData("C7b5", "7")]
+    [InlineData("C7#5", "7")]
     public void Fifth_form_does_not_shadow_altered_fifths(string input, string expectedQuality)
     {
         // The '5' form must only match a bare "5" straight after the root — the

@@ -34,18 +34,18 @@ public static class VoiceLeadRoutes
             [FromServices] ChordParser parser,
             [FromServices] ChordExpander expander) =>
         {
-            var form        = await req.ReadFormAsync();
-            var chordsRaw   = form["chords"].ToString().Trim();
-            var solutions   = int.TryParse(form["solutions"],  out var s) ? Math.Clamp(s, 1, 10) : 1;
+            var form = await req.ReadFormAsync();
+            var chordsRaw = form["chords"].ToString().Trim();
+            var solutions = int.TryParse(form["solutions"], out var s) ? Math.Clamp(s, 1, 10) : 1;
             var minComfortPct = int.TryParse(form["minComfort"], out var mc) ? Math.Clamp(mc, 0, 100) : 70;
-            var minComfort  = minComfortPct / 100.0;
+            var minComfort = minComfortPct / 100.0;
 
             // Sourcing from a song section (D57 bug #6) supplies its own chord
             // list, bars, tuning, and hand constraints — the manual tuning
             // field and typed chords are ignored in that mode.
             var useActiveSection = form["useActiveSection"].Contains("true");
-            var songSlug    = form["songSlug"].ToString();
-            var sectionId   = form["sectionId"].ToString();
+            var songSlug = form["songSlug"].ToString();
+            var sectionId = form["sectionId"].ToString();
 
             string[] chordSymbols;
             int[] bars;
@@ -78,7 +78,7 @@ public static class VoiceLeadRoutes
             }
             else
             {
-                tuning      = form["tuning"].ToString().Trim();
+                tuning = form["tuning"].ToString().Trim();
                 tuningLabel = VoicingRoutes.ResolveLabel(form["tuningName"].ToString(), tuning, catalogs);
 
                 if (string.IsNullOrWhiteSpace(chordsRaw))
@@ -110,7 +110,7 @@ public static class VoiceLeadRoutes
                             $"Invalid chord '{chordSymbols[i]}': {parseErr}"));
 
                 var spec = expander.Expand(sym);
-                var set  = VoicingSearch.Search(spec, resolvedTuning, hand,
+                var set = VoicingSearch.Search(spec, resolvedTuning, hand,
                     searchParams, catalogs.VoicingCategories);
 
                 var voicings = set.Voicings;

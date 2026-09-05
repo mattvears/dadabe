@@ -23,6 +23,9 @@ Thumbs.db
 # Script output
 out/
 
+# Runtime logs
+src/Dadabe.Editor/logs/
+
 # Coverage
 coverage*.xml
 *.coverage

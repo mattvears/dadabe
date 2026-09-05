@@ -1,4 +1,4 @@
-﻿using Dadabe.Editor.Services;
+using Dadabe.Editor.Services;
 using Dadabe.Editor.Slices;
 
 namespace Dadabe.Editor.Routes;
@@ -152,10 +152,10 @@ public static class ReferenceRoutes
 
     private static IResult RenderTabFragment(ReferenceService svc, string tab) => tab switch
     {
-        "modes"               => Results.RazorSlice<ReferenceModeList, IReadOnlyList<ModeModel>>(svc.ListModes()),
-        "scales"              => Results.RazorSlice<ReferenceScaleList, IReadOnlyList<ScaleModel>>(svc.ListScales()),
-        "voicing-categories"  => Results.RazorSlice<ReferenceVoicingCategories, string?>(svc.GetVoicingCategories()),
-        _                     => Results.RazorSlice<ReferenceCadenceList, IReadOnlyList<CadenceModel>>(svc.ListCadences()),
+        "modes" => Results.RazorSlice<ReferenceModeList, IReadOnlyList<ModeModel>>(svc.ListModes()),
+        "scales" => Results.RazorSlice<ReferenceScaleList, IReadOnlyList<ScaleModel>>(svc.ListScales()),
+        "voicing-categories" => Results.RazorSlice<ReferenceVoicingCategories, string?>(svc.GetVoicingCategories()),
+        _ => Results.RazorSlice<ReferenceCadenceList, IReadOnlyList<CadenceModel>>(svc.ListCadences()),
     };
 
     private static async Task<(CadenceModel? model, string error)> ParseCadenceForm(
@@ -165,7 +165,7 @@ public static class ReferenceRoutes
         var type = form["type"].ToString();
         if (string.IsNullOrWhiteSpace(type)) return (null, "Type is required.");
 
-        var slug   = existingSlug ?? DataStore.ToSlug(type + "-" + Guid.NewGuid().ToString("N")[..6]);
+        var slug = existingSlug ?? DataStore.ToSlug(type + "-" + Guid.NewGuid().ToString("N")[..6]);
         var chords = form["chords"].Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c!).ToList();
 
         return (new CadenceModel(
@@ -182,7 +182,7 @@ public static class ReferenceRoutes
         var name = form["name"].ToString();
         if (string.IsNullOrWhiteSpace(name)) return (null, "Name is required.");
 
-        var slug      = existingSlug ?? DataStore.ToSlug(name);
+        var slug = existingSlug ?? DataStore.ToSlug(name);
         var intervals = ParseIntList(form["intervals"].ToString());
         var noteNames = ParseStringList(form["noteNames"].ToString());
 
@@ -201,8 +201,8 @@ public static class ReferenceRoutes
         var name = form["name"].ToString();
         if (string.IsNullOrWhiteSpace(name)) return (null, "Name is required.");
 
-        var slug      = existingSlug ?? DataStore.ToSlug(name);
-        var notes     = ParseStringList(form["notes"].ToString());
+        var slug = existingSlug ?? DataStore.ToSlug(name);
+        var notes = ParseStringList(form["notes"].ToString());
         var intervals = ParseIntList(form["intervals"].ToString());
 
         return (new ScaleModel(

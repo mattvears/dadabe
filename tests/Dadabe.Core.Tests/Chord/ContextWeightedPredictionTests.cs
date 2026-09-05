@@ -39,7 +39,7 @@ public class ContextWeightedPredictionTests
         var context = new[] { Spec("Fmaj7"), Spec("Dm7"), Spec("Cmaj7") }.ToList();
         var results = NextChordPredictor.Predict(spec, 10, entropy: 0.2, context);
 
-        var g7   = results.FirstOrDefault(c => c.Symbol == "G7");
+        var g7 = results.FirstOrDefault(c => c.Symbol == "G7");
         var bbm7 = results.FirstOrDefault(c => c.Symbol == "Bbmaj7");
 
         g7.Should().NotBeNull("G7 is V7 in C major and should appear in predictions for Cmaj7");
@@ -55,10 +55,10 @@ public class ContextWeightedPredictionTests
         var spec = Spec("G7");
         var context = new[] { Spec("Cmaj7") }.ToList();
 
-        var lowEntropy  = NextChordPredictor.Predict(spec, 5, entropy: 0.1, context);
+        var lowEntropy = NextChordPredictor.Predict(spec, 5, entropy: 0.1, context);
         var highEntropy = NextChordPredictor.Predict(spec, 5, entropy: 5.0, context);
 
-        double lowSpread  = lowEntropy.Max(c => c.Probability)  - lowEntropy.Min(c => c.Probability);
+        double lowSpread = lowEntropy.Max(c => c.Probability) - lowEntropy.Min(c => c.Probability);
         double highSpread = highEntropy.Max(c => c.Probability) - highEntropy.Min(c => c.Probability);
 
         lowSpread.Should().BeGreaterThan(highSpread);

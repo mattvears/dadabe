@@ -176,8 +176,14 @@ public static class KeyInference
         if (root.Length == 0) return false;
         int natural = root[0] switch
         {
-            'C' => 0, 'D' => 2, 'E' => 4, 'F' => 5,
-            'G' => 7, 'A' => 9, 'B' => 11, _ => -1,
+            'C' => 0,
+            'D' => 2,
+            'E' => 4,
+            'F' => 5,
+            'G' => 7,
+            'A' => 9,
+            'B' => 11,
+            _ => -1,
         };
         if (natural < 0) return false;
         int acc = 0;

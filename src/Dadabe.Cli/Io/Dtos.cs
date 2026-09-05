@@ -172,8 +172,8 @@ public sealed record PredictionResultDto(
     PredictionMetadataDto? Metadata);
 
 public sealed record PredictionCandidateDto(
-    [property: JsonPropertyName("chord")]   string Chord,
-    [property: JsonPropertyName("score")]   double Score,
+    [property: JsonPropertyName("chord")] string Chord,
+    [property: JsonPropertyName("score")] double Score,
     [property: JsonPropertyName("reasons"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     IReadOnlyList<string>? Reasons);
 
@@ -185,33 +185,33 @@ public sealed record PredictionMetadataDto(
 
 /// <summary>Payload for the <c>transform</c> subcommand.</summary>
 public sealed record TransformResultDto(
-    [property: JsonPropertyName("source")]      IReadOnlyList<string> Source,
-    [property: JsonPropertyName("results")]     IReadOnlyList<TransformVariantDto> Results);
+    [property: JsonPropertyName("source")] IReadOnlyList<string> Source,
+    [property: JsonPropertyName("results")] IReadOnlyList<TransformVariantDto> Results);
 
 public sealed record TransformVariantDto(
-    [property: JsonPropertyName("chain")]       IReadOnlyList<TransformStepDto> Chain,
-    [property: JsonPropertyName("chords")]      IReadOnlyList<string> Chords,
+    [property: JsonPropertyName("chain")] IReadOnlyList<TransformStepDto> Chain,
+    [property: JsonPropertyName("chords")] IReadOnlyList<string> Chords,
     [property: JsonPropertyName("playability"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
                                                 PlayabilityDto? Playability,
     [property: JsonPropertyName("keyBefore"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
                                                 string? KeyBefore,
     [property: JsonPropertyName("keyAfter"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
                                                 string? KeyAfter,
-    [property: JsonPropertyName("notes")]       IReadOnlyList<TransformNoteDto> Notes);
+    [property: JsonPropertyName("notes")] IReadOnlyList<TransformNoteDto> Notes);
 
 public sealed record TransformStepDto(
-    [property: JsonPropertyName("type")]        string Type,
-    [property: JsonPropertyName("params")]      IReadOnlyDictionary<string, string> Params);
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("params")] IReadOnlyDictionary<string, string> Params);
 
 public sealed record PlayabilityDto(
-    [property: JsonPropertyName("worstComfort")]  int WorstComfort,
+    [property: JsonPropertyName("worstComfort")] int WorstComfort,
     [property: JsonPropertyName("totalDistance")] int TotalDistance,
-    [property: JsonPropertyName("minFret")]       int MinFret,
-    [property: JsonPropertyName("maxFret")]       int MaxFret,
-    [property: JsonPropertyName("unplayable")]    IReadOnlyList<string> Unplayable);
+    [property: JsonPropertyName("minFret")] int MinFret,
+    [property: JsonPropertyName("maxFret")] int MaxFret,
+    [property: JsonPropertyName("unplayable")] IReadOnlyList<string> Unplayable);
 
 public sealed record TransformNoteDto(
     [property: JsonPropertyName("index"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
                                                 int? Index,
-    [property: JsonPropertyName("kind")]        string Kind,
-    [property: JsonPropertyName("message")]     string Message);
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("message")] string Message);

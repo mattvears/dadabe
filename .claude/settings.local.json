@@ -13,7 +13,10 @@
       "Bash(powershell.exe -NoProfile -Command ' *)",
       "Bash(powershell.exe -NoProfile -File 'C:\\\\src\\\\dadabe\\\\scripts\\\\generate-voicings.ps1' -DadabeCmd 'C:\\\\src\\\\dadabe\\\\src\\\\Dadabe.Cli\\\\bin\\\\Debug\\\\net10.0\\\\dadabe.exe' -OutDir 'C:\\\\dadabe_out' -Source 'C:\\\\tmp\\\\dadabe-empty' -TopN 5 -Entropy 0.5 -ChartLimit 5)",
       "Bash(powershell.exe *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(rtk *)",
+      "Bash(cd *)",
+      "Bash(powershell *)"
     ]
   }
 }
