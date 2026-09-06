@@ -11,6 +11,15 @@
         <input type="hidden" name="tuning" id="form-tuning" />
         <input type="hidden" name="tuningName" id="form-tuning-name" />
 
+        <p class="form-section-label">Key-aware settings</p>
+        <div class="form-row">
+            <wa-select name="strictness" size="small" value="loose" style="width:160px">
+                <wa-option value="loose">loose (approximate)</wa-option>
+                <wa-option value="strict">strict (skip &amp; report)</wa-option>
+            </wa-select>
+            <wa-input name="keyOverride" size="small" placeholder="Key override, e.g. C or Am" style="width:200px"></wa-input>
+        </div>
+
         <p class="form-section-label">Chain</p>
         <div id="chain-steps">
             <div class="chain-step-wrap" id="chain-step-0">
@@ -27,6 +36,10 @@
                         <wa-option value="reduce">reduce</wa-option>
                         <wa-option value="tritone-sub">tritone-sub</wa-option>
                         <wa-option value="plr">plr</wa-option>
+                        <wa-option value="diatonic-transpose">diatonic-transpose</wa-option>
+                        <wa-option value="parallel-mode">parallel-mode</wa-option>
+                        <wa-option value="substitute">substitute</wa-option>
+                        <wa-option value="negative-harmony">negative-harmony</wa-option>
                     </wa-select>
                     <wa-input name="paramsRaw" size="small" style="flex:1"></wa-input>
                     <wa-button type="button" variant="neutral" size="small" onclick="this.closest('.chain-step-wrap').remove()">
@@ -72,6 +85,10 @@
         'reduce': 'level=triad (triad or seventh)',
         'tritone-sub': 'positions=0,2 (optional 0-based chord indices; omit to affect every dominant)',
         'plr': 'op=P (P, L, or R)',
+        'diatonic-transpose': 'by=1 (scale degrees, not semitones) — positions=0,2 optional',
+        'parallel-mode': 'mode=mixolydian (ionian/dorian/phrygian/lydian/mixolydian/aeolian/locrian) — positions=0,2 optional',
+        'substitute': 'variant=0 (optional — which same-function chord to pick) — positions=0,2 optional',
+        'negative-harmony': 'axis=C (optional — defaults to the inferred key\'s tonic)',
     };
 
     window.onChainStepTypeChange = function (select) {

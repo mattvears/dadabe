@@ -36,8 +36,9 @@ public static class TransformRoutes
 
             var form = await req.ReadFormAsync();
             var chainInputs = ReadChainInputs(form);
+            var options = BuildRequestOptions(form);
             var model = RunTransform(progression, chainInputs, form["tuning"].ToString(), form["tuningName"].ToString(),
-                catalogs, parser, expander);
+                catalogs, parser, expander, options);
             return Results.RazorSlice<Dadabe.Editor.Slices.TransformResult, TransformResultViewModel>(model);
         });
 
@@ -61,7 +62,7 @@ public static class TransformRoutes
 
             var form = await req.ReadFormAsync();
             var name = form["name"].ToString();
-            var (ok, error, chords, derivedFrom) = ApplyChainForCommit(progression, ReadChainInputs(form), catalogs, parser);
+            var (ok, error, chords, derivedFrom) = ApplyChainForCommit(progression, ReadChainInputs(form), catalogs, parser, BuildRequestOptions(form));
             if (!ok) { return ErrorFragment(error!); }
 
             var (createOk, createError) = progressions.Create(name, chords!, progression.Tempo, derivedFrom);
@@ -75,7 +76,7 @@ public static class TransformRoutes
             if (progression is null) { return Results.NotFound(); }
 
             var form = await req.ReadFormAsync();
-            var (ok, error, chords, derivedFrom) = ApplyChainForCommit(progression, ReadChainInputs(form), catalogs, parser);
+            var (ok, error, chords, derivedFrom) = ApplyChainForCommit(progression, ReadChainInputs(form), catalogs, parser, BuildRequestOptions(form));
             if (!ok) { return ErrorFragment(error!); }
 
             var (updateOk, updateError) = progressions.Update(progression.Slug, progression.Name, chords!, progression.Tempo, derivedFrom);
@@ -112,9 +113,29 @@ public static class TransformRoutes
         return dict;
     }
 
+    /// <summary>Builds the D54/D46 request-wide options from the transform panel's strictness select and key-override input, shared by every key-aware transform.</summary>
+    private static TransformRequestOptions BuildRequestOptions(IFormCollection form)
+    {
+        var strictness = string.Equals(form["strictness"].ToString(), "strict", StringComparison.OrdinalIgnoreCase)
+            ? Strictness.Strict
+            : Strictness.Loose;
+
+        (int RootPc, bool IsMinor)? keyOverride = null;
+        var keyText = form["keyOverride"].ToString().Trim();
+        if (!string.IsNullOrEmpty(keyText))
+        {
+            var isMinor = keyText.Length > 1 && keyText.EndsWith('m');
+            var noteText = isMinor ? keyText[..^1] : keyText;
+            if (Note.TryParse(noteText, out var note)) { keyOverride = (note.PitchClass.Value, isMinor); }
+        }
+
+        return new TransformRequestOptions(strictness, keyOverride);
+    }
+
     private static TransformResultViewModel RunTransform(
         ProgressionModel progression, List<(string Type, string ParamsRaw)> chainInputs,
-        string tuningName, string tuningLabel, Catalogs catalogs, ChordParser parser, ChordExpander expander)
+        string tuningName, string tuningLabel, Catalogs catalogs, ChordParser parser, ChordExpander expander,
+        TransformRequestOptions options)
     {
         if (chainInputs.Count == 0)
         {
@@ -126,7 +147,7 @@ public static class TransformRoutes
         try
         {
             var steps = chainInputs.Select(c => new TransformStep(c.Type, ParseParams(c.ParamsRaw))).ToList();
-            result = TransformChain.Apply(catalog, parser, progression.Chords, steps);
+            result = TransformChain.Apply(catalog, parser, progression.Chords, steps, options);
         }
         catch (Exception ex) when (ex is FormatException or ArgumentException or KeyNotFoundException)
         {
@@ -179,7 +200,8 @@ public static class TransformRoutes
 
     /// <summary>Re-applies a chain for a commit action (save/replace), producing the final chord list plus provenance.</summary>
     private static (bool Ok, string? Error, List<string>? Chords, DerivedFrom? DerivedFrom) ApplyChainForCommit(
-        ProgressionModel progression, List<(string Type, string ParamsRaw)> chainInputs, Catalogs catalogs, ChordParser parser)
+        ProgressionModel progression, List<(string Type, string ParamsRaw)> chainInputs, Catalogs catalogs, ChordParser parser,
+        TransformRequestOptions options)
     {
         if (chainInputs.Count == 0) { return (false, "No transform chain to commit.", null, null); }
 
@@ -187,7 +209,7 @@ public static class TransformRoutes
         try
         {
             var steps = chainInputs.Select(c => new TransformStep(c.Type, ParseParams(c.ParamsRaw))).ToList();
-            var result = TransformChain.Apply(catalog, parser, progression.Chords, steps);
+            var result = TransformChain.Apply(catalog, parser, progression.Chords, steps, options);
             var derivedFrom = new DerivedFrom(
                 progression.Slug,
                 steps.Select(s => new TransformStepDto(
@@ -239,6 +261,7 @@ public static class TransformRoutes
         "invert" => new() { ["axis"] = "C" },
         "quality-map" => new() { ["to"] = "m7" },
         "plr" => new() { ["op"] = "P" },
+        "parallel-mode" => new() { ["mode"] = "mixolydian" },
         _ => new(),
     };
 
@@ -249,6 +272,7 @@ public static class TransformRoutes
         "invert" => "axis=C",
         "quality-map" => "to=m7",
         "plr" => "op=P",
+        "parallel-mode" => "mode=mixolydian",
         _ => "",
     };
 
