@@ -80,6 +80,17 @@ public class ChordSymbolEmitTests
         Parser.Parse(input).ToSymbol().Should().Be(expected);
     }
 
+    [Theory]
+    [InlineData("C7sus", "C7sus4")]
+    [InlineData("C13sus", "C13sus4")]
+    [InlineData("C7b9sus4", "C7sus4b9")]
+    public void Sus4_emits_first_among_alterations(string input, string expected)
+    {
+        // D57: sus4 reads immediately after the extension number in real notation
+        // ("G13sus4b9", never "G13b9sus4"), so it sorts first among alterations.
+        Parser.Parse(input).ToSymbol().Should().Be(expected);
+    }
+
     [Fact]
     public void Slash_chord_bass_is_emitted_after_the_chord()
     {

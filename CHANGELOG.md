@@ -7,6 +7,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`sus4` as a modifier, not just a form (D57).** `7sus4`, `9sus4`, `13sus4` (and the
+  `sus`/`sus4` shorthand — `E13sus`) now parse: `sus4`/`sus` is registered as an alteration
+  modifier (`displaces: "3"`, adds `"4"`) alongside `b5`/`#5`/etc., composing with any form
+  that has a plain 3rd to displace and with other alterations in the same symbol
+  (`E7sus4b9`). Previously `sus4`/`sus`/`sus2` existed only as standalone triad forms, so
+  the far more common extended-dominant-sus chords from real chord charts couldn't be typed
+  at all. The reverse order (`Esus13`) is intentionally not supported — it isn't standard
+  notation and would require the parser to backtrack past a form it already committed to.
+  New `docs/chord-grammar.md` documents the form/modifier/extension/alteration model this
+  fix builds on.
+
+### Fixed
+
+- Clarified `docs/v0.6/design.md` §1: the strict/loose split only ever concerns the triad
+  quality baked into `ChordSymbol.Quality` (`maj7`, `9`, `13`, etc.) — `Extensions`
+  (`add9`/`add11`/`add13`) and other `Alterations` always survive a key-aware transform
+  untouched, in both modes. The doc's original "triad-reduce then re-extend" phrasing
+  implied loose mode reconstructs an equivalent seventh on the new triad; it does not — it
+  reassigns a bare triad quality outright (`Cmaj7` → `Cm`, not `Cm7`).
+
 ## [v0.6] — 2026-09-05 — Key-aware transforms
 
 ### Added

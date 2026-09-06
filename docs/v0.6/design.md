@@ -47,7 +47,7 @@ where approximation is often what the user actually wants.
 | Mode | Behaviour |
 | --- | --- |
 | `strict` | Skip anything the transform cannot express exactly; report every skip |
-| `loose` | Approximate (nearest diatonic, triad-reduce then re-extend) and flag every approximation |
+| `loose` | Approximate (nearest diatonic, triad-reduce and reassign quality) and flag every approximation |
 
 A single setting on the request, surfaced in the transform panel. The alternative — a
 per-transform policy — was rejected because users cannot predict it and because it
@@ -58,6 +58,29 @@ key-aware transform actually want; `strict` remains available but is not the def
 which reverses the leaning stated earlier in this section.
 
 **This blocked §3 and §4; both are now unblocked on this decision.**
+
+### Extensions and alterations under strict/loose
+
+The `strict`/`loose` split only ever concerns the *triad quality itself* — see
+[Extensions vs. alterations, in `ChordSymbol`](../chord-grammar.md#extensions-vs-alterations-in-chordsymbol)
+for the underlying distinction. Two cases, handled differently by construction:
+
+- **`ChordSymbol.Extensions`/`.Alterations`** (`add9`, `add11`, `add13`, `b5`, `#5`, `b9`,
+  `#9`, `#11`, `b13`, `sus4`) **always survive untouched**, in both modes. A chord like
+  `Cadd9` transposes cleanly with no note at all — its `Quality` (`""`) is already a plain
+  triad, so it's outside the strict/loose branch entirely; `add9` just rides along on the
+  `with { Root = ... }`/`with { Quality = ... }` copy.
+- **A seventh or extension baked into `Quality` itself** (`maj7`, `m7`, `9`, `11`, `13`,
+  `dim7`, `m7b5`, `mMaj7`, `6`) is what strict/loose actually governs. `strict` skips the
+  chord and reports it; `loose` does **not** reconstruct an equivalent seventh on the new
+  triad — despite "re-extend" suggesting otherwise, the implementation (`ChordApproximation.
+  TryApplyTriadQuality`) triad-reduces and reassigns the new bare triad quality outright
+  (`Cmaj7` → `Cm`, not `Cm7` or `CmMaj7`), flagged with an `"approximated"` note so the
+  simplification is visible rather than silent.
+
+Put concretely: `E13sus4add9`'s `add9` extension is preserved by every key-aware transform
+regardless of strictness, but the `13`-ness of its `Quality` is the part that gets
+triad-reduced away in `loose` mode (or skipped in `strict`).
 
 ## 2. Out-of-key chord policy (D46) — [KEY] — Resolved
 

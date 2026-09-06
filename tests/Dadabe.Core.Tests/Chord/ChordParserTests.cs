@@ -69,6 +69,46 @@ public class ChordParserTests
     }
 
     [Theory]
+    [InlineData("E7sus4", "7")]
+    [InlineData("E7sus", "7")]
+    [InlineData("E9sus4", "9")]
+    [InlineData("E13sus4", "13")]
+    [InlineData("E13sus", "13")]
+    public void Sus4_combines_with_extended_dominant_forms(string input, string expectedQuality)
+    {
+        // D57: sus4 is also a modifier (not just a standalone form), so it can
+        // displace the 3rd on any dominant/major form — the real-world
+        // fakebook notation for 7sus4/9sus4/13sus4 chords.
+        var chord = Parser.Parse(input);
+        chord.Quality.Should().Be(expectedQuality);
+        chord.Alterations.Should().Contain("sus4");
+    }
+
+    [Fact]
+    public void Sus4_displaces_the_third_and_adds_the_fourth()
+    {
+        var spec = new ChordExpander(Grammar).Expand(Parser.Parse("E7sus4"));
+        spec.Tones.Select(t => t.Function).Should().NotContain("3");
+        spec.Tones.Select(t => t.Function).Should().Contain("4");
+        spec.Required.Should().Contain("4");
+    }
+
+    [Fact]
+    public void Sus4_and_an_alteration_combine_in_either_order()
+    {
+        var ab = Parser.Parse("E7sus4b9");
+        var ba = Parser.Parse("E7b9sus4");
+        ab.Alterations.Should().BeEquivalentTo(ba.Alterations);
+    }
+
+    [Fact]
+    public void Esus13_is_not_valid_notation_sus_must_follow_the_extension_number()
+    {
+        var act = () => Parser.Parse("Esus13");
+        act.Should().Throw<FormatException>();
+    }
+
+    [Theory]
     [InlineData("C/G", Letter.C, 0, "", Letter.G, 0)]
     [InlineData("Cmaj7/E", Letter.C, 0, "maj7", Letter.E, 0)]
     [InlineData("Fmaj7/A", Letter.F, 0, "maj7", Letter.A, 0)]

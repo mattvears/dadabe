@@ -40,7 +40,7 @@ public sealed record ChordSymbol(
     // Grammar-declared order (ChordGrammar.json "modifiers"), not input order — normalising
     // is the point: C7#9b13 and C7b13#9 both emit as C7#9b13 (D44).
     private static readonly ImmutableArray<string> ExtensionOrder = ["add9", "add11", "add13"];
-    private static readonly ImmutableArray<string> AlterationOrder = ["b5", "#5", "b9", "#9", "#11", "b13"];
+    private static readonly ImmutableArray<string> AlterationOrder = ["sus4", "b5", "#5", "b9", "#9", "#11", "b13"];
 
     /// <summary>
     /// Renders this symbol back to a string the parser accepts:

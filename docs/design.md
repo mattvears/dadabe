@@ -1,5 +1,9 @@
 # Dadabe documentation index
 
+## Reference
+
+- **Chord symbol grammar** (forms, extensions, alterations, canonical emission): `docs/chord-grammar.md`
+
 ## Current work
 
 - **v0.5.2 — Transform Engine + Song Mode Foundation**: `docs/v0.5.2/design.md`

@@ -247,6 +247,9 @@
     { "tokens": ["add13"], "kind": "addition",
       "addTones": [{ "function": "13", "semitones": 21 }], "required": ["13"] },
 
+    { "tokens": ["sus4", "sus"], "kind": "alteration", "displaces": "3",
+      "addTones": [{ "function": "4", "semitones": 5 }], "required": ["4"] },
+
     { "tokens": ["b5"],  "kind": "alteration", "displaces": "5",
       "addTones": [{ "function": "b5",  "semitones": 6  }], "required": ["b5"] },
     { "tokens": ["#5"],  "kind": "alteration", "displaces": "5",
