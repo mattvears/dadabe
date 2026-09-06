@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [v0.6] — 2026-09-05 — Key-aware transforms
+
 ### Added
 
 - **Strictness policy (D54) and out-of-key chord policy (D46).** New `TransformRequestOptions`
