@@ -9,6 +9,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Strictness policy (D54) and out-of-key chord policy (D46).** New `TransformRequestOptions`
+  (`Strictness: Strict | Loose`, optional key override) threaded through `TransformChain.Apply`
+  via two reserved step-parameter keys, so the eleven existing key-blind transforms are
+  unaffected. Defaults to `loose`: approximate (nearest diatonic, triad-reduce then re-extend)
+  and flag every approximation, rather than v0.5.2's blanket skip-and-report. An out-of-key
+  chord chromatic-transposes with quality left alone and is always flagged (`out-of-key` note,
+  never silent); a progression `KeyInference.InferKey` cannot resolve (below 50% coverage)
+  produces a uniform `needs-key` note instead of falling back to C major.
+- **Key-aware transform family (D47)**: `diatonic-transpose` (moves by scale degree, not
+  semitone — quality changes as a side effect), `parallel-mode` (rebuilds each chord on its
+  degree in a different mode of the same tonic; a `positions` param doubles as selective
+  borrowing), `substitute` (functional-group substitution — tonic/subdominant/dominant — chosen
+  by live common-tone count rather than a fixed per-key table), and `negative-harmony` (mirrors
+  roots about the inferred key's tonic and flips major↔minor). `TransformCatalog` grows from
+  eleven to fifteen registered transforms. Built on new shared `Dadabe.Core.Transform` helpers —
+  `KeyAwareTransform` (key resolution + the strict/loose branch), `ScaleTriads` (generalizes
+  `KeyInference`'s degree/quality table to any 7-note scale), `ChordApproximation` (the
+  triad-reduce-and-reassign-quality logic, shared with a refactored `ReduceTransform`) — plus a new
+  Core-native `DiatonicModes` table (ionian…locrian), kept separate from the Editor's
+  reference-glossary `ModeModel` catalog and cross-checked against it in tests.
+- Editor transform panel gains request-level strictness and key-override controls (shared by
+  every key-aware transform) plus the four new transform types in the chain-step select; the
+  CLI `transform` subcommand's `--all` discovery mode and single-arg (`type:value`) shorthand
+  are extended to match.
+
+---
+
+## [v0.5.4] — 2026-09-05 — Transform engine, song mode, and comfort model refinements
+
+Covers what shipped across the v0.5.2/v0.5.3 development commits and was tagged as v0.5.4;
+this range was never split into per-patch changelog entries, so it is recorded here as one.
+
+### Added
+
 - Power-chord (fifth) support. New `5` form in `ChordGrammar.json` — `C5`, `F#5`, `Bb5`
   parse to root + perfect fifth with no third. Unlike the triad forms, `required` lists
   `1` alongside `5`, since a rootless root-and-fifth dyad has no meaning.
