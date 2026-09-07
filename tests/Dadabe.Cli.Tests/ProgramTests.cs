@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using FluentAssertions;
 
 namespace Dadabe.Cli.Tests;
@@ -59,6 +60,72 @@ public class ProgramTests
         try
         {
             Run("tuning", "NOT_A_TUNING", "--out", path).Should().Be(1);
+        }
+        finally
+        {
+            if (File.Exists(path)) { File.Delete(path); }
+        }
+    }
+
+    // ---- voicings: nothing exercised the CLI parser's own option wiring for
+    // this command before v0.6.1 adds --inversion alongside --require-root
+    // here (docs/v0.6.1/design.md §1.8) — these pin the existing wiring so a
+    // mistake in the new option doesn't silently also break an old one.
+
+    [Fact]
+    public void Voicings_command_succeeds_via_the_CLI_parser()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "dadabe-prog-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            Run("voicings", "Cmaj7", "--tuning", "STANDARD", "--out", path).Should().Be(0);
+            File.Exists(path).Should().BeTrue();
+            var root = JsonNode.Parse(File.ReadAllText(path))!.AsObject();
+            root["data"]!["voicings"]!.AsArray().Should().NotBeEmpty();
+        }
+        finally
+        {
+            if (File.Exists(path)) { File.Delete(path); }
+        }
+    }
+
+    [Fact]
+    public void Voicings_command_with_bad_chord_returns_exit_one()
+    {
+        Run("voicings", "NotAChord", "--out", "ignored.json").Should().Be(1);
+    }
+
+    [Fact]
+    public void Require_root_flag_reaches_SearchParams_and_excludes_rootless_voicings()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "dadabe-prog-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            // Fm7's default floor omits the root (D4), so --require-root must
+            // visibly change the result if the flag is actually threaded
+            // through to SearchParams.RequireRoot rather than just parsed.
+            Run("voicings", "Fm7", "--tuning", "STANDARD", "--require-root", "--out", path).Should().Be(0);
+            var voicings = JsonNode.Parse(File.ReadAllText(path))!["data"]!["voicings"]!.AsArray();
+            voicings.Should().NotBeEmpty();
+            static bool HasRootFunction(JsonNode? v) => v!["positions"]!.AsArray()
+                .Any(p => p!["function"]?.GetValue<string>() == "1");
+            voicings.All(HasRootFunction).Should().BeTrue("--require-root must exclude every rootless voicing");
+        }
+        finally
+        {
+            if (File.Exists(path)) { File.Delete(path); }
+        }
+    }
+
+    [Fact]
+    public void Min_comfort_flag_reaches_VoicingsCommand_and_filters_results()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "dadabe-prog-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            Run("voicings", "Cmaj7", "--tuning", "STANDARD", "--min-comfort", "1.1", "--out", path).Should().Be(0);
+            var voicings = JsonNode.Parse(File.ReadAllText(path))!["data"]!["voicings"]!.AsArray();
+            voicings.Should().BeEmpty("no voicing can score above the 0.0-1.0 comfort ceiling");
         }
         finally
         {

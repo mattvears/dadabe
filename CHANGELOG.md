@@ -9,6 +9,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Regression-coverage pass ahead of v0.6.1** (`docs/v0.6.1/design.md`'s inversions and
+  open-position/resonance work): `SearchParams.ContentHash` had no direct tests despite
+  D58 adding a new field to it — `SearchParamsTests` now pins which fields participate and
+  that `Categories` hashes order-independently. `VoicingsCommand.Run`'s `minComfort` filter
+  and slash-bass-unreachable warning had no direct tests either, despite `minResonance` (D59)
+  and the inversion-unreachable warning (D58) following those exact patterns —
+  `VoicingsCommandTests` covers both. The `voicings` CLI command had never been exercised
+  through the actual argument parser at all (only `chord`/`tuning` were); `ProgramTests`
+  gained coverage that `--require-root` and `--min-comfort` actually reach `SearchParams`/
+  `VoicingsCommand.Run`, the exact spot `--inversion` will be wired in next to.
 - **`sus4` as a modifier, not just a form (D57).** `7sus4`, `9sus4`, `13sus4` (and the
   `sus`/`sus4` shorthand — `E13sus`) now parse: `sus4`/`sus` is registered as an alteration
   modifier (`displaces: "3"`, adds `"4"`) alongside `b5`/`#5`/etc., composing with any form
