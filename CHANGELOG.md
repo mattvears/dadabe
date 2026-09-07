@@ -32,6 +32,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- **`ChordExpander` modifier collisions on the same pitch class.** Applying a modifier that
+  adds a tone an octave apart from one already present (e.g. `sus4`'s `4` vs. a stacked
+  `13`'s `11` — same pitch class, different octave) now drops the existing tone instead of
+  leaving both. `Reachability` keys chord tones by pitch class, so `E13sus` was keeping an
+  unreachable stacked `11` alongside the sus `4` on the same pitch class. The newly-applied
+  tone always wins, so the grammar doesn't need to spell out every such collision via
+  `displaces`.
 - Clarified `docs/v0.6/design.md` §1: the strict/loose split only ever concerns the triad
   quality baked into `ChordSymbol.Quality` (`maj7`, `9`, `13`, etc.) — `Extensions`
   (`add9`/`add11`/`add13`) and other `Alterations` always survive a key-aware transform

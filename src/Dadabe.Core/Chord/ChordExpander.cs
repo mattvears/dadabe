@@ -128,6 +128,23 @@ public sealed class ChordExpander
         }
         foreach (var add in mod.AddTones)
         {
+            // A tone an octave apart from `add` (e.g. "11" and "4", or "13" and
+            // "6") shares its pitch class. Two such tones can never coexist in a
+            // ChordSpec (Reachability keys tones by pitch class), so whichever
+            // extension is already present loses to the one being applied now —
+            // this is what makes e.g. "13sus4" drop the stacked 11 in favor of
+            // the sus 4 without the grammar needing to spell out every such
+            // collision via "displaces".
+            var addPc = ((add.Semitones % 12) + 12) % 12;
+            for (var i = tones.Count - 1; i >= 0; i--)
+            {
+                var pc = ((tones[i].Semitones % 12) + 12) % 12;
+                if (pc == addPc)
+                {
+                    required.Remove(tones[i].Function);
+                    tones.RemoveAt(i);
+                }
+            }
             tones.Add(add);
         }
         foreach (var r in mod.Required)

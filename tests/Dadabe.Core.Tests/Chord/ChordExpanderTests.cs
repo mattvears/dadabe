@@ -161,6 +161,18 @@ public class ChordExpanderTests
     }
 
     [Fact]
+    public void E13sus_drops_the_stacked_11_in_favor_of_the_sus_4()
+    {
+        // "13" stacks a natural 11 alongside the 3rd; sus4 displaces the 3rd
+        // but the 11 and the sus 4 are the same pitch class an octave apart,
+        // so keeping both would give Reachability two chord tones on pc 9.
+        var spec = Expand("E13sus");
+        Functions(spec).Should().Contain("4");
+        Functions(spec).Should().NotContain("11");
+        spec.PitchClasses.Select(pc => pc.Value).Should().OnlyHaveUniqueItems();
+    }
+
+    [Fact]
     public void Memo_cache_returns_identical_spec()
     {
         var cache = new InMemoryMemo<ChordSymbol, ChordSpec>();
